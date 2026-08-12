@@ -1,0 +1,116 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: senaite.trimeta.samplefields 1.0.0\n"
+"POT-Creation-Date: 2026-07-28 00:00+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: fr\n"
+"Language-Team: Trimeta Group\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Domain: senaite.trimeta.samplefields\n"
+
+msgid "Sample Code"
+msgstr "Code echantillon"
+
+msgid "Unique internal code assigned to the sample."
+msgstr "Code interne unique attribue a l'echantillon."
+
+msgid "Sample Reference"
+msgstr "Reference de l'echantillon"
+
+msgid "Designation"
+msgstr "Designation"
+
+msgid "Reception Weight (g)"
+msgstr "Poids a la reception (g)"
+
+msgid "Quantity Received"
+msgstr "Quantite recue"
+
+msgid "Quantity Under Analysis (g)"
+msgstr "Quantite mise sous analyse (g)"
+
+msgid "Technical Sample Weight (g)"
+msgstr "Poids de l'echantillon-tech (g)"
+
+msgid "Reception Temperature (deg C)"
+msgstr "Temperature a la reception (deg C)"
+
+msgid "Sample Condition"
+msgstr "Condition de l'echantillon"
+
+msgid "Packaging Condition"
+msgstr "Etat de l'emballage"
+
+msgid "Origin"
+msgstr "Provenance"
+
+msgid "Supplier / Customer Details"
+msgstr "Detail fournisseur / client"
+
+msgid "Received By"
+msgstr "Personne ayant receptionne"
+
+msgid "Contract"
+msgstr "Contrat"
+
+msgid "Lab Entry Voucher"
+msgstr "BE LABO (bon d'entree)"
+
+msgid "Raw material"
+msgstr "Matiere premiere"
+
+msgid "Finished product"
+msgstr "Produit fini"
+
+msgid "Semi-finished product"
+msgstr "Produit semi-fini"
+
+msgid "Water"
+msgstr "Eau"
+
+msgid "Packaging"
+msgstr "Emballage"
+
+msgid "Other"
+msgstr "Autre"
+
+msgid "Compliant"
+msgstr "Conforme"
+
+msgid "Non-compliant"
+msgstr "Non conforme"
+
+msgid "Vacuum-sealed"
+msgstr "Sous vide"
+
+msgid "Zip bag"
+msgstr "Sachet zip"
+
+msgid "Kraft paper"
+msgstr "Kraft"
+
+msgid "Antananarivo"
+msgstr "Antananarivo"
+
+msgid "Toamasina"
+msgstr "Toamasina"
+
+msgid "Sambava"
+msgstr "Sambava"
+
+msgid "Almavillas"
+msgstr "Almavillas"
+
+msgid "External / Client"
+msgstr "Externe / Client"
+
+msgid "Reception Agent 1"
+msgstr "Agent reception 1"
+
+msgid "Reception Agent 2"
+msgstr "Agent reception 2"
+
+msgid "Lab Manager"
+msgstr "Responsable laboratoire"

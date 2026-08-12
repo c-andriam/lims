@@ -1,0 +1,3 @@
+setuptools
+senaite.core
+archetypes.schemaextender

@@ -1,0 +1,7 @@
+2026-07-27T08:24:21 (20) created PID file '/data/zeoserver/zeoserver.pid'
+2026-07-27T08:24:21 (20) opening storage u'1' using FileStorage
+2026-07-27T08:24:21 (20) Blob directory /data/blobstorage does not exist. Selected `bushy` layout. 
+2026-07-27T08:24:21 (20) Blob directory '/data/blobstorage/' does not exist. Created new directory.
+2026-07-27T08:24:21 (20) Blob temporary directory '/data/blobstorage/tmp' does not exist. Created new directory.
+2026-07-27T08:24:21 StorageServer created RW with storages: 1:RW:/data/filestorage/Data.fs
+2026-07-27T08:24:21 listening on ('', 8080)

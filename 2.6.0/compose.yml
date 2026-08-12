@@ -1,0 +1,17 @@
+services:
+  senaite:
+    image: docker.io/senaite/senaite:v2.6.0
+    container_name: senaite
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - senaite-data:/data
+      - ./addons/senaite.trimeta.samplefields:/home/senaite/senaitelims/src/senaite.trimeta.samplefields
+      - ./custom.cfg:/home/senaite/senaitelims/custom.cfg
+    environment:
+      - SITE=senaite
+      - PASSWORD=bebex
+      - TZ=Indian/Antananarivo
+volumes:
+  senaite-data:

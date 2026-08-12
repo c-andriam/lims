@@ -1,0 +1,13 @@
+Metadata-Version: 1.1
+Name: senaite.trimeta.samplefields
+Version: 1.0.0
+Summary: Champs personnalises Reception/Analyse pour SENAITE LIMS - Trimeta Group
+Home-page: https://github.com/candriam/senaite.trimeta.samplefields
+Author: Trimeta Group / Juvence Andriamampionona (candriam)
+Author-email: UNKNOWN
+License: GPL-2.0
+Description: Add-on ajoutant les champs obligatoires et facultatifs requis dans les sections Reception et Analyse des caracteristiques des echantillons.
+Keywords: senaite lims trimeta samplefields
+Platform: UNKNOWN
+Classifier: Framework :: Plone
+Classifier: Programming Language :: Python

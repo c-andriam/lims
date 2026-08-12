@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="senaite.trimeta.samplefields">
+
+  <!-- Sert le dossier resources/ sous ++resource++senaite.trimeta.samplefields.static -->
+  <browser:resourceDirectory
+      name="senaite.trimeta.samplefields.static"
+      directory="resources"
+      />
+
+  <!-- Injecte le script uniquement sur les pages ar_add -->
+  <browser:viewlet
+      name="senaite.trimeta.samplefields.reception_separator"
+      manager="plone.app.layout.viewlets.interfaces.IHtmlHead"
+      class=".viewlets.ReceptionSeparatorViewlet"
+      permission="zope2.View"
+      layer="bika.lims.interfaces.IBikaLIMS"
+      />
+
+</configure>

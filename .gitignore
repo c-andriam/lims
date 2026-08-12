@@ -1,6 +1,5 @@
 *.pyc
 __pycache__/
-data/
 *.tar.gz
 Dockerfile
 buildout.cfg
