@@ -1,0 +1,12 @@
+*.pyc
+__pycache__/
+data/
+*.tar.gz
+Dockerfile
+buildout.cfg
+build_deps.txt
+run_deps.txt
+requirements.txt
+docker-entrypoint.sh
+docker-initialize.py
+docker-compose.yml.orig
