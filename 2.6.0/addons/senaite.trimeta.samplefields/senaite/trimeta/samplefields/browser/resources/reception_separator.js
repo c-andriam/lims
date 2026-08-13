@@ -215,9 +215,9 @@
       var filtered = items.filter(function (v) {
         return v.toLowerCase().indexOf(lower) !== -1;
       });
-      if (filtered.length === 0) {
-        return;
-      }
+      // On affiche toujours le menu (meme vide) pour signaler que ce
+      // champ accepte des suggestions dynamiques, meme s'il n'y en a
+      // pas encore d'enregistree.
 
       var dropdown = document.createElement("div");
       dropdown.className = "trimeta-suggest-dropdown";
@@ -296,6 +296,14 @@
         row.appendChild(remove);
         dropdown.appendChild(row);
       });
+
+      if (filtered.length === 0) {
+        var empty = document.createElement("div");
+        empty.textContent = "No suggestions yet";
+        empty.style.cssText =
+          "padding:8px 10px;color:#bbb;font-style:italic;font-size:12px;";
+        dropdown.appendChild(empty);
+      }
 
       document.body.appendChild(dropdown);
     });
