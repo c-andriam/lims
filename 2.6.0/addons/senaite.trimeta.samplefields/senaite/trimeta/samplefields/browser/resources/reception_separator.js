@@ -223,30 +223,45 @@
       dropdown.className = "trimeta-suggest-dropdown";
       dropdown.style.cssText =
         "position:absolute;z-index:9999;background:#fff;" +
-        "border:1px solid #ccc;border-radius:3px;" +
-        "box-shadow:0 2px 6px rgba(0,0,0,0.15);" +
-        "max-height:180px;overflow-y:auto;font-size:13px;";
+        "border:1px solid #d6d6d6;border-radius:2px;" +
+        "box-shadow:0 2px 6px rgba(0,0,0,0.12);" +
+        "max-height:200px;overflow-y:auto;font-size:13px;" +
+        "font-family:inherit;";
 
       var rect = input.getBoundingClientRect();
       dropdown.style.left = (rect.left + window.scrollX) + "px";
       dropdown.style.top = (rect.bottom + window.scrollY) + "px";
-      dropdown.style.width = Math.max(rect.width, 180) + "px";
+      dropdown.style.width = Math.max(rect.width, 200) + "px";
+
+      // En-tete discret, dans le style des colonnes du widget de
+      // recherche natif (ex: "Nom" / "Identifiant" pour Client).
+      var header = document.createElement("div");
+      header.textContent = "Suggestions";
+      header.style.cssText =
+        "padding:6px 10px;font-weight:600;font-size:11px;" +
+        "text-transform:uppercase;letter-spacing:0.03em;" +
+        "color:#888;background:#fafafa;" +
+        "border-bottom:1px solid #eee;";
+      dropdown.appendChild(header);
 
       filtered.forEach(function (value) {
         var row = document.createElement("div");
         row.style.cssText =
           "display:flex;justify-content:space-between;" +
-          "align-items:center;padding:5px 8px;cursor:pointer;";
+          "align-items:center;padding:6px 10px;cursor:pointer;" +
+          "border-bottom:1px solid #f5f5f5;";
         row.onmouseenter = function () {
-          row.style.background = "#f0f5ff";
+          row.style.background = "#f0f0f0";
+          remove.style.visibility = "visible";
         };
         row.onmouseleave = function () {
           row.style.background = "";
+          remove.style.visibility = "hidden";
         };
 
         var label = document.createElement("span");
         label.textContent = value;
-        label.style.flex = "1";
+        label.style.cssText = "flex:1;color:#333;";
         label.onmousedown = function (e) {
           e.preventDefault();
           input.value = value;
@@ -258,12 +273,16 @@
         remove.textContent = "\u2715";
         remove.title = "Remove suggestion";
         remove.style.cssText =
-          "color:#999;padding:0 4px;margin-left:6px;cursor:pointer;";
+          "color:#aaa;padding:2px 5px;margin-left:6px;" +
+          "cursor:pointer;visibility:hidden;font-size:11px;" +
+          "border-radius:2px;";
         remove.onmouseenter = function () {
-          remove.style.color = "#c00";
+          remove.style.color = "#fff";
+          remove.style.background = "#c00";
         };
         remove.onmouseleave = function () {
-          remove.style.color = "#999";
+          remove.style.color = "#aaa";
+          remove.style.background = "";
         };
         remove.onmousedown = function (e) {
           e.preventDefault();
@@ -328,6 +347,27 @@
     });
   }
 
+  function addSuggestionRemote(fieldname, value) {
+    value = (value || "").trim();
+    if (!value) {
+      return;
+    }
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", getApiUrl(), true);
+    xhr.setRequestHeader(
+      "Content-Type", "application/x-www-form-urlencoded"
+    );
+    xhr.onload = function () {
+      // Invalide le cache pour ce champ afin que la prochaine
+      // ouverture du menu propose bien la valeur tout juste ajoutee.
+      delete suggestionCache[fieldname];
+    };
+    xhr.send(
+      "action=add&field=" + encodeURIComponent(fieldname) +
+      "&value=" + encodeURIComponent(value)
+    );
+  }
+
   function attachSuggestBehavior(fieldname) {
     var $ = window.jQuery;
     var elements = findAllFieldElements($, fieldname);
@@ -345,8 +385,16 @@
       input.addEventListener("input", function () {
         buildDropdown(input, fieldname, input.value);
       });
+      // Valide (= enregistre comme suggestion future) des que le
+      // champ perd le focus (changement de champ) ou sur Entree.
       input.addEventListener("blur", function () {
+        addSuggestionRemote(fieldname, input.value);
         setTimeout(closeAllDropdowns, 150);
+      });
+      input.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.keyCode === 13) {
+          addSuggestionRemote(fieldname, input.value);
+        }
       });
     });
     registerGlobalClickListener();

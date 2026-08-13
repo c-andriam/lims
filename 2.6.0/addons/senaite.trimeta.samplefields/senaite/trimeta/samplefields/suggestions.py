@@ -90,14 +90,29 @@ def on_sample_added(obj, event):
     created. Reads the 5 free-text fields and remembers any non-empty
     value as a future suggestion.
     """
+    logger.warning(
+        "### TRIMETA: on_sample_added APPELE pour obj=%r (id=%s) ###",
+        obj, getattr(obj, "getId", lambda: "?")(),
+    )
     try:
         for fieldname in SUGGESTION_FIELDS:
             field = obj.getField(fieldname)
             if field is None:
+                logger.warning(
+                    "### TRIMETA: champ %s introuvable sur l'objet ###",
+                    fieldname,
+                )
                 continue
             value = field.get(obj)
+            logger.warning(
+                "### TRIMETA: champ %s = %r ###", fieldname, value
+            )
             if value:
                 add_suggestion(fieldname, value)
+                logger.warning(
+                    "### TRIMETA: suggestion ajoutee pour %s: %r ###",
+                    fieldname, value,
+                )
     except Exception:
         # Never let suggestion-tracking break sample creation.
         logger.exception(

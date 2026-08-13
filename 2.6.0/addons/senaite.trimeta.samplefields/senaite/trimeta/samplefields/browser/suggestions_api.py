@@ -57,4 +57,8 @@ class SuggestionsAPI(BrowserView):
             suggestions.remove_suggestion(fieldname, value)
             return json.dumps({"success": True})
 
+        if action == "add":
+            suggestions.add_suggestion(fieldname, value)
+            return json.dumps({"success": True})
+
         return json.dumps({"success": False, "error": "unknown action"})
