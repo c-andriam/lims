@@ -37,6 +37,9 @@ msgstr "Poids de l'echantillon-tech (g)"
 msgid "Reception Temperature (deg C)"
 msgstr "Temperature a la reception (deg C)"
 
+msgid "Must be between 15 and 31 deg C."
+msgstr "Doit etre comprise entre 15 et 31 deg C."
+
 msgid "Sample Condition"
 msgstr "Condition de l'echantillon"
 

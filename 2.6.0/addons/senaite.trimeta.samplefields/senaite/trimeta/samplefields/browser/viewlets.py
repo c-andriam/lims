@@ -18,6 +18,8 @@ logger = logging.getLogger("senaite.trimeta.samplefields")
 
 SCRIPT_TAG = (
     '<script type="text/javascript" '
+    'id="trimeta-samplefields-script" '
+    'data-portal-url="%s" '
     'src="%s/++resource++senaite.trimeta.samplefields.static/'
     'reception_separator.js"></script>'
 )
@@ -48,4 +50,4 @@ class ReceptionSeparatorViewlet(ViewletBase):
         if "/ar_add" not in request_url:
             return ""
         portal_url = self.portal_state.portal_url()
-        return STYLE_TAG + (SCRIPT_TAG % portal_url)
+        return STYLE_TAG + (SCRIPT_TAG % (portal_url, portal_url))

@@ -5,6 +5,14 @@ Extension de schema pour le type Sample (AnalysisRequest) de SENAITE.
 Ajoute les 15 champs de la section RECEPTION demandes par Trimeta Group.
 Utilise archetypes.schemaextender, la methode standard pour etendre un
 schema Archetypes sans toucher au code core de SENAITE.
+
+Designation, Sample Condition, Packaging Condition, Origin et
+Received By sont des champs texte libre avec autocompletion
+dynamique et partagee (voir suggestions.py + browser/suggestions_api.py
++ resources/reception_separator.js), plutot que des listes
+deroulantes fixes.
+
+Reception Temperature reste une liste deroulante stricte 15-31 degC.
 """
 
 from AccessControl import ClassSecurityInfo
@@ -15,6 +23,18 @@ from Products.Archetypes.public import (
     StringWidget,
     DecimalWidget,
 )
+from archetypes.schemaextender.field import ExtensionField
+from archetypes.schemaextender.interfaces import IOrderableSchemaExtender
+from zope.component import adapts
+from zope.interface import implementer
+from zope.i18nmessageid import MessageFactory
+
+from bika.lims.interfaces import IAnalysisRequest
+
+from senaite.trimeta.samplefields import vocabularies as vocab
+from senaite.trimeta.samplefields import PRODUCT_NAME
+
+_ = MessageFactory("senaite.trimeta.samplefields")
 
 # Visibilite explicite requise pour que nos champs apparaissent dans la
 # grille "Request new analyses" (mode 'add'). Sans cela, les widgets AT
@@ -25,18 +45,6 @@ ADD_VISIBLE = {
     "view": "visible",
     "add": "edit",
 }
-from archetypes.schemaextender.field import ExtensionField
-from archetypes.schemaextender.interfaces import IOrderableSchemaExtender
-from zope.component import adapts
-from zope.interface import implementer
-
-from bika.lims.interfaces import IAnalysisRequest
-from zope.i18nmessageid import MessageFactory
-
-_ = MessageFactory("senaite.trimeta.samplefields")
-
-from senaite.trimeta.samplefields import vocabularies as vocab
-from senaite.trimeta.samplefields import PRODUCT_NAME
 
 
 # --- Champs custom (ExtensionField = version "extensible" des champs AT) ---
@@ -47,7 +55,7 @@ class ExtStringField(ExtensionField, StringField):
 
 
 class ExtFixedPointField(ExtensionField, FixedPointField):
-    """Champ numerique (poids, quantite, temperature) extensible."""
+    """Champ numerique (poids, quantite) extensible."""
     security = ClassSecurityInfo()
 
 
@@ -57,9 +65,8 @@ class ReceptionFieldsExtender(object):
 
     adapts(IAnalysisRequest)
 
-    # ---------------------------------------------------------------
-    # 1. Code echantillon
     fields = [
+        # 1. Sample Code
         ExtStringField(
             "SampleCode",
             required=True,
@@ -72,7 +79,7 @@ class ReceptionFieldsExtender(object):
             ),
         ),
 
-        # 2. Reference de l'echantillon
+        # 2. Sample Reference
         ExtStringField(
             "SampleReference",
             required=True,
@@ -84,20 +91,18 @@ class ReceptionFieldsExtender(object):
             ),
         ),
 
-        # 3. Designation (liste deroulante)
+        # 3. Designation - texte libre avec autocompletion dynamique
         ExtStringField(
             "Designation",
             required=True,
-            vocabulary=vocab.as_displaylist(vocab.DESIGNATION_VOCAB),
             schemata="Reception",
-            widget=SelectionWidget(
+            widget=StringWidget(
                 visible=ADD_VISIBLE,
                 label=_(u"Designation"),
-                format="select",
             ),
         ),
 
-        # 4. Poids a la reception
+        # 4. Reception Weight
         ExtFixedPointField(
             "ReceptionWeight",
             required=True,
@@ -109,7 +114,7 @@ class ReceptionFieldsExtender(object):
             ),
         ),
 
-        # 5. Quantite recue
+        # 5. Quantity Received
         ExtFixedPointField(
             "QuantityReceived",
             required=True,
@@ -121,7 +126,7 @@ class ReceptionFieldsExtender(object):
             ),
         ),
 
-        # 6. Quantite mise sous analyse (grs)
+        # 6. Quantity Under Analysis
         ExtFixedPointField(
             "QuantityUnderAnalysis",
             required=True,
@@ -133,7 +138,7 @@ class ReceptionFieldsExtender(object):
             ),
         ),
 
-        # 7. Poids de l'echantillon-tech
+        # 7. Technical Sample Weight
         ExtFixedPointField(
             "TechSampleWeight",
             required=True,
@@ -145,58 +150,54 @@ class ReceptionFieldsExtender(object):
             ),
         ),
 
-        # 8. Temperature a la reception
-        ExtFixedPointField(
+        # 8. Reception Temperature - liste deroulante stricte 15-31 degC
+        ExtStringField(
             "ReceptionTemperature",
             required=True,
-            precision=1,
+            vocabulary=vocab.as_displaylist(vocab.TEMPERATURE_VOCAB),
             schemata="Reception",
-            widget=DecimalWidget(
+            widget=SelectionWidget(
                 visible=ADD_VISIBLE,
+                format="select",
                 label=_(u"Reception Temperature (deg C)"),
+                description=_(u"Must be between 15 and 31 deg C."),
             ),
         ),
 
-        # 9. Condition de l'echantillon (liste deroulante)
+        # 9. Sample Condition - texte libre avec autocompletion dynamique
         ExtStringField(
             "SampleCondition",
             required=True,
-            vocabulary=vocab.as_displaylist(vocab.SAMPLE_CONDITION_VOCAB),
             schemata="Reception",
-            widget=SelectionWidget(
+            widget=StringWidget(
                 visible=ADD_VISIBLE,
                 label=_(u"Sample Condition"),
-                format="select",
             ),
         ),
 
-        # 10. Etat de l'emballage (liste deroulante)
+        # 10. Packaging Condition - texte libre avec autocompletion dynamique
         ExtStringField(
             "PackagingCondition",
             required=True,
-            vocabulary=vocab.as_displaylist(vocab.PACKAGING_CONDITION_VOCAB),
             schemata="Reception",
-            widget=SelectionWidget(
+            widget=StringWidget(
                 visible=ADD_VISIBLE,
                 label=_(u"Packaging Condition"),
-                format="select",
             ),
         ),
 
-        # 11. Provenance (liste deroulante)
+        # 11. Origin - texte libre avec autocompletion dynamique
         ExtStringField(
             "Origin",
             required=True,
-            vocabulary=vocab.as_displaylist(vocab.ORIGIN_VOCAB),
             schemata="Reception",
-            widget=SelectionWidget(
+            widget=StringWidget(
                 visible=ADD_VISIBLE,
                 label=_(u"Origin"),
-                format="select",
             ),
         ),
 
-        # 12. Detail fournisseur / client
+        # 12. Supplier / Customer Details
         ExtStringField(
             "SupplierCustomerDetail",
             required=True,
@@ -208,20 +209,18 @@ class ReceptionFieldsExtender(object):
             ),
         ),
 
-        # 13. Personne ayant receptionne (liste deroulante)
+        # 13. Received By - texte libre avec autocompletion dynamique
         ExtStringField(
             "Receptionist",
             required=True,
-            vocabulary=vocab.as_displaylist(vocab.RECEPTIONIST_VOCAB),
             schemata="Reception",
-            widget=SelectionWidget(
+            widget=StringWidget(
                 visible=ADD_VISIBLE,
                 label=_(u"Received By"),
-                format="select",
             ),
         ),
 
-        # 14. CONTRAT
+        # 14. Contract
         ExtStringField(
             "Contract",
             required=True,
@@ -233,7 +232,7 @@ class ReceptionFieldsExtender(object):
             ),
         ),
 
-        # 15. BE LABO
+        # 15. Lab Entry Voucher
         ExtStringField(
             "EntryVoucher",
             required=True,
@@ -254,7 +253,6 @@ class ReceptionFieldsExtender(object):
 
     def getOrder(self, schematas):
         """Place l'onglet Reception juste apres l'onglet par defaut."""
-        default = schematas.get("default", [])
         reception_fields = [f.getName() for f in self.fields]
         schematas["Reception"] = reception_fields
         return schematas

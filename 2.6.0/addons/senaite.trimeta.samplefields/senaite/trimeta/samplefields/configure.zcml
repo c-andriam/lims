@@ -15,6 +15,14 @@
       for="bika.lims.interfaces.IAnalysisRequest"
       />
 
+  <!-- A chaque creation d'un Sample, enregistre les valeurs des
+       champs Reception en tant que suggestions futures -->
+  <subscriber
+      for="bika.lims.interfaces.IAnalysisRequest
+           zope.lifecycleevent.interfaces.IObjectAddedEvent"
+      handler=".suggestions.on_sample_added"
+      />
+
   <include package=".browser" />
 
 </configure>

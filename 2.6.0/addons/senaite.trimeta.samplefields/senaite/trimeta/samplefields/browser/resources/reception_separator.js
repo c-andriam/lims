@@ -3,16 +3,52 @@
 // 1. Separateur visuel discret au-dessus de la section "Reception".
 // 2. Correctif fiable pour l'affichage inline des erreurs "champ
 //    requis" sur les widgets complexes (Client, Contact, Sample Type,
-//    Date Sampled). Le mecanisme natif de SENAITE cherche le
-//    conteneur ".field" via field.parent("div.field"), ce qui echoue
-//    silencieusement pour les widgets ou l'id du champ est deja
-//    porte par l'element ".field" lui-meme (ex: ArchetypesReferenceWidget).
-//    On reintercepte la reponse AJAX du formulaire pour reappliquer
-//    l'affichage avec .closest(".field"), qui couvre les deux cas
-//    sans rien casser pour les champs deja fonctionnels.
+//    Date Sampled).
+// 3. Autocompletion dynamique et partagee (façon barre de recherche
+//    YouTube) pour Designation, Sample Condition, Packaging
+//    Condition, Origin et Received By : champ libre au depart, les
+//    valeurs validees sont proposees ensuite a tous les postes.
+// 4. Clavier/validation numerique amelioree pour les champs Poids,
+//    Quantite, etc.
 (function () {
   "use strict";
 
+  var SUGGEST_FIELDS = [
+    "Designation",
+    "SampleCondition",
+    "PackagingCondition",
+    "Origin",
+    "Receptionist"
+  ];
+
+  var NUMERIC_FIELDS = [
+    "ReceptionWeight",
+    "QuantityReceived",
+    "QuantityUnderAnalysis",
+    "TechSampleWeight"
+  ];
+
+  var API_URL = null; // resolu au premier usage
+
+  function getApiUrl() {
+    if (API_URL === null) {
+      var scriptTag = document.getElementById(
+        "trimeta-samplefields-script"
+      );
+      var portalUrl = scriptTag ?
+        scriptTag.getAttribute("data-portal-url") : null;
+      if (!portalUrl) {
+        var parts = window.location.href.split("/senaite/");
+        portalUrl = parts.length > 1 ? parts[0] + "/senaite" : "";
+      }
+      API_URL = portalUrl + "/@@trimeta-suggestions";
+    }
+    return API_URL;
+  }
+
+  // ---------------------------------------------------------------
+  // 1. Separateur visuel
+  // ---------------------------------------------------------------
   function insertSeparator() {
     var target = document.querySelector('tr[fieldName="SampleCode-0"]') ||
                  document.querySelector('tr[fieldName="SampleCode"]');
@@ -22,52 +58,21 @@
     if (document.getElementById("trimeta-reception-separator")) {
       return true;
     }
-
     var row = document.createElement("tr");
     row.id = "trimeta-reception-separator";
     row.innerHTML =
       '<td colspan="10" style="' +
-      'background:#f7f7f7;' +
-      'border-top:2px solid #ddd;' +
-      'padding:4px 8px;' +
-      'font-size:11px;' +
-      'font-weight:600;' +
-      'text-transform:uppercase;' +
-      'letter-spacing:0.03em;' +
-      'color:#888;">' +
-      "Reception" +
-      "</td>";
-
+      'background:#f7f7f7;border-top:2px solid #ddd;padding:4px 8px;' +
+      'font-size:11px;font-weight:600;text-transform:uppercase;' +
+      'letter-spacing:0.03em;color:#888;">Reception</td>';
     target.parentNode.insertBefore(row, target);
     return true;
   }
 
-  function tryInsert(retries) {
-    if (insertSeparator()) {
-      return;
-    }
-    if (retries <= 0) {
-      return;
-    }
-    setTimeout(function () {
-      tryInsert(retries - 1);
-    }, 300);
-  }
-
-  function ensureErrorBox(container) {
-    var box = container.find("> div.fieldErrorBox");
-    if (box.length === 0) {
-      box = window.jQuery(
-        '<div class="fieldErrorBox"></div>'
-      ).appendTo(container);
-    }
-    return box;
-  }
-
+  // ---------------------------------------------------------------
+  // 2. Correctif erreurs inline (widgets complexes)
+  // ---------------------------------------------------------------
   function findFieldElement($, fieldname) {
-    // Differents widgets SENAITE exposent l'id du champ sous des
-    // formats variables. On essaie plusieurs strategies dans l'ordre
-    // et on prend la premiere qui matche.
     var selectors = [
       "#" + fieldname,
       "#archetypes-fieldname-" + fieldname,
@@ -88,6 +93,15 @@
     return null;
   }
 
+  function ensureErrorBox(container) {
+    var box = container.find("> div.fieldErrorBox");
+    if (box.length === 0) {
+      box = window.jQuery('<div class="fieldErrorBox"></div>')
+        .appendTo(container);
+    }
+    return box;
+  }
+
   function fixInlineErrors(fielderrors) {
     if (!fielderrors) {
       return;
@@ -98,8 +112,6 @@
       if (!field) {
         return;
       }
-      // .closest() couvre a la fois le cas ou l'element porte deja
-      // la classe "field" et celui ou elle est portee par un ancetre.
       var container = field.closest(".field");
       if (container.length === 0) {
         return;
@@ -125,14 +137,260 @@
       if (data && data.errors && data.errors.fielderrors) {
         fixInlineErrors(data.errors.fielderrors);
       }
+      // Si la creation a reussi, les valeurs viennent d'etre
+      // enregistrees cote serveur comme suggestions (evenement
+      // IObjectAddedEvent) : on invalide notre cache local pour que
+      // la prochaine ouverture de suggestion les propose bien.
+      if (data && !data.errors) {
+        suggestionCache = {};
+      }
     });
   }
 
+  // ---------------------------------------------------------------
+  // 3. Autocompletion dynamique partagee
+  // ---------------------------------------------------------------
+  var suggestionCache = {};
+
+  function fetchSuggestions(fieldname, callback) {
+    if (suggestionCache[fieldname]) {
+      callback(suggestionCache[fieldname]);
+      return;
+    }
+    var xhr = new XMLHttpRequest();
+    xhr.open(
+      "GET",
+      getApiUrl() + "?field=" + encodeURIComponent(fieldname),
+      true
+    );
+    xhr.onload = function () {
+      if (xhr.status === 200) {
+        try {
+          var data = JSON.parse(xhr.responseText);
+          suggestionCache[fieldname] = data.suggestions || [];
+          callback(suggestionCache[fieldname]);
+        } catch (e) {
+          callback([]);
+        }
+      } else {
+        callback([]);
+      }
+    };
+    xhr.onerror = function () {
+      callback([]);
+    };
+    xhr.send();
+  }
+
+  function removeSuggestionRemote(fieldname, value, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", getApiUrl(), true);
+    xhr.setRequestHeader(
+      "Content-Type", "application/x-www-form-urlencoded"
+    );
+    xhr.onload = function () {
+      if (suggestionCache[fieldname]) {
+        suggestionCache[fieldname] = suggestionCache[fieldname].filter(
+          function (v) { return v !== value; }
+        );
+      }
+      if (callback) { callback(); }
+    };
+    xhr.send(
+      "action=remove&field=" + encodeURIComponent(fieldname) +
+      "&value=" + encodeURIComponent(value)
+    );
+  }
+
+  function closeAllDropdowns() {
+    document.querySelectorAll(".trimeta-suggest-dropdown").forEach(
+      function (el) { el.remove(); }
+    );
+  }
+
+  function buildDropdown(input, fieldname, filterText) {
+    closeAllDropdowns();
+    fetchSuggestions(fieldname, function (items) {
+      var lower = (filterText || "").toLowerCase();
+      var filtered = items.filter(function (v) {
+        return v.toLowerCase().indexOf(lower) !== -1;
+      });
+      if (filtered.length === 0) {
+        return;
+      }
+
+      var dropdown = document.createElement("div");
+      dropdown.className = "trimeta-suggest-dropdown";
+      dropdown.style.cssText =
+        "position:absolute;z-index:9999;background:#fff;" +
+        "border:1px solid #ccc;border-radius:3px;" +
+        "box-shadow:0 2px 6px rgba(0,0,0,0.15);" +
+        "max-height:180px;overflow-y:auto;font-size:13px;";
+
+      var rect = input.getBoundingClientRect();
+      dropdown.style.left = (rect.left + window.scrollX) + "px";
+      dropdown.style.top = (rect.bottom + window.scrollY) + "px";
+      dropdown.style.width = Math.max(rect.width, 180) + "px";
+
+      filtered.forEach(function (value) {
+        var row = document.createElement("div");
+        row.style.cssText =
+          "display:flex;justify-content:space-between;" +
+          "align-items:center;padding:5px 8px;cursor:pointer;";
+        row.onmouseenter = function () {
+          row.style.background = "#f0f5ff";
+        };
+        row.onmouseleave = function () {
+          row.style.background = "";
+        };
+
+        var label = document.createElement("span");
+        label.textContent = value;
+        label.style.flex = "1";
+        label.onmousedown = function (e) {
+          e.preventDefault();
+          input.value = value;
+          input.dispatchEvent(new Event("change", { bubbles: true }));
+          closeAllDropdowns();
+        };
+
+        var remove = document.createElement("span");
+        remove.textContent = "\u2715";
+        remove.title = "Remove suggestion";
+        remove.style.cssText =
+          "color:#999;padding:0 4px;margin-left:6px;cursor:pointer;";
+        remove.onmouseenter = function () {
+          remove.style.color = "#c00";
+        };
+        remove.onmouseleave = function () {
+          remove.style.color = "#999";
+        };
+        remove.onmousedown = function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          removeSuggestionRemote(fieldname, value, function () {
+            buildDropdown(input, fieldname, input.value);
+          });
+        };
+
+        row.appendChild(label);
+        row.appendChild(remove);
+        dropdown.appendChild(row);
+      });
+
+      document.body.appendChild(dropdown);
+    });
+  }
+
+  function findAllFieldElements($, basename) {
+    // Couvre toutes les colonnes (arnum) du formulaire multi-echantillons :
+    // basename-0, basename-1, basename-2, ...
+    var results = [];
+    var selectors = [
+      '[id^="' + basename + '-"]',
+      '[id^="archetypes-fieldname-' + basename + '-"]',
+      '[data-fieldname^="' + basename + '-"]',
+      '[data-name^="' + basename + '-"]'
+    ];
+    var seen = {};
+    selectors.forEach(function (sel) {
+      var found;
+      try {
+        found = $(sel);
+      } catch (e) {
+        return;
+      }
+      found.each(function () {
+        var el = this;
+        var key = el.tagName + ":" +
+          (el.id || el.getAttribute("data-fieldname") ||
+           el.getAttribute("data-name"));
+        if (!seen[key]) {
+          seen[key] = true;
+          results.push($(el));
+        }
+      });
+    });
+    return results;
+  }
+
+  var globalClickListenerRegistered = false;
+
+  function registerGlobalClickListener() {
+    if (globalClickListenerRegistered) {
+      return;
+    }
+    globalClickListenerRegistered = true;
+    document.addEventListener("click", function (e) {
+      if (!e.target.matches || !e.target.matches("input")) {
+        closeAllDropdowns();
+      }
+    });
+  }
+
+  function attachSuggestBehavior(fieldname) {
+    var $ = window.jQuery;
+    var elements = findAllFieldElements($, fieldname);
+    elements.forEach(function (field) {
+      var input = field.is("input") ? field[0] :
+        field.find("input[type=text]").first()[0];
+      if (!input || input.getAttribute("data-trimeta-bound")) {
+        return;
+      }
+      input.setAttribute("data-trimeta-bound", "1");
+
+      input.addEventListener("focus", function () {
+        buildDropdown(input, fieldname, input.value);
+      });
+      input.addEventListener("input", function () {
+        buildDropdown(input, fieldname, input.value);
+      });
+      input.addEventListener("blur", function () {
+        setTimeout(closeAllDropdowns, 150);
+      });
+    });
+    registerGlobalClickListener();
+  }
+
+  function attachAllSuggestFields() {
+    SUGGEST_FIELDS.forEach(attachSuggestBehavior);
+  }
+
+  // ---------------------------------------------------------------
+  // 4. Champs numeriques : clavier/validation amelioree
+  // ---------------------------------------------------------------
+  function enhanceNumericFields() {
+    var $ = window.jQuery;
+    NUMERIC_FIELDS.forEach(function (fieldname) {
+      var elements = findAllFieldElements($, fieldname);
+      elements.forEach(function (field) {
+        var input = field.is("input") ? field[0] :
+          field.find("input[type=text]").first()[0];
+        if (!input || input.getAttribute("data-trimeta-numeric")) {
+          return;
+        }
+        input.setAttribute("data-trimeta-numeric", "1");
+        input.setAttribute("inputmode", "decimal");
+        input.addEventListener("keypress", function (e) {
+          var char = String.fromCharCode(e.which);
+          if (!/[0-9.,]/.test(char)) {
+            e.preventDefault();
+          }
+        });
+      });
+    });
+  }
+
+  // ---------------------------------------------------------------
+  // Init
+  // ---------------------------------------------------------------
   function tryInit(retries) {
     var sepDone = insertSeparator();
     var jqReady = !!window.jQuery;
     if (jqReady) {
       watchAjaxSubmit();
+      attachAllSuggestFields();
+      enhanceNumericFields();
     }
     if (sepDone && jqReady) {
       return;
@@ -147,5 +405,14 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     tryInit(20);
+    // Reverifie periodiquement pour couvrir les colonnes ajoutees
+    // dynamiquement via le bouton "+Add" (idempotent grace aux
+    // gardes data-trimeta-*).
+    setInterval(function () {
+      if (window.jQuery) {
+        attachAllSuggestFields();
+        enhanceNumericFields();
+      }
+    }, 2000);
   });
 })();

@@ -11,8 +11,10 @@ senaite.trimeta.samplefields.egg-info/top_level.txt
 senaite/trimeta/__init__.py
 senaite/trimeta/samplefields/__init__.py
 senaite/trimeta/samplefields/extender.py
+senaite/trimeta/samplefields/suggestions.py
 senaite/trimeta/samplefields/vocabularies.py
 senaite/trimeta/samplefields/browser/__init__.py
+senaite/trimeta/samplefields/browser/suggestions_api.py
 senaite/trimeta/samplefields/browser/viewlets.py
 senaite/trimeta/samplefields/patches/__init__.py
 senaite/trimeta/samplefields/patches/ajax_submit_patch.py

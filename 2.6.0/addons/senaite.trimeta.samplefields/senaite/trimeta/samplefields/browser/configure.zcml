@@ -19,4 +19,13 @@
       layer="bika.lims.interfaces.IBikaLIMS"
       />
 
+  <!-- API JSON pour lister/supprimer les suggestions dynamiques -->
+  <browser:page
+      for="*"
+      name="trimeta-suggestions"
+      class=".suggestions_api.SuggestionsAPI"
+      permission="zope2.View"
+      layer="bika.lims.interfaces.IBikaLIMS"
+      />
+
 </configure>
