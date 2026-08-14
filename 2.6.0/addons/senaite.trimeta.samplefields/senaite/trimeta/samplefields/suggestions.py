@@ -26,14 +26,25 @@ STORAGE_KEY = "senaite.trimeta.samplefields.suggestions"
 # The free-text fields that get dynamic suggestions. "Receptionist"
 # was removed: it is now a reference field pointing to existing
 # LabContacts, not a free-text suggestion field.
+# The free-text fields that get dynamic suggestions. "Receptionist"
+# was removed: it is now a reference field pointing to existing
+# LabContacts, not a free-text suggestion field.
+#
+# Deliberately EXCLUDED: SampleCode, AnalysisSheetNumber, EntryVoucher.
+# These must stay unique per record; surfacing old values as
+# suggestions would risk encouraging accidental duplicate reuse of
+# a unique identifier.
 SUGGESTION_FIELDS = (
     "Designation",
     "SampleCondition",
     "PackagingCondition",
     "Origin",
+    "SupplierCustomerDetail",
+    "Contract",
     "Aroma",
     "Color",
     "Texture",
+    "AromaDevelopment",
 )
 
 

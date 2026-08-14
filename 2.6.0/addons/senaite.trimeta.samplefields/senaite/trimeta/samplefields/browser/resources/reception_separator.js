@@ -18,9 +18,12 @@
     "SampleCondition",
     "PackagingCondition",
     "Origin",
+    "SupplierCustomerDetail",
+    "Contract",
     "Aroma",
     "Color",
-    "Texture"
+    "Texture",
+    "AromaDevelopment"
   ];
 
   var NUMERIC_FIELDS = [
