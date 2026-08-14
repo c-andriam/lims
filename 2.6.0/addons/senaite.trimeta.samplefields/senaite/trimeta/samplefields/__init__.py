@@ -9,6 +9,10 @@ logger.warning("### TRIMETA SAMPLEFIELDS - MODULE IMPORTE ###")
 # (un message par champ obligatoire manquant) est conserve. Seul le
 # bandeau recapitulatif en haut de page est supprime, via le JS
 # reception_separator.js (voir browser/viewlets.py).
+#
+# Le patch date_received_patch (DateReceived modifiable manuellement)
+# reste actif et est charge ci-dessous.
+import senaite.trimeta.samplefields.patches  # noqa
 
 
 def initialize(context):

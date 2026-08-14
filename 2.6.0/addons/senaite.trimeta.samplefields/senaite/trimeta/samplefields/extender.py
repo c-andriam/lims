@@ -6,13 +6,15 @@ Ajoute les 15 champs de la section RECEPTION demandes par Trimeta Group.
 Utilise archetypes.schemaextender, la methode standard pour etendre un
 schema Archetypes sans toucher au code core de SENAITE.
 
-Designation, Sample Condition, Packaging Condition, Origin et
-Received By sont des champs texte libre avec autocompletion
-dynamique et partagee (voir suggestions.py + browser/suggestions_api.py
-+ resources/reception_separator.js), plutot que des listes
-deroulantes fixes.
+Designation, Sample Condition, Packaging Condition et Origin sont des
+champs texte libre avec autocompletion dynamique et partagee (voir
+suggestions.py + browser/suggestions_api.py +
+resources/reception_separator.js), plutot que des listes deroulantes
+fixes.
 
-Reception Temperature reste une liste deroulante stricte 15-31 degC.
+Reception Temperature et Item Code (ex-Sample Reference) restent des
+listes deroulantes strictes. Received By est une reference dynamique
+vers les LabContacts existants.
 """
 
 from AccessControl import ClassSecurityInfo
@@ -30,6 +32,9 @@ from zope.interface import implementer
 from zope.i18nmessageid import MessageFactory
 
 from bika.lims.interfaces import IAnalysisRequest
+from bika.lims.browser.fields import UIDReferenceField
+from senaite.core.browser.widgets.referencewidget import ReferenceWidget
+from senaite.core.catalog import CONTACT_CATALOG
 
 from senaite.trimeta.samplefields import vocabularies as vocab
 from senaite.trimeta.samplefields import PRODUCT_NAME
@@ -59,6 +64,19 @@ class ExtFixedPointField(ExtensionField, FixedPointField):
     security = ClassSecurityInfo()
 
 
+class ExtUIDReferenceField(ExtensionField, UIDReferenceField):
+    """Champ de reference moderne (UID, rendu AJAX) extensible.
+
+    C'est le meme mecanisme que celui utilise nativement par SENAITE
+    pour Client/Contact (bika.lims.browser.fields.UIDReferenceField +
+    senaite.core.browser.widgets.referencewidget.ReferenceWidget),
+    contrairement a l'ancien Products.Archetypes.public.ReferenceField
+    qui provoque une erreur de rendu (NameError: same_type) avec le
+    moteur de template Chameleon utilise par ar_add2.pt.
+    """
+    security = ClassSecurityInfo()
+
+
 @implementer(IOrderableSchemaExtender)
 class ReceptionFieldsExtender(object):
     """Ajoute les champs de la section RECEPTION au Sample."""
@@ -79,15 +97,17 @@ class ReceptionFieldsExtender(object):
             ),
         ),
 
-        # 2. Sample Reference
+        # 2. Code article (remplace l'ancien "Sample Reference", juge
+        # redondant avec un autre champ)
         ExtStringField(
-            "SampleReference",
+            "CodeArticle",
             required=True,
-            searchable=True,
+            vocabulary=vocab.as_displaylist(vocab.CODE_ARTICLE_VOCAB),
             schemata="Reception",
-            widget=StringWidget(
+            widget=SelectionWidget(
                 visible=ADD_VISIBLE,
-                label=_(u"Sample Reference"),
+                format="select",
+                label=_(u"Item Code"),
             ),
         ),
 
@@ -209,14 +229,34 @@ class ReceptionFieldsExtender(object):
             ),
         ),
 
-        # 13. Received By - texte libre avec autocompletion dynamique
-        ExtStringField(
+        # 13. Received By - reference dynamique vers les LabContacts
+        # existants (menu de recherche, comme Client/Contact). Utilise
+        # le meme mecanisme moderne (UIDReferenceField) que ces
+        # champs natifs, compatible avec le rendu Chameleon de
+        # ar_add2.pt.
+        ExtUIDReferenceField(
             "Receptionist",
             required=True,
             schemata="Reception",
-            widget=StringWidget(
+            allowed_types=("LabContact",),
+            mode="rw",
+            widget=ReferenceWidget(
                 visible=ADD_VISIBLE,
                 label=_(u"Received By"),
+                description=_(u"Select the lab contact who received "
+                               u"the sample."),
+                render_own_label=True,
+                ui_item="Title",
+                catalog=CONTACT_CATALOG,
+                query={
+                    "portal_type": "LabContact",
+                    "is_active": True,
+                    "sort_on": "sortable_title",
+                    "sort_order": "ascending",
+                },
+                columns=[
+                    {"name": "Title", "label": _(u"Name")},
+                ],
             ),
         ),
 

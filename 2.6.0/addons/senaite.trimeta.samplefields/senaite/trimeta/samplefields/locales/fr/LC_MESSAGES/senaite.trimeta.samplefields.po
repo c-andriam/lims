@@ -16,8 +16,11 @@ msgstr "Code echantillon"
 msgid "Unique internal code assigned to the sample."
 msgstr "Code interne unique attribue a l'echantillon."
 
-msgid "Sample Reference"
-msgstr "Reference de l'echantillon"
+msgid "Item Code"
+msgstr "Code article"
+
+msgid "Select the lab contact who received the sample."
+msgstr "Selectionner le contact labo ayant receptionne l'echantillon."
 
 msgid "Designation"
 msgstr "Designation"
@@ -51,9 +54,6 @@ msgstr "Provenance"
 
 msgid "Supplier / Customer Details"
 msgstr "Detail fournisseur / client"
-
-msgid "Received By"
-msgstr "Personne ayant receptionne"
 
 msgid "Contract"
 msgstr "Contrat"

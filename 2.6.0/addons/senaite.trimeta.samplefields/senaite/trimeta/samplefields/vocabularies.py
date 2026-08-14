@@ -20,6 +20,18 @@ TEMPERATURE_VOCAB = tuple(
     (str(i), u"{} \u00b0C".format(i)) for i in range(15, 32)
 )
 
+# Code article: liste fixe de codes produit (remplace l'ancien champ
+# "Reference de l'echantillon", juge redondant).
+CODE_ARTICLE_VOCAB = (
+    ("V-GNN", "V-GNN"),
+    ("V-GTK", "V-GTK"),
+    ("V-RAF", "V-RAF"),
+    ("V-RBF", "V-RBF"),
+    ("V-RCF", "V-RCF"),
+    ("V-LLB", "V-LLB"),
+    ("AUTRES", "AUTRES"),
+)
+
 
 def as_displaylist(vocab_tuple):
     """Convert a vocabulary tuple into an Archetypes DisplayList."""

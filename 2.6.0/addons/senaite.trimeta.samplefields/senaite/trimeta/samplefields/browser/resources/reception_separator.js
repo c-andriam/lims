@@ -17,8 +17,7 @@
     "Designation",
     "SampleCondition",
     "PackagingCondition",
-    "Origin",
-    "Receptionist"
+    "Origin"
   ];
 
   var NUMERIC_FIELDS = [

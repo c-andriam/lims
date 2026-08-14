@@ -23,13 +23,14 @@ logger = logging.getLogger("senaite.trimeta.samplefields")
 
 STORAGE_KEY = "senaite.trimeta.samplefields.suggestions"
 
-# The 5 free-text fields that get dynamic suggestions.
+# The free-text fields that get dynamic suggestions. "Receptionist"
+# was removed: it is now a reference field pointing to existing
+# LabContacts, not a free-text suggestion field.
 SUGGESTION_FIELDS = (
     "Designation",
     "SampleCondition",
     "PackagingCondition",
     "Origin",
-    "Receptionist",
 )
 
 
