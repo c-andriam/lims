@@ -33,6 +33,8 @@ from zope.i18nmessageid import MessageFactory
 
 from bika.lims.interfaces import IAnalysisRequest
 from bika.lims.browser.fields import UIDReferenceField
+from bika.lims.browser.widgets import DateTimeWidget
+from senaite.core.browser.fields.datetime import DateTimeField
 from senaite.core.browser.widgets.referencewidget import ReferenceWidget
 from senaite.core.catalog import CONTACT_CATALOG
 
@@ -74,6 +76,11 @@ class ExtUIDReferenceField(ExtensionField, UIDReferenceField):
     qui provoque une erreur de rendu (NameError: same_type) avec le
     moteur de template Chameleon utilise par ar_add2.pt.
     """
+    security = ClassSecurityInfo()
+
+
+class ExtDateTimeField(ExtensionField, DateTimeField):
+    """Champ date/heure extensible, meme mecanisme que DateSampled."""
     security = ClassSecurityInfo()
 
 
@@ -283,6 +290,134 @@ class ReceptionFieldsExtender(object):
                 label=_(u"Lab Entry Voucher"),
             ),
         ),
+
+        # =====================================================
+        # SECTION ANALYSE
+        # =====================================================
+
+        # A1. Analysis Sheet Number
+        ExtStringField(
+            "AnalysisSheetNumber",
+            required=True,
+            searchable=True,
+            schemata="Analyse",
+            widget=StringWidget(
+                visible=ADD_VISIBLE,
+                label=_(u"Analysis Sheet Number"),
+            ),
+        ),
+
+        # A2. Beginning of analysis
+        ExtDateTimeField(
+            "AnalysisStart",
+            required=False,
+            mode="rw",
+            schemata="Analyse",
+            widget=DateTimeWidget(
+                label=_(u"Beginning of Analysis"),
+                show_time=True,
+                visible=ADD_VISIBLE,
+                render_own_label=True,
+            ),
+        ),
+
+        # A3. End of analysis
+        ExtDateTimeField(
+            "AnalysisEnd",
+            required=False,
+            mode="rw",
+            schemata="Analyse",
+            widget=DateTimeWidget(
+                label=_(u"End of Analysis"),
+                show_time=True,
+                visible=ADD_VISIBLE,
+                render_own_label=True,
+            ),
+        ),
+
+        # A4. Analysis Preparer (plusieurs possibles)
+        ExtUIDReferenceField(
+            "AnalysisPreparer",
+            required=False,
+            schemata="Analyse",
+            allowed_types=("LabContact",),
+            multiValued=True,
+            mode="rw",
+            widget=ReferenceWidget(
+                visible=ADD_VISIBLE,
+                label=_(u"Analysis Preparer"),
+                description=_(u"One or more people who prepared "
+                               u"this analysis."),
+                render_own_label=True,
+                ui_item="Title",
+                catalog=CONTACT_CATALOG,
+                query={
+                    "portal_type": "LabContact",
+                    "is_active": True,
+                    "sort_on": "sortable_title",
+                    "sort_order": "ascending",
+                },
+                columns=[
+                    {"name": "Title", "label": _(u"Name")},
+                ],
+            ),
+        ),
+
+        # A5. Pod length
+        ExtFixedPointField(
+            "PodLength",
+            required=False,
+            precision=2,
+            schemata="Analyse",
+            widget=DecimalWidget(
+                visible=ADD_VISIBLE,
+                label=_(u"Pod Length (cm)"),
+            ),
+        ),
+
+        # A6. Aroma development (texte libre simple, pas de suggestion)
+        ExtStringField(
+            "AromaDevelopment",
+            required=False,
+            schemata="Analyse",
+            widget=StringWidget(
+                visible=ADD_VISIBLE,
+                label=_(u"Aroma Development"),
+            ),
+        ),
+
+        # A7. Aroma - texte libre avec autocompletion dynamique
+        ExtStringField(
+            "Aroma",
+            required=False,
+            schemata="Analyse",
+            widget=StringWidget(
+                visible=ADD_VISIBLE,
+                label=_(u"Aroma"),
+            ),
+        ),
+
+        # A8. Color - texte libre avec autocompletion dynamique
+        ExtStringField(
+            "Color",
+            required=False,
+            schemata="Analyse",
+            widget=StringWidget(
+                visible=ADD_VISIBLE,
+                label=_(u"Color"),
+            ),
+        ),
+
+        # A9. Texture - texte libre avec autocompletion dynamique
+        ExtStringField(
+            "Texture",
+            required=False,
+            schemata="Analyse",
+            widget=StringWidget(
+                visible=ADD_VISIBLE,
+                label=_(u"Texture"),
+            ),
+        ),
     ]
 
     def __init__(self, context):
@@ -292,7 +427,16 @@ class ReceptionFieldsExtender(object):
         return self.fields
 
     def getOrder(self, schematas):
-        """Place l'onglet Reception juste apres l'onglet par defaut."""
-        reception_fields = [f.getName() for f in self.fields]
+        """Regroupe correctement les champs par onglet (Reception,
+        Analyse), selon la schemata reellement definie sur chacun."""
+        reception_fields = [
+            f.getName() for f in self.fields
+            if f.schemata == "Reception"
+        ]
+        analyse_fields = [
+            f.getName() for f in self.fields
+            if f.schemata == "Analyse"
+        ]
         schematas["Reception"] = reception_fields
+        schematas["Analyse"] = analyse_fields
         return schematas

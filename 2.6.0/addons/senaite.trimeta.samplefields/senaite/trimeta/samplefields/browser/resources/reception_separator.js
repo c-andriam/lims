@@ -17,14 +17,18 @@
     "Designation",
     "SampleCondition",
     "PackagingCondition",
-    "Origin"
+    "Origin",
+    "Aroma",
+    "Color",
+    "Texture"
   ];
 
   var NUMERIC_FIELDS = [
     "ReceptionWeight",
     "QuantityReceived",
     "QuantityUnderAnalysis",
-    "TechSampleWeight"
+    "TechSampleWeight",
+    "PodLength"
   ];
 
   var API_URL = null; // resolu au premier usage
@@ -48,24 +52,35 @@
   // ---------------------------------------------------------------
   // 1. Separateur visuel
   // ---------------------------------------------------------------
-  function insertSeparator() {
-    var target = document.querySelector('tr[fieldName="SampleCode-0"]') ||
-                 document.querySelector('tr[fieldName="SampleCode"]');
+  function insertOneSeparator(id, firstFieldName, label) {
+    var target = document.querySelector(
+      'tr[fieldName="' + firstFieldName + '-0"]'
+    ) || document.querySelector('tr[fieldName="' + firstFieldName + '"]');
     if (!target) {
       return false;
     }
-    if (document.getElementById("trimeta-reception-separator")) {
+    if (document.getElementById(id)) {
       return true;
     }
     var row = document.createElement("tr");
-    row.id = "trimeta-reception-separator";
+    row.id = id;
     row.innerHTML =
       '<td colspan="10" style="' +
       'background:#f7f7f7;border-top:2px solid #ddd;padding:4px 8px;' +
       'font-size:11px;font-weight:600;text-transform:uppercase;' +
-      'letter-spacing:0.03em;color:#888;">Reception</td>';
+      'letter-spacing:0.03em;color:#888;">' + label + '</td>';
     target.parentNode.insertBefore(row, target);
     return true;
+  }
+
+  function insertSeparator() {
+    var a = insertOneSeparator(
+      "trimeta-reception-separator", "SampleCode", "Reception"
+    );
+    var b = insertOneSeparator(
+      "trimeta-analyse-separator", "AnalysisSheetNumber", "Analyse"
+    );
+    return a && b;
   }
 
   // ---------------------------------------------------------------

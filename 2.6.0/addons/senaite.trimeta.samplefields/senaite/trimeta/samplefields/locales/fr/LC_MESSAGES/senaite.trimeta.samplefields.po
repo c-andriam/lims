@@ -43,6 +43,36 @@ msgstr "Temperature a la reception (deg C)"
 msgid "Must be between 15 and 31 deg C."
 msgstr "Doit etre comprise entre 15 et 31 deg C."
 
+msgid "Analysis Sheet Number"
+msgstr "Numero fiche d'analyse"
+
+msgid "Beginning of Analysis"
+msgstr "Debut d'analyse"
+
+msgid "End of Analysis"
+msgstr "Fin de l'analyse"
+
+msgid "Analysis Preparer"
+msgstr "Preparateur d'analyse"
+
+msgid "One or more people who prepared this analysis."
+msgstr "Une ou plusieurs personnes ayant prepare cette analyse."
+
+msgid "Pod Length (cm)"
+msgstr "Longueur des gousses (cm)"
+
+msgid "Aroma Development"
+msgstr "Developpement de l'arome"
+
+msgid "Aroma"
+msgstr "Arome"
+
+msgid "Color"
+msgstr "Couleur"
+
+msgid "Texture"
+msgstr "Texture"
+
 msgid "Sample Condition"
 msgstr "Condition de l'echantillon"
 

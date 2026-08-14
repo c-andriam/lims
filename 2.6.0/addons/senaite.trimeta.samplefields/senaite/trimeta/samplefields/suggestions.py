@@ -31,6 +31,9 @@ SUGGESTION_FIELDS = (
     "SampleCondition",
     "PackagingCondition",
     "Origin",
+    "Aroma",
+    "Color",
+    "Texture",
 )
 
 
