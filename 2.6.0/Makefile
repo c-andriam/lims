@@ -51,7 +51,7 @@ ARGS ?=
 
 .PHONY: help debug up down restart logs ps pull shell status \
         clean fclean re install backup restore redeploy-addon \
-        first-setup test test-list test-pure check-engine fix-perms doctor require-running test-env
+        first-setup test test-list test-pure check-engine fix-perms doctor require-running test-env impress-info
 
 check-engine:
 	@if [ -z "$(ENGINE)" ]; then \
@@ -150,6 +150,9 @@ test: require-running ## Lance les tests de l'add-on dans le container
 	  fi; \
 	  echo "Runner: $$RUNNER"; \
 	  $$RUNNER --test-path=$(ADDON_SRC) -s $(ADDON) $(ARGS)'
+
+impress-info: require-running ## Inventorie senaite.impress (prepare le gabarit COA)
+	@ENGINE=$(ENGINE) SERVICE=$(SERVICE) INSTANCE_DIR=$(INSTANCE_DIR) sh scripts/impress-info.sh
 
 test-env: require-running ## Inventorie ce qui permet de lancer les tests
 	@ENGINE=$(ENGINE) SERVICE=$(SERVICE) INSTANCE_DIR=$(INSTANCE_DIR) sh scripts/test-env.sh
