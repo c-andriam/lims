@@ -31,7 +31,7 @@ ARGS ?=
 
 .PHONY: help debug up down restart logs ps build pull shell status \
         clean fclean re install backup restore redeploy-addon \
-        first-setup test test-list test-pure check-engine fix-perms
+        first-setup test test-list test-pure check-engine fix-perms doctor
 
 check-engine:
 	@if [ -z "$(ENGINE)" ]; then \
@@ -128,6 +128,9 @@ test-list: check-engine ## Liste les tests sans les executer
 
 test-pure: ## Tests de logique pure, sans container (instantane)
 	@python $(ADDON_DIR)/senaite/trimeta/samplefields/tests/run_pure.py
+
+doctor: ## Etat des lieux: containers, ports, volumes, droits, add-on
+	@ENGINE=$(ENGINE) SERVICE=$(SERVICE) PORT=$(PORT) ADDON_DIR=addons sh scripts/doctor.sh
 
 fix-perms: ## Repare les droits sur addons/ apres un buildout en container
 	@ENGINE=$(ENGINE) TARGET=addons sh scripts/fix-perms.sh
