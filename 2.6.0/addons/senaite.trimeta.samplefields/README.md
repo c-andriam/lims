@@ -30,6 +30,22 @@ Add-on SENAITE 2.6 pour Trimeta Group.
   des Échantillons (avec le Lot), dans la grille de saisie des Work
   Sheets et dans la liste des rapports d'analyse.
 
+## Configuration de la machine
+
+Chaque serveur a son adresse et ses ports libres. Ces valeurs vivent
+dans `2.6.0/.env`, qui n'est **pas** versionné :
+
+```bash
+cd 2.6.0
+cp .env.example .env
+$EDITOR .env          # SENAITE_PORT, SENAITE_HOST
+make down && make up
+```
+
+`make debug` affiche l'adresse publiée et indique si le port vient de
+`.env` ou de la valeur par défaut. `make doctor` liste les ports libres
+parmi les candidats habituels.
+
 ## Installation
 
 L'add-on est monté dans le container par `compose.yml` et compilé par

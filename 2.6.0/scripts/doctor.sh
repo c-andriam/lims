@@ -53,6 +53,21 @@ else
 fi
 
 echo ""
+echo "Ports libres parmi les candidats habituels :"
+for candidate in 8080 8081 8082 8090 8180 9080; do
+    if command -v ss >/dev/null 2>&1; then
+        if ss -tln 2>/dev/null | grep -q ":$candidate "; then
+            echo "  $candidate  occupe"
+        else
+            echo "  $candidate  LIBRE"
+        fi
+    fi
+done
+echo ""
+echo "Pour en choisir un: ecrire SENAITE_PORT=<port> dans 2.6.0/.env"
+echo "(voir .env.example), puis 'make down' et 'make up'."
+
+echo ""
 echo "Processus rootlessport (podman laisse parfois un orphelin qui"
 echo "garde le port apres un arret brutal) :"
 ps -eo pid,etime,cmd 2>/dev/null | grep -i '[r]ootlessport' \

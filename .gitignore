@@ -16,3 +16,7 @@ docker-compose.yml.orig
 # l'utilisateur du container que git ne pouvait plus modifier
 # (cf. make fix-perms).
 *.egg-info/
+
+# Configuration propre a chaque machine (adresse, ports libres).
+# Voir 2.6.0/.env.example.
+/2.6.0/.env

@@ -22,11 +22,23 @@ ENGINE := $(shell \
 PYTHON        := $(shell command -v python3 2>/dev/null || command -v python 2>/dev/null)
 
 SERVICE       := senaite
-# Port publie sur l'hote. Surcharge ponctuelle: make up PORT=8081
-# Surcharge permanente: ecrire SENAITE_PORT=8081 dans 2.6.0/.env
-PORT          ?= 8080
+# Configuration propre a cette machine, lue depuis 2.6.0/.env
+# (non versionne, voir .env.example). Ordre de priorite:
+#   1. la ligne de commande   make up PORT=8081
+#   2. le fichier .env        SENAITE_PORT=8081
+#   3. la valeur par defaut   8080
+#
+# ATTENTION: SENAITE_PORT doit etre exporte APRES la lecture de .env.
+# Exporte inconditionnellement a 8080, il ecraserait le .env, puisque
+# l'environnement l'emporte sur le fichier pour compose.
+ENV_PORT      := $(shell sed -n 's/^SENAITE_PORT=//p' .env 2>/dev/null | tail -1)
+ENV_HOST      := $(shell sed -n 's/^SENAITE_HOST=//p' .env 2>/dev/null | tail -1)
+
+PORT          ?= $(if $(ENV_PORT),$(ENV_PORT),8080)
+HOST          ?= $(if $(ENV_HOST),$(ENV_HOST),localhost)
+
 export SENAITE_PORT := $(PORT)
-SITE_URL      := http://localhost:$(PORT)/senaite
+SITE_URL      := http://$(HOST):$(PORT)/senaite
 IMAGE         := docker.io/senaite/senaite:v2.6.0
 INSTANCE_DIR  := /home/senaite/senaitelims
 ADDON         := senaite.trimeta.samplefields
@@ -49,6 +61,8 @@ debug: ## Affiche les outils detectes
 	@echo "Outil compose  : $(COMPOSE)"
 	@echo "Moteur conteneur: $(if $(ENGINE),$(ENGINE),AUCUN)"
 	@echo "Python hote     : $(if $(PYTHON),$(PYTHON),AUCUN)"
+	@echo "Adresse publiee : $(SITE_URL)"
+	@echo "Source du port  : $(if $(ENV_PORT),.env,defaut)"
 
 help: ## Affiche cette aide
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
