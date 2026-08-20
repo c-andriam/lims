@@ -45,7 +45,7 @@ def patched_after_receive(analysis_request):
 def apply_patch():
     from bika.lims.workflow.analysisrequest import events
     events.after_receive = patched_after_receive
-    logger.warning(
-        "### TRIMETA: patch applique sur after_receive "
-        "(DateReceived preservee si deja saisie manuellement) ###"
+    logger.info(
+        "Patch applique sur after_receive: DateReceived est preservee "
+        "si elle a deja ete saisie manuellement"
     )

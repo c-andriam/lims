@@ -1,14 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configure
     xmlns="http://namespaces.zope.org/zope"
-    xmlns:five="http://namespaces.zope.org/five"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:i18n="http://namespaces.zope.org/i18n"
     i18n_domain="senaite.trimeta.samplefields">
 
   <!-- Enregistre le dossier locales/ pour la traduction automatique -->
   <i18n:registerTranslations directory="locales" />
 
-  <!-- Enregistre l'extender comme adapter sur IAnalysisRequest -->
+  <!-- =============================================================
+       Profil d'installation
+       ============================================================= -->
+  <genericsetup:registerProfile
+      name="default"
+      title="SENAITE Trimeta - champs personnalises"
+      description="Champs Reception/Analyse et index de catalogue
+                   associes pour Trimeta Group."
+      directory="profiles/default"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      post_handler=".setuphandlers.post_install"
+      />
+
+  <genericsetup:registerProfile
+      name="uninstall"
+      title="SENAITE Trimeta - desinstallation"
+      description="Retire les index de catalogue ajoutes par l'add-on.
+                   Les valeurs saisies sur les echantillons sont
+                   conservees."
+      directory="profiles/uninstall"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      post_handler=".setuphandlers.post_uninstall"
+      />
+
+  <include package=".upgrades" />
+
+  <!-- =============================================================
+       Schema du type Sample (AnalysisRequest)
+       ============================================================= -->
+
+  <!-- Ajoute les champs des sections Reception et Analyse -->
   <adapter
       factory=".extender.ReceptionFieldsExtender"
       provides="archetypes.schemaextender.interfaces.IOrderableSchemaExtender"
@@ -23,8 +53,25 @@
       for="bika.lims.interfaces.IAnalysisRequest"
       />
 
+  <!-- =============================================================
+       Indexation
+       ============================================================= -->
+
+  <!-- Indexeur nomme: alimente a la fois l'index et la colonne de
+       metadonnees `getSampleCode` du sample_catalog. Indispensable
+       car les champs schemaextender n'ont pas d'accesseur de classe
+       (voir catalog.py). -->
+  <adapter
+      name="getSampleCode"
+      factory=".indexers.getSampleCode"
+      />
+
+  <!-- =============================================================
+       Suggestions partagees
+       ============================================================= -->
+
   <!-- A chaque creation d'un Sample, enregistre les valeurs des
-       champs Reception en tant que suggestions futures -->
+       champs libres en tant que suggestions futures -->
   <subscriber
       for="bika.lims.interfaces.IAnalysisRequest
            zope.lifecycleevent.interfaces.IObjectAddedEvent"

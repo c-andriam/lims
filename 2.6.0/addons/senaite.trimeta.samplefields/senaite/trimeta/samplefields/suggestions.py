@@ -26,9 +26,6 @@ STORAGE_KEY = "senaite.trimeta.samplefields.suggestions"
 # The free-text fields that get dynamic suggestions. "Receptionist"
 # was removed: it is now a reference field pointing to existing
 # LabContacts, not a free-text suggestion field.
-# The free-text fields that get dynamic suggestions. "Receptionist"
-# was removed: it is now a reference field pointing to existing
-# LabContacts, not a free-text suggestion field.
 #
 # Deliberately EXCLUDED: SampleCode, AnalysisSheetNumber, EntryVoucher.
 # These must stay unique per record; surfacing old values as
@@ -102,36 +99,31 @@ def list_suggestions(fieldname):
 
 def on_sample_added(obj, event):
     """Event subscriber: fired when a Sample (AnalysisRequest) is
-    created. Reads the 5 free-text fields and remembers any non-empty
+    created. Reads the free-text fields and remembers any non-empty
     value as a future suggestion.
     """
-    logger.warning(
-        "### TRIMETA: on_sample_added APPELE pour obj=%r (id=%s) ###",
-        obj, getattr(obj, "getId", lambda: "?")(),
-    )
+    remembered = []
     try:
         for fieldname in SUGGESTION_FIELDS:
             field = obj.getField(fieldname)
             if field is None:
-                logger.warning(
-                    "### TRIMETA: champ %s introuvable sur l'objet ###",
-                    fieldname,
-                )
+                # Champ absent du schema: l'objet a ete cree avant
+                # l'ajout du champ, ou le schema n'est pas etendu.
                 continue
             value = field.get(obj)
-            logger.warning(
-                "### TRIMETA: champ %s = %r ###", fieldname, value
-            )
             if value:
                 add_suggestion(fieldname, value)
-                logger.warning(
-                    "### TRIMETA: suggestion ajoutee pour %s: %r ###",
-                    fieldname, value,
-                )
+                remembered.append(fieldname)
     except Exception:
         # Never let suggestion-tracking break sample creation.
         logger.exception(
-            "### TRIMETA: erreur non bloquante lors de l'enregistrement "
-            "des suggestions pour l'echantillon %s ###",
+            "Enregistrement des suggestions impossible pour "
+            "l'echantillon %s",
             getattr(obj, "getId", lambda: "?")(),
         )
+        return
+
+    if remembered:
+        logger.debug("Suggestions enregistrees pour %s: %s",
+                     getattr(obj, "getId", lambda: "?")(),
+                     ", ".join(remembered))

@@ -1,0 +1,4 @@
+include *.txt *.rst *.md
+recursive-include senaite *.zcml *.xml *.pt *.js *.css *.po *.pot *.mo
+global-exclude *.pyc
+global-exclude __pycache__
