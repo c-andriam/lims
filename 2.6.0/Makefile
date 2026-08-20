@@ -23,6 +23,7 @@ IMAGE         := docker.io/senaite/senaite:v2.6.0
 INSTANCE_DIR  := /home/senaite/senaitelims
 ADDON         := senaite.trimeta.samplefields
 ADDON_SRC     := $(INSTANCE_DIR)/src/$(ADDON)
+ADDON_DIR     := addons/$(ADDON)
 
 # ARGS permet de passer des options au testrunner :
 #   make test ARGS="-t test_sample_is_findable_by_code"
@@ -30,7 +31,7 @@ ARGS ?=
 
 .PHONY: help debug up down restart logs ps build pull shell status \
         clean fclean re install backup restore redeploy-addon \
-        first-setup test test-list check-engine
+        first-setup test test-list test-pure check-engine
 
 check-engine:
 	@if [ -z "$(ENGINE)" ]; then \
@@ -124,6 +125,9 @@ test: check-engine ## Lance les tests de l'add-on dans le container
 
 test-list: check-engine ## Liste les tests sans les executer
 	$(MAKE) test ARGS="--list-tests"
+
+test-pure: ## Tests de logique pure, sans container (instantane)
+	@python $(ADDON_DIR)/senaite/trimeta/samplefields/tests/run_pure.py
 
 # ---------------------------------------------------------------------
 # Sauvegarde / restauration

@@ -69,6 +69,9 @@
       factory=".indexers.getSampleCode"
       />
 
+  <!-- Colonnes Code echantillon / Lot dans les listings -->
+  <include package=".listings" />
+
   <!-- =============================================================
        Suggestions partagees
        ============================================================= -->

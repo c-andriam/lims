@@ -26,6 +26,9 @@ Add-on SENAITE 2.6 pour Trimeta Group.
   rend affichable, triable et filtrable dans les listings.
 - **Champ « Lot »** — le champ natif `ClientSampleID` est présenté sous
   le libellé « Lot », et la référence en doublon est masquée.
+- **Colonnes de listing** — le code échantillon apparaît dans la liste
+  des Échantillons (avec le Lot), dans la grille de saisie des Work
+  Sheets et dans la liste des rapports d'analyse.
 
 ## Installation
 
@@ -53,19 +56,27 @@ Si l'add-on était déjà installé dans une version antérieure, jouer les
 ## Tests
 
 ```bash
-make test                    # toute la suite
+make test-pure               # logique pure, instantané, sans container
+make test                    # toute la suite, dans le container
 make test-list               # liste les tests sans les exécuter
 make test ARGS="-t test_sample_is_findable_by_code"
 ```
 
-Les tests s'exécutent **dans le container**, sur une instance Plone
-jetable montée par la couche de test de `senaite.core` : ils ne
-touchent jamais les données de production.
+`make test` s'exécute **dans le container**, sur une instance Plone
+jetable montée par la couche de test de `senaite.core` : les données de
+production ne sont jamais touchées. Le premier lancement prend une
+minute, le temps de monter le site.
 
-Certains tests ne nécessitent aucun site Plone (vocabulaires,
-normalisation d'index, déclaration du schéma) et s'exécutent en
-quelques millisecondes ; les autres montent un site complet, ce qui
-prend une minute au premier lancement.
+`make test-pure` couvre la partie de l'add-on qui ne dépend ni de Zope
+ni de SENAITE — déclaration des champs, vocabulaires, normalisation
+d'index, insertion de colonnes, discrimination des adaptateurs de
+listing. Il tourne en quelques millisecondes sur n'importe quel poste,
+en remplaçant les imports SENAITE par des doublures minimales.
+
+**`make test-pure` ne remplace pas `make test`.** Il ne prouve pas que
+l'add-on fonctionne dans SENAITE : l'installation du profil, les index
+de catalogue, le schéma sur un échantillon réel et les suggestions ont
+besoin d'un vrai site.
 
 ## Architecture
 
@@ -73,6 +84,7 @@ prend une minute au premier lancement.
 |---|---|
 | `extender.py` | Champs des sections Réception et Analyse |
 | `qualitydata/` | Section Assurance Qualité (41 champs) |
+| `listings/` | Colonnes ajoutées aux listings |
 | `schema_modifier.py` | Retouches sur les champs natifs |
 | `patches/` | Correctif sur `after_receive` du workflow |
 | `catalog.py` | Déclare les index et colonnes à créer |
@@ -124,6 +136,24 @@ Les lots de solvants et les numéros de série bénéficient du « rajout
 mémorisé ». Comme ils sont saisis après la création de l'échantillon,
 un second abonné (`on_sample_modified`) est nécessaire : celui qui
 écoute la création ne les verrait jamais.
+
+### Les adaptateurs de listing
+
+L'usage courant est d'enregistrer un `IListingViewAdapter` pour une
+classe de vue précise. C'est plus fin, mais fragile : SENAITE a déplacé
+ses vues de listing d'un module à l'autre au fil des versions 2.x, et
+un chemin devenu faux fait échouer le chargement du ZCML — donc le
+démarrage complet de l'instance, pas seulement la colonne concernée.
+
+Les adaptateurs sont donc enregistrés pour l'interface `IListingView` et
+un contexte quelconque, et chacun déclare ce sur quoi il s'applique via
+sa liste `portal_types`. Le coût est de deux comparaisons de chaînes par
+listing affiché ; le bénéfice est qu'une réorganisation interne de
+SENAITE fait au pire disparaître une colonne, jamais tomber le site.
+
+Même logique pour les erreurs : `before_render` et `folder_item`
+attrapent tout et journalisent. Mieux vaut une colonne vide qu'un écran
+de listing qui ne s'affiche plus.
 
 ## Traductions
 
