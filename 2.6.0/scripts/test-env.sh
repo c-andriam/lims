@@ -35,11 +35,25 @@ section() {
 }
 
 # L'interpreteur peut s'appeler python ou python3 selon l'image.
-PY="$(run 'command -v python || command -v python3' | tr -d '\r')"
-if [ -z "$PY" ]; then
-    echo "ERREUR: aucun interpreteur python trouve dans le container." >&2
-    exit 1
-fi
+#
+# ATTENTION: run() capture aussi la sortie d'erreur. Sans
+# validation, un message d'erreur se retrouverait injecte dans les
+# commandes construites plus bas, ou ses parentheses seraient lues
+# comme du code shell.  On exige donc un chemin absolu, rien
+# d'autre.
+#
+# python3 est cherche EN PREMIER: certaines images embarquent
+# encore un python2 qui repondrait a `command -v python` sans rien
+# pouvoir importer du buildout.
+PY="$(run "command -v python3 || command -v python" | tr -d '\r' | tr -d '\n')"
+case "$PY" in
+    /*python*) ;;
+    *)
+        echo "ERREUR: aucun interpreteur python utilisable dans" >&2
+        echo "le container. Reponse obtenue: $PY" >&2
+        exit 1
+        ;;
+esac
 
 section "Interpreteur"
 echo "Chemin  : $PY"
