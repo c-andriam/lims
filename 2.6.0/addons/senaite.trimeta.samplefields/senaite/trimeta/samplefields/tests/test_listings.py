@@ -245,15 +245,26 @@ class TestFailureIsolation(unittest.TestCase):
         def fill_item(self, obj, item, index):
             raise RuntimeError("remplissage casse")
 
+    # Avaler une erreur en silence serait pire que la laisser passer:
+    # la colonne disparaitrait sans que personne ne sache pourquoi.
+    # assertLogs verifie donc que l'erreur est bien journalisee -- et,
+    # au passage, capture la trace au lieu de l'afficher au milieu
+    # d'une execution de tests reussie.
+    LOGGER = "senaite.trimeta.samplefields"
+
     def test_before_render_swallows_errors(self):
         listing = FakeListing(portal_type="AnalysisRequest")
-        self.BrokenAdapter(listing, None).before_render()
+        with self.assertLogs(self.LOGGER, level="ERROR") as captured:
+            self.BrokenAdapter(listing, None).before_render()
+        self.assertIn("colonnes cassees", str(captured.output))
 
     def test_folder_item_returns_the_item_unchanged(self):
         listing = FakeListing(portal_type="AnalysisRequest")
         adapter = self.BrokenAdapter(listing, None)
-        item = adapter.folder_item(FakeBrain(), {"existing": 1}, 0)
+        with self.assertLogs(self.LOGGER, level="ERROR") as captured:
+            item = adapter.folder_item(FakeBrain(), {"existing": 1}, 0)
         self.assertEqual(item, {"existing": 1})
+        self.assertIn("remplissage casse", str(captured.output))
 
 
 def test_suite():
