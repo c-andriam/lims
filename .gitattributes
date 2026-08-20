@@ -1,0 +1,15 @@
+# Ce projet se deploie sur Linux depuis des postes Windows.
+#
+# Les fichiers ci-dessous DOIVENT arriver en LF sur le serveur: un
+# script shell en CRLF echoue avec "bad interpreter: /bin/sh^M", et un
+# Makefile en CRLF produit des erreurs de recette illisibles.
+# core.autocrlf fait deja ce travail sur ce poste, mais c'est une
+# configuration locale: on ne peut pas compter dessus ailleurs.
+*.sh      text eol=lf
+Makefile  text eol=lf
+*.cfg     text eol=lf
+*.yml     text eol=lf
+
+# Catalogues de traduction compiles: format binaire, toute conversion
+# de fin de ligne les corrompt.
+*.mo      binary
