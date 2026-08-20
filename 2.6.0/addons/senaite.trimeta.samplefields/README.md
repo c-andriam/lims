@@ -53,6 +53,26 @@ Si l'add-on était déjà installé dans une version antérieure, jouer les
 
     http://<hôte>:8080/senaite/portal_setup/manage_upgrades
 
+### Si `git checkout` échoue avec « Permission denied »
+
+`compose.yml` monte ce répertoire dans le container. Quand buildout
+s'exécute dedans, il y écrit des fichiers (`egg-info`, `__pycache__`)
+sous l'identité de l'utilisateur du container — et git ne peut alors
+plus les modifier depuis l'hôte.
+
+```bash
+cd 2.6.0
+make fix-perms
+```
+
+Le script essaie d'abord `podman unshare`, qui ne demande aucun droit
+root, puis retombe sur `sudo chown` si nécessaire.
+
+`egg-info/` n'est volontairement **pas** versionné : buildout le
+régénère à chaque déploiement. Après un `git checkout` qui l'a supprimé,
+relancer `make redeploy-addon` pour le reconstruire — sans lui, le
+paquet n'est pas résolu et l'add-on ne se charge pas.
+
 ## Tests
 
 ```bash

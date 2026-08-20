@@ -31,7 +31,7 @@ ARGS ?=
 
 .PHONY: help debug up down restart logs ps build pull shell status \
         clean fclean re install backup restore redeploy-addon \
-        first-setup test test-list test-pure check-engine
+        first-setup test test-list test-pure check-engine fix-perms
 
 check-engine:
 	@if [ -z "$(ENGINE)" ]; then \
@@ -128,6 +128,9 @@ test-list: check-engine ## Liste les tests sans les executer
 
 test-pure: ## Tests de logique pure, sans container (instantane)
 	@python $(ADDON_DIR)/senaite/trimeta/samplefields/tests/run_pure.py
+
+fix-perms: ## Repare les droits sur addons/ apres un buildout en container
+	@ENGINE=$(ENGINE) TARGET=addons sh scripts/fix-perms.sh
 
 # ---------------------------------------------------------------------
 # Sauvegarde / restauration

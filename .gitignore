@@ -9,3 +9,10 @@ requirements.txt
 docker-entrypoint.sh
 docker-initialize.py
 docker-compose.yml.orig
+
+# Genere par buildout DANS le container, sur un repertoire monte depuis
+# l'hote. Le suivre en versionnant produisait deux problemes: des diffs
+# parasites a chaque deploiement, et des fichiers appartenant a
+# l'utilisateur du container que git ne pouvait plus modifier
+# (cf. make fix-perms).
+*.egg-info/
