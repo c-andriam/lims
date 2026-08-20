@@ -17,7 +17,10 @@ ENGINE := $(shell \
 	else echo ""; fi)
 
 SERVICE       := senaite
-PORT          := 8080
+# Port publie sur l'hote. Surcharge ponctuelle: make up PORT=8081
+# Surcharge permanente: ecrire SENAITE_PORT=8081 dans 2.6.0/.env
+PORT          ?= 8080
+export SENAITE_PORT := $(PORT)
 SITE_URL      := http://localhost:$(PORT)/senaite
 IMAGE         := docker.io/senaite/senaite:v2.6.0
 INSTANCE_DIR  := /home/senaite/senaitelims

@@ -66,7 +66,7 @@ if [ -n "$ENGINE" ]; then
     echo "Volume monte sur /data, par container :"
     for name in $("$ENGINE" ps -a --format '{{.Names}}' 2>/dev/null); do
         vol="$("$ENGINE" inspect -f \
-            '{{range .Mounts}}{{if eq .Destination "/data"}}{{.Name}}{{.Source}}{{end}}{{end}}' \
+            '{{range .Mounts}}{{if eq .Destination "/data"}}{{.Name}}  [{{.Source}}]{{end}}{{end}}' \
             "$name" 2>/dev/null)"
         [ -n "$vol" ] && echo "  $name  ->  $vol"
     done

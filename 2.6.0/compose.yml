@@ -4,7 +4,10 @@ services:
     container_name: senaite
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      # Port publie sur l'hote, configurable: cette machine heberge
+      # d'autres applications qui peuvent revendiquer le meme port.
+      # Surcharge via .env (SENAITE_PORT=8081) ou make up PORT=8081.
+      - "${SENAITE_PORT:-8080}:8080"
     volumes:
       - senaite-data:/data
       - ./addons/senaite.trimeta.samplefields:/home/senaite/senaitelims/src/senaite.trimeta.samplefields
