@@ -134,17 +134,10 @@ test-pure: ## Tests de logique pure, sans container (instantane)
 # ---------------------------------------------------------------------
 
 backup: check-engine ## Sauvegarde le volume de donnees
-	@mkdir -p backups
-	$(ENGINE) run --rm -v senaite-data:/data -v $(PWD)/backups:/backup \
-		alpine tar czf /backup/senaite-data-$$(date +%Y%m%d-%H%M%S).tar.gz -C /data .
-	@echo "Backup cree dans ./backups/"
+	@ENGINE=$(ENGINE) SERVICE=$(SERVICE) sh scripts/backup.sh
 
-restore: check-engine ## Restaure un backup (usage: make restore FILE=backups/xxx.tar.gz)
-	@if [ -z "$(FILE)" ]; then \
-		echo "ERREUR: precise le fichier, ex: make restore FILE=backups/xxx.tar.gz"; \
-		exit 1; fi
-	$(ENGINE) run --rm -v senaite-data:/data -v $(PWD)/backups:/backup \
-		alpine tar xzf /backup/$(notdir $(FILE)) -C /data
+restore: check-engine ## Restaure (FILE=backups/x.tar.gz CONFIRM=yes)
+	@ENGINE=$(ENGINE) SERVICE=$(SERVICE) FILE="$(FILE)" CONFIRM="$(CONFIRM)" sh scripts/restore.sh
 
 # ---------------------------------------------------------------------
 # Nettoyage
