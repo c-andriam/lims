@@ -51,7 +51,7 @@ ARGS ?=
 
 .PHONY: help debug up down restart logs ps pull shell status \
         clean fclean re install backup restore redeploy-addon \
-        first-setup test test-list test-pure check-engine fix-perms doctor require-running test-env impress-info
+        first-setup test test-list test-pure check-engine fix-perms doctor require-running test-env impress-info sync
 
 check-engine:
 	@if [ -z "$(ENGINE)" ]; then \
@@ -174,6 +174,12 @@ require-running: check-engine
 
 doctor: ## Etat des lieux: containers, ports, volumes, droits, add-on
 	@ENGINE=$(ENGINE) SERVICE=$(SERVICE) PORT=$(PORT) ADDON_DIR=addons sh scripts/doctor.sh
+
+sync: ## Recupere les dernieres modifications, droits d'abord
+	@# L'ordre compte: un git pull bute sur les fichiers que le
+	@# container s'est appropries. On reprend la main avant.
+	@ENGINE=$(ENGINE) TARGET=addons sh scripts/fix-perms.sh
+	@git -C .. pull
 
 fix-perms: ## Repare les droits sur addons/ apres un buildout en container
 	@ENGINE=$(ENGINE) TARGET=addons sh scripts/fix-perms.sh
