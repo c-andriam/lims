@@ -22,6 +22,9 @@ setup(
         "Framework :: Plone",
         "Framework :: Zope2",
         "Programming Language :: Python",
+        # L'image senaite/senaite:v2.6.0 deployee tourne en Python 2.7
+        # (eggs cp27mu). Le code doit rester compatible avec les deux.
+        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
     ],
     keywords="senaite lims trimeta samplefields",

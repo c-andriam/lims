@@ -7,6 +7,8 @@ est un ARReport, qui pointe vers l'echantillon dont il rend compte.
 """
 
 from bika.lims import api
+
+from senaite.trimeta.samplefields.compat import string_types
 from senaite.app.listing.interfaces import IListingViewAdapter
 from zope.i18nmessageid import MessageFactory
 from zope.interface import implementer
@@ -37,7 +39,7 @@ class ReportsListingAdapter(BaseListingAdapter):
     def get_sample_uid(self, report):
         """UID de l'echantillon dont le rapport rend compte."""
         uid = getattr(report, "getAnalysisRequestUID", None)
-        if isinstance(uid, str) and uid:
+        if isinstance(uid, string_types) and uid:
             return uid
         try:
             obj = api.get_object(report)

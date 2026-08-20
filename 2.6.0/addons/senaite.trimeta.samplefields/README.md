@@ -118,6 +118,29 @@ l'add-on fonctionne dans SENAITE : l'installation du profil, les index
 de catalogue, le schéma sur un échantillon réel et les suggestions ont
 besoin d'un vrai site.
 
+## Python 2, pas Python 3
+
+L'image `senaite/senaite:v2.6.0` déployée ici tourne en **Python 2.7**
+(eggs `cp27mu`, `/usr/local/bin/python` → 2.7.18). Le code de l'add-on
+doit rester compatible avec les deux versions.
+
+Le piège principal est le type des chaînes : sur Python 2, `str`
+désigne des **octets** et `unicode` du texte ; sur Python 3, c'est
+l'inverse. Un `isinstance(valeur, str)` écrit pour Python 3 est donc
+faux sur Python 2, et le comportement qui s'ensuit est **silencieux** :
+
+- `str(u"Réception")` lève `UnicodeEncodeError` — l'échantillon devient
+  non indexable ;
+- `tuple(u"AnalysisRequest")` renvoie quinze caractères au lieu d'un
+  type de contenu — une colonne de listing disparaît sans erreur.
+
+Utiliser `compat.string_types` et `compat.to_text` plutôt que `str`.
+`unittest.assertLogs` n'existe pas non plus sur 2.7 : voir
+`capture_logs` dans `tests/test_listings.py`.
+
+`tests/run_pure.py` fait exception : il s'exécute sur le **Python 3 de
+l'hôte**, jamais dans le container, et peut donc utiliser `importlib`.
+
 ## Architecture
 
 | Fichier | Rôle |
@@ -127,6 +150,7 @@ besoin d'un vrai site.
 | `listings/` | Colonnes ajoutées aux listings |
 | `schema_modifier.py` | Retouches sur les champs natifs |
 | `patches/` | Correctif sur `after_receive` du workflow |
+| `compat.py` | Compatibilité Python 2 / 3 sur les chaînes |
 | `catalog.py` | Déclare les index et colonnes à créer |
 | `indexers.py` | Indexeurs nommés pour les champs schemaextender |
 | `setuphandlers.py` | Création des index + réindexation à l'installation |

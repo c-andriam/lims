@@ -11,6 +11,8 @@ mecanisme fiable pour indexer un champ schemaextender (voir catalog.py).
 from bika.lims.interfaces import IAnalysisRequest
 from plone.indexer import indexer
 
+from senaite.trimeta.samplefields.compat import to_text
+
 
 def get_field_value(instance, fieldname, default=""):
     """Lit la valeur d'un champ etendu sans supposer l'existence d'un
@@ -29,15 +31,13 @@ def get_field_value(instance, fieldname, default=""):
 
 
 def to_index_string(value):
-    """Normalise une valeur pour un FieldIndex: toujours une chaine,
-    jamais None (sinon le catalogue stocke un marqueur inutilisable)."""
-    if value is None:
-        return ""
-    if isinstance(value, bytes):
-        value = value.decode("utf-8", "replace")
-    elif not isinstance(value, str):
-        value = str(value)
-    return value.strip()
+    """Normalise une valeur pour un FieldIndex: toujours du texte,
+    jamais None (sinon le catalogue stocke un marqueur inutilisable).
+
+    Passe par compat.to_text: sur Python 2, `str(u"Réception")` leverait
+    UnicodeEncodeError et rendrait l'echantillon non indexable.
+    """
+    return to_text(value).strip()
 
 
 @indexer(IAnalysisRequest)

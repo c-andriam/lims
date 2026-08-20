@@ -99,6 +99,33 @@ run "sed -n '1,110p' $IMPRESS/templates/reports/Default.pt 2>/dev/null"
 section "Stockage des PDF: adaptateur a surcharger pour le nommage"
 run "grep -n 'class \|def \|ARReport\|filename' $IMPRESS/storage.py 2>/dev/null | head -40"
 
+section "Vue specifique aux echantillons (analysisrequest/)"
+# Default.pt n'est qu'un assemblage: chaque section du COA est un
+# template a part, rendu par une methode render_<section>. Pour changer
+# le contenu du COA il suffit donc de surcharger LES SECTIONS voulues,
+# pas le rapport entier.
+run "ls -1 $IMPRESS/analysisrequest/ 2>/dev/null"
+
+section "Templates de section du COA"
+run "ls -1 $IMPRESS/analysisrequest/templates/ 2>/dev/null"
+
+section "Methodes de la vue echantillon"
+run "grep -n 'class \|    def ' $IMPRESS/analysisrequest/reportview.py 2>/dev/null | head -80"
+
+section "Section INFO du COA (celle a modifier en priorite)"
+# C'est elle qui porte les caracteristiques de l'echantillon: c'est la
+# que doivent apparaitre poids, temperature, designation, lot, client.
+run "cat $IMPRESS/analysisrequest/templates/info.pt 2>/dev/null | head -80"
+
+section "Stockage: methode store() complete"
+run "sed -n '30,130p' $IMPRESS/storage.py 2>/dev/null"
+
+section "Nommage du PDF telecharge (publishview.py)"
+run "sed -n '190,225p' $IMPRESS/publishview.py 2>/dev/null"
+
+section "store_multireports_individually: piste pour la demande D11"
+run "grep -rn 'store_multireports_individually\|store_individually' $IMPRESS/ 2>/dev/null | grep -v '.pyo' | head -10"
+
 section "Interfaces publiques"
 run "grep -n 'class I' $IMPRESS/interfaces.py 2>/dev/null | head -30"
 

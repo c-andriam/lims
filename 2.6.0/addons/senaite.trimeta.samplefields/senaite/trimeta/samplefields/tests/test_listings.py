@@ -12,8 +12,10 @@ vide sur des ecrans qui n'ont rien a voir, et une erreur non rattrapee
 empecherait le listing de s'afficher.
 """
 
+import logging
 import unittest
 from collections import OrderedDict
+from contextlib import contextmanager
 
 from senaite.trimeta.samplefields.listings.base import BaseListingAdapter
 from senaite.trimeta.samplefields.listings.base import insert_column_after
@@ -35,6 +37,38 @@ class FakeListing(object):
             self.contentFilter["portal_type"] = portal_type
         self.columns = OrderedDict(columns or [])
         self.review_states = review_states or []
+
+
+@contextmanager
+def capture_logs(name, level=logging.ERROR):
+    """Capture les enregistrements d'un logger, sur Python 2 comme 3.
+
+    unittest.assertLogs n'existe qu'a partir de Python 3.4, et le
+    container SENAITE deploye tourne en Python 2.7.
+
+    Capturer sert deux buts: verifier que l'incident est bien trace, et
+    eviter que la pile d'appels ne s'affiche au milieu d'une execution
+    de tests reussie.
+    """
+    logger = logging.getLogger(name)
+    records = []
+
+    class _Collector(logging.Handler):
+        def emit(self, record):
+            records.append(record)
+
+    handler = _Collector()
+    previous_level = logger.level
+    previous_propagate = logger.propagate
+    logger.addHandler(handler)
+    logger.setLevel(level)
+    logger.propagate = False
+    try:
+        yield records
+    finally:
+        logger.removeHandler(handler)
+        logger.setLevel(previous_level)
+        logger.propagate = previous_propagate
 
 
 class FakeBrain(object):
@@ -246,25 +280,26 @@ class TestFailureIsolation(unittest.TestCase):
             raise RuntimeError("remplissage casse")
 
     # Avaler une erreur en silence serait pire que la laisser passer:
-    # la colonne disparaitrait sans que personne ne sache pourquoi.
-    # assertLogs verifie donc que l'erreur est bien journalisee -- et,
-    # au passage, capture la trace au lieu de l'afficher au milieu
-    # d'une execution de tests reussie.
+    # la colonne disparaitrait sans que personne ne sache pourquoi. On
+    # verifie donc les deux moities du contrat -- le listing survit ET
+    # l'incident est trace.
     LOGGER = "senaite.trimeta.samplefields"
 
     def test_before_render_swallows_errors(self):
         listing = FakeListing(portal_type="AnalysisRequest")
-        with self.assertLogs(self.LOGGER, level="ERROR") as captured:
+        with capture_logs(self.LOGGER) as records:
             self.BrokenAdapter(listing, None).before_render()
-        self.assertIn("colonnes cassees", str(captured.output))
+        self.assertEqual(len(records), 1)
+        self.assertIn("colonnes cassees", str(records[0].exc_info[1]))
 
     def test_folder_item_returns_the_item_unchanged(self):
         listing = FakeListing(portal_type="AnalysisRequest")
         adapter = self.BrokenAdapter(listing, None)
-        with self.assertLogs(self.LOGGER, level="ERROR") as captured:
+        with capture_logs(self.LOGGER) as records:
             item = adapter.folder_item(FakeBrain(), {"existing": 1}, 0)
         self.assertEqual(item, {"existing": 1})
-        self.assertIn("remplissage casse", str(captured.output))
+        self.assertEqual(len(records), 1)
+        self.assertIn("remplissage casse", str(records[0].exc_info[1]))
 
 
 def test_suite():

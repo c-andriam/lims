@@ -34,7 +34,20 @@ class TestIndexStringNormalisation(unittest.TestCase):
         self.assertEqual(to_index_string(42), "42")
 
     def test_accents_survive(self):
+        """Sur Python 2, un str() naif sur du texte accentue leverait
+        UnicodeEncodeError et rendrait l'echantillon non indexable."""
         self.assertEqual(to_index_string(u"Réception"), u"Réception")
+
+    def test_result_is_always_text(self):
+        """Jamais d'octets en retour: le catalogue melangerait alors des
+        types et le tri deviendrait incoherent."""
+        from senaite.trimeta.samplefields.compat import text_type
+        for value in (None, b"ECH-1", u"ECH-2", 42, u"Réception"):
+            self.assertIsInstance(to_index_string(value), text_type)
+
+    def test_utf8_bytes_are_decoded(self):
+        self.assertEqual(to_index_string(u"Réception".encode("utf-8")),
+                         u"Réception")
 
 
 class TestSampleCodeIndex(TrimetaTestCase):

@@ -22,6 +22,8 @@ import logging
 
 from bika.lims import api
 
+from senaite.trimeta.samplefields.compat import string_types
+
 logger = logging.getLogger("senaite.trimeta.samplefields")
 
 
@@ -96,7 +98,11 @@ class BaseListingAdapter(object):
         portal_type = content_filter.get("portal_type")
         if not portal_type:
             return ()
-        if isinstance(portal_type, str):
+        # string_types couvre str ET unicode: sur Python 2, un
+        # portal_type unicode echouerait le test et tuple() le
+        # decouperait en caracteres. La colonne disparaitrait alors
+        # sans la moindre erreur.
+        if isinstance(portal_type, string_types):
             return (portal_type,)
         return tuple(portal_type)
 

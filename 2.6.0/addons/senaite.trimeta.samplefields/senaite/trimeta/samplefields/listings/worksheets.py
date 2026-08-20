@@ -14,6 +14,8 @@ quelques dizaines d'analyses reparties sur bien moins d'echantillons.
 """
 
 from bika.lims import api
+
+from senaite.trimeta.samplefields.compat import string_types
 from senaite.app.listing.interfaces import IListingViewAdapter
 from zope.i18nmessageid import MessageFactory
 from zope.interface import implementer
@@ -53,7 +55,7 @@ class WorksheetAnalysesAdapter(BaseListingAdapter):
         controle, rendus particuliers).
         """
         uid = getattr(analysis, "getRequestUID", None)
-        if isinstance(uid, str) and uid:
+        if isinstance(uid, string_types) and uid:
             return uid
         try:
             obj = api.get_object(analysis)
