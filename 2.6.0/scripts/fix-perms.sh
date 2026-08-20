@@ -9,15 +9,26 @@
 # container, qui n'est pas celle du compte du serveur.
 #
 # Resultat: git ne peut plus ni modifier ni supprimer ces fichiers, et
-# un `git checkout` echoue avec une pluie de "Permission denied".
+# un `git pull` echoue avec "Permission denied".
 #
-# Ce script diagnostique la situation puis repare, en essayant d'abord
-# la methode qui ne demande pas les droits root.
+# Ce script est appele automatiquement a la fin de `make redeploy-addon`
+# (en mode QUIET), pour que le probleme ne se represente plus. Il reste
+# lancable a la main via `make fix-perms`.
+#
+# Variables:
+#   TARGET   repertoire a reparer (defaut: addons)
+#   ENGINE   podman ou docker
+#   QUIET    si "1", ne parle que s'il y a quelque chose a reparer
 
 set -eu
 
 TARGET="${TARGET:-addons}"
 ENGINE="${ENGINE:-}"
+QUIET="${QUIET:-}"
+
+say() {
+    [ "$QUIET" = "1" ] || echo "$@"
+}
 
 if [ ! -d "$TARGET" ]; then
     echo "ERREUR: '$TARGET' introuvable." >&2
@@ -28,20 +39,26 @@ fi
 MY_UID="$(id -u)"
 MY_GID="$(id -g)"
 
-echo "Compte courant : $(id -un) (uid=$MY_UID gid=$MY_GID)"
-echo ""
-echo "Proprietaires actuels dans $TARGET :"
-find "$TARGET" ! -user "$MY_UID" -printf '  uid=%U gid=%G  %p\n' 2>/dev/null \
-    | head -10 || true
-
 FOREIGN="$(find "$TARGET" ! -user "$MY_UID" 2>/dev/null | wc -l | tr -d ' ')"
+
 if [ "$FOREIGN" -eq 0 ]; then
-    echo "  (aucun -- rien a reparer)"
+    say "Droits sur $TARGET: tout appartient a $(id -un), rien a faire."
     exit 0
 fi
-echo ""
-echo "$FOREIGN fichier(s) appartiennent a un autre utilisateur."
-echo ""
+
+# A partir d'ici il y a quelque chose a reparer: on parle, meme en mode
+# QUIET. Une reparation silencieuse cacherait un comportement qui merite
+# d'etre visible.
+echo "Droits: $FOREIGN fichier(s) de $TARGET appartiennent a un autre"
+echo "utilisateur (buildout a tourne dans le container). Reparation..."
+
+if [ "$QUIET" != "1" ]; then
+    echo ""
+    echo "Compte courant : $(id -un) (uid=$MY_UID gid=$MY_GID)"
+    find "$TARGET" ! -user "$MY_UID" -printf '  uid=%U gid=%G  %p\n' \
+        2>/dev/null | head -10 || true
+    echo ""
+fi
 
 # --- Methode 1: podman rootless.
 # Les fichiers ecrits par le container appartiennent a des sous-uid que
@@ -53,13 +70,12 @@ if [ "$ENGINE" = "podman" ] || command -v podman >/dev/null 2>&1; then
         echo "Repare via 'podman unshare' (aucun droit root necessaire)."
         exit 0
     fi
-    echo "'podman unshare' n'a pas suffi (container en mode root ?)."
-    echo ""
+    say "'podman unshare' n'a pas suffi (container en mode root ?)."
 fi
 
 # --- Methode 2: chown classique, demande les droits root.
 if command -v sudo >/dev/null 2>&1; then
-    echo "Tentative avec sudo..."
+    say "Tentative avec sudo..."
     sudo chown -R "$MY_UID:$MY_GID" "$TARGET"
     echo "Repare via sudo."
     exit 0

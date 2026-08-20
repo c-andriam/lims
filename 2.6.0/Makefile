@@ -93,6 +93,7 @@ shell: check-engine ## Ouvre un shell dans le container
 redeploy-addon: require-running ## Recharge l'add-on apres modification dans addons/
 	$(ENGINE) exec -i $(SERVICE) bash -c \
 		"cd $(INSTANCE_DIR) && buildout -c custom.cfg"
+	@ENGINE=$(ENGINE) TARGET=addons QUIET=1 sh scripts/fix-perms.sh
 	$(MAKE) restart
 	@echo ""
 	@echo "Add-on redeploye. Verifie les logs avec: make logs"

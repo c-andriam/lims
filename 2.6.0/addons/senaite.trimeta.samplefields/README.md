@@ -68,6 +68,10 @@ make fix-perms
 Le script essaie d'abord `podman unshare`, qui ne demande aucun droit
 root, puis retombe sur `sudo chown` si nécessaire.
 
+`make redeploy-addon` l'exécute désormais automatiquement juste après
+buildout : le problème ne devrait plus se présenter. La cible reste
+disponible pour les cas où buildout a été lancé à la main.
+
 `egg-info/` n'est volontairement **pas** versionné : buildout le
 régénère à chaque déploiement. Après un `git checkout` qui l'a supprimé,
 relancer `make redeploy-addon` pour le reconstruire — sans lui, le
