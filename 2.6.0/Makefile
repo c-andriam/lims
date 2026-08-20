@@ -16,6 +16,11 @@ ENGINE := $(shell \
 	elif command -v docker >/dev/null 2>&1; then echo "docker"; \
 	else echo ""; fi)
 
+# Interpreteur de l'HOTE, pour les tests qui ne passent pas par le
+# container. Les distributions recentes ne fournissent plus de commande
+# `python` tout court: on cherche python3 d'abord.
+PYTHON        := $(shell command -v python3 2>/dev/null || command -v python 2>/dev/null)
+
 SERVICE       := senaite
 # Port publie sur l'hote. Surcharge ponctuelle: make up PORT=8081
 # Surcharge permanente: ecrire SENAITE_PORT=8081 dans 2.6.0/.env
@@ -43,6 +48,7 @@ check-engine:
 debug: ## Affiche les outils detectes
 	@echo "Outil compose  : $(COMPOSE)"
 	@echo "Moteur conteneur: $(if $(ENGINE),$(ENGINE),AUCUN)"
+	@echo "Python hote     : $(if $(PYTHON),$(PYTHON),AUCUN)"
 
 help: ## Affiche cette aide
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -137,7 +143,13 @@ test-list: require-running ## Liste les tests sans les executer
 	$(MAKE) test ARGS="--list-tests"
 
 test-pure: ## Tests de logique pure, sans container (instantane)
-	@python $(ADDON_DIR)/senaite/trimeta/samplefields/tests/run_pure.py
+	@if [ -z "$(PYTHON)" ]; then \
+	  echo "ERREUR: aucun interpreteur python sur l'hote."; \
+	  echo "Installe python3, ou lance les tests dans le"; \
+	  echo "container avec 'make test'."; \
+	  exit 1; \
+	fi
+	@$(PYTHON) $(ADDON_DIR)/senaite/trimeta/samplefields/tests/run_pure.py
 
 require-running: check-engine
 	@ENGINE=$(ENGINE) SERVICE=$(SERVICE) PORT=$(PORT) sh scripts/require-running.sh
