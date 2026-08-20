@@ -34,7 +34,7 @@ ARGS ?=
 
 .PHONY: help debug up down restart logs ps pull shell status \
         clean fclean re install backup restore redeploy-addon \
-        first-setup test test-list test-pure check-engine fix-perms doctor require-running
+        first-setup test test-list test-pure check-engine fix-perms doctor require-running test-env
 
 check-engine:
 	@if [ -z "$(ENGINE)" ]; then \
@@ -120,12 +120,18 @@ test: require-running ## Lance les tests de l'add-on dans le container
 	    RUNNER="bin/zope-testrunner"; \
 	  else \
 	    echo "ERREUR: aucun testrunner dans $(INSTANCE_DIR)/bin."; \
-	    echo "Ajoute zope.testrunner au buildout, puis relance"; \
-	    echo "make redeploy-addon."; \
+	    echo "Lance 'make test-env' pour inventorier ce qui"; \
+	    echo "est disponible dans le container."; \
+	    echo ""; \
+	    echo "En attendant, 'make test-pure' tourne sans container"; \
+	    echo "et couvre 54 tests de logique pure."; \
 	    exit 1; \
 	  fi; \
 	  echo "Runner: $$RUNNER"; \
 	  $$RUNNER --test-path=$(ADDON_SRC) -s $(ADDON) $(ARGS)'
+
+test-env: require-running ## Inventorie ce qui permet de lancer les tests
+	@ENGINE=$(ENGINE) SERVICE=$(SERVICE) INSTANCE_DIR=$(INSTANCE_DIR) sh scripts/test-env.sh
 
 test-list: require-running ## Liste les tests sans les executer
 	$(MAKE) test ARGS="--list-tests"
