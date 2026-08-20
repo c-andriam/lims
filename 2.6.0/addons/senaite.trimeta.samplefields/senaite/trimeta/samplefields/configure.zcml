@@ -53,6 +53,9 @@
       for="bika.lims.interfaces.IAnalysisRequest"
       />
 
+  <!-- Section Assurance Qualite (41 champs facultatifs) -->
+  <include package=".qualitydata" />
+
   <!-- =============================================================
        Indexation
        ============================================================= -->
@@ -76,6 +79,14 @@
       for="bika.lims.interfaces.IAnalysisRequest
            zope.lifecycleevent.interfaces.IObjectAddedEvent"
       handler=".suggestions.on_sample_added"
+      />
+
+  <!-- Les champs Assurance Qualite sont saisis APRES la creation:
+       sans cet abonne, leurs valeurs ne seraient jamais memorisees. -->
+  <subscriber
+      for="bika.lims.interfaces.IAnalysisRequest
+           zope.lifecycleevent.interfaces.IObjectModifiedEvent"
+      handler=".suggestions.on_sample_modified"
       />
 
   <include package=".browser" />

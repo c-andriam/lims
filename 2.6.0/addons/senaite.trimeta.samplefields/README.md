@@ -17,8 +17,15 @@ Add-on SENAITE 2.6 pour Trimeta Group.
 - **Date de réception modifiable** — un correctif permet de saisir une
   date de réception antérieure, sans qu'elle soit écrasée au moment de
   la transition « Receive ».
+- **Section Assurance Qualité** — 41 champs facultatifs répartis en
+  7 sous-sections (extraction, dosage HPLC, dessiccateur, AW mètre,
+  vérification de performance des appareils, consommables, validation).
+  Ils sont masqués à la création de l'échantillon et visibles ensuite,
+  puisqu'ils sont renseignés après l'analyse.
 - **Index de catalogue** — le code échantillon est indexé, ce qui le
   rend affichable, triable et filtrable dans les listings.
+- **Champ « Lot »** — le champ natif `ClientSampleID` est présenté sous
+  le libellé « Lot », et la référence en doublon est masquée.
 
 ## Installation
 
@@ -65,7 +72,8 @@ prend une minute au premier lancement.
 | Fichier | Rôle |
 |---|---|
 | `extender.py` | Champs des sections Réception et Analyse |
-| `schema_modifier.py` | Débloque le champ natif `DateReceived` |
+| `qualitydata/` | Section Assurance Qualité (41 champs) |
+| `schema_modifier.py` | Retouches sur les champs natifs |
 | `patches/` | Correctif sur `after_receive` du workflow |
 | `catalog.py` | Déclare les index et colonnes à créer |
 | `indexers.py` | Indexeurs nommés pour les champs schemaextender |
@@ -98,6 +106,37 @@ renommer « Lot » dans l'interface.
 
 Le test `test_lot_uses_the_native_client_sample_id` documente ce choix
 et alerte si SENAITE cessait de fournir cet index.
+
+### La section Assurance Qualité
+
+Les 41 champs se ramènent à cinq formes seulement : une date, un
+opérateur, une conformité OK/NOK, un comptage 1/2/3, un texte libre.
+Chaque forme est une fabrique dans `qualitydata/fields.py` ; les champs
+eux-mêmes sont déclarés par sous-section dans `qualitydata/extender.py`.
+
+Cette structure `SECTIONS` est la source unique de vérité : elle produit
+la liste plate remise à schemaextender, l'ordre de l'onglet, **et** les
+intitulés de sous-section dessinés dans le formulaire par
+`quality_sections.js`. Ajouter un champ à une sous-section suffit — le
+reste suit.
+
+Les lots de solvants et les numéros de série bénéficient du « rajout
+mémorisé ». Comme ils sont saisis après la création de l'échantillon,
+un second abonné (`on_sample_modified`) est nécessaire : celui qui
+écoute la création ne les verrait jamais.
+
+## Traductions
+
+Le catalogue français est dans `locales/fr/LC_MESSAGES/`. Le `.mo` doit
+être recompilé après toute modification du `.po` :
+
+```bash
+msgfmt -o senaite.trimeta.samplefields.mo senaite.trimeta.samplefields.po
+```
+
+Par convention, les traductions existantes sont **sans accents**.
+Conserver cette convention tant que le catalogue n'est pas repris
+d'un bloc, pour éviter un fichier à moitié accentué.
 
 ## Versions du profil
 

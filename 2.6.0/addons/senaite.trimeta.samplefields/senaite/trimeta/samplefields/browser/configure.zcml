@@ -4,17 +4,27 @@
     xmlns:browser="http://namespaces.zope.org/browser"
     i18n_domain="senaite.trimeta.samplefields">
 
-  <!-- Sert le dossier resources/ sous ++resource++senaite.trimeta.samplefields.static -->
+  <!-- Sert le dossier resources/ sous
+       ++resource++senaite.trimeta.samplefields.static -->
   <browser:resourceDirectory
       name="senaite.trimeta.samplefields.static"
       directory="resources"
       />
 
-  <!-- Injecte le script uniquement sur les pages ar_add -->
+  <!-- Formulaire de creation d'echantillon -->
   <browser:viewlet
       name="senaite.trimeta.samplefields.reception_separator"
       manager="plone.app.layout.viewlets.interfaces.IHtmlHead"
       class=".viewlets.ReceptionSeparatorViewlet"
+      permission="zope2.View"
+      layer="bika.lims.interfaces.IBikaLIMS"
+      />
+
+  <!-- Formulaires de modification: sous-sections Assurance Qualite -->
+  <browser:viewlet
+      name="senaite.trimeta.samplefields.quality_sections"
+      manager="plone.app.layout.viewlets.interfaces.IHtmlHead"
+      class=".viewlets.QualitySectionsViewlet"
       permission="zope2.View"
       layer="bika.lims.interfaces.IBikaLIMS"
       />
