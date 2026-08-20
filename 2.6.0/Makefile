@@ -29,9 +29,9 @@ ADDON_DIR     := addons/$(ADDON)
 #   make test ARGS="-t test_sample_is_findable_by_code"
 ARGS ?=
 
-.PHONY: help debug up down restart logs ps build pull shell status \
+.PHONY: help debug up down restart logs ps pull shell status \
         clean fclean re install backup restore redeploy-addon \
-        first-setup test test-list test-pure check-engine fix-perms doctor
+        first-setup test test-list test-pure check-engine fix-perms doctor require-running
 
 check-engine:
 	@if [ -z "$(ENGINE)" ]; then \
@@ -54,7 +54,8 @@ pull: ## Telecharge l'image senaite v2.6.0
 
 up: ## Demarre SENAITE en arriere-plan
 	$(COMPOSE) up -d
-	@echo "SENAITE en cours de demarrage -> $(SITE_URL)"
+	@ENGINE=$(ENGINE) SERVICE=$(SERVICE) PORT=$(PORT) sh scripts/require-running.sh
+	@echo "SENAITE demarre -> $(SITE_URL)"
 
 install: pull up ## Pull + up en une commande
 
@@ -80,7 +81,7 @@ shell: check-engine ## Ouvre un shell dans le container
 # Add-on
 # ---------------------------------------------------------------------
 
-redeploy-addon: check-engine ## Recharge l'add-on apres modification dans addons/
+redeploy-addon: require-running ## Recharge l'add-on apres modification dans addons/
 	$(ENGINE) exec -i $(SERVICE) bash -c \
 		"cd $(INSTANCE_DIR) && buildout -c custom.cfg"
 	$(MAKE) restart
@@ -106,7 +107,7 @@ first-setup: ## Premiere installation complete sur une nouvelle machine
 # Tests
 # ---------------------------------------------------------------------
 
-test: check-engine ## Lance les tests de l'add-on dans le container
+test: require-running ## Lance les tests de l'add-on dans le container
 	@echo "Tests de $(ADDON)..."
 	@$(ENGINE) exec -i $(SERVICE) bash -c '\
 	  cd $(INSTANCE_DIR); \
@@ -123,11 +124,14 @@ test: check-engine ## Lance les tests de l'add-on dans le container
 	  echo "Runner: $$RUNNER"; \
 	  $$RUNNER --test-path=$(ADDON_SRC) -s $(ADDON) $(ARGS)'
 
-test-list: check-engine ## Liste les tests sans les executer
+test-list: require-running ## Liste les tests sans les executer
 	$(MAKE) test ARGS="--list-tests"
 
 test-pure: ## Tests de logique pure, sans container (instantane)
 	@python $(ADDON_DIR)/senaite/trimeta/samplefields/tests/run_pure.py
+
+require-running: check-engine
+	@ENGINE=$(ENGINE) SERVICE=$(SERVICE) PORT=$(PORT) sh scripts/require-running.sh
 
 doctor: ## Etat des lieux: containers, ports, volumes, droits, add-on
 	@ENGINE=$(ENGINE) SERVICE=$(SERVICE) PORT=$(PORT) ADDON_DIR=addons sh scripts/doctor.sh
