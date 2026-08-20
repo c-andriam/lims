@@ -84,9 +84,20 @@ make fix-perms
 Le script essaie d'abord `podman unshare`, qui ne demande aucun droit
 root, puis retombe sur `sudo chown` si nécessaire.
 
-`make redeploy-addon` l'exécute désormais automatiquement juste après
-buildout : le problème ne devrait plus se présenter. La cible reste
-disponible pour les cas où buildout a été lancé à la main.
+`make redeploy-addon` l'exécute automatiquement juste après buildout,
+et il supprime au passage les `.pyc` récupérés.
+
+**La cause de fond est ailleurs** : Python 2 écrit son bytecode *à côté*
+des sources, pas dans un `__pycache__`. Le container en produisait donc
+dans `addons/` — monté depuis l'hôte — à chaque import, c'est-à-dire à
+chaque démarrage de SENAITE. `compose.yml` pose maintenant
+`PYTHONDONTWRITEBYTECODE=1`, ce qui supprime le problème à la racine.
+
+Ce réglage ne prend effet qu'après recréation du container :
+
+```bash
+make down && make up
+```
 
 `egg-info/` n'est volontairement **pas** versionné : buildout le
 régénère à chaque déploiement. Après un `git checkout` qui l'a supprimé,

@@ -13,6 +13,12 @@ services:
       - ./addons/senaite.trimeta.samplefields:/home/senaite/senaitelims/src/senaite.trimeta.samplefields
       - ./custom.cfg:/home/senaite/senaitelims/custom.cfg
     environment:
+      # Python 2 ecrit ses .pyc A COTE des sources, pas dans un
+      # __pycache__. Le container en produirait donc dans le repertoire
+      # addons/ monte depuis l'hote, a chaque import, sous SON identite
+      # -- et git ne pourrait plus toucher ces fichiers.
+      # C'est la cause reelle des "Permission denied" au git pull.
+      - PYTHONDONTWRITEBYTECODE=1
       - SITE=senaite
       - PASSWORD=bebex
       - TZ=Indian/Antananarivo

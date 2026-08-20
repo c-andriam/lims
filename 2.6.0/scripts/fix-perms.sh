@@ -30,6 +30,17 @@ say() {
     [ "$QUIET" = "1" ] || echo "$@"
 }
 
+clean_bytecode() {
+    # Le bytecode Python 2 est ecrit a cote des sources. Ces fichiers
+    # sont regenerables et ne sont pas versionnes: les supprimer evite
+    # qu'ils ne redeviennent un obstacle au prochain git pull.
+    count="$(find "$TARGET" -name '*.pyc' 2>/dev/null | wc -l | tr -d ' ')"
+    if [ "$count" -gt 0 ]; then
+        find "$TARGET" -name '*.pyc' -delete 2>/dev/null || true
+        echo "$count fichier(s) .pyc supprime(s)."
+    fi
+}
+
 if [ ! -d "$TARGET" ]; then
     echo "ERREUR: '$TARGET' introuvable." >&2
     echo "Lance ce script depuis le repertoire 2.6.0/." >&2
@@ -68,6 +79,7 @@ fi
 if [ "$ENGINE" = "podman" ] || command -v podman >/dev/null 2>&1; then
     if podman unshare chown -R 0:0 "$TARGET" 2>/dev/null; then
         echo "Repare via 'podman unshare' (aucun droit root necessaire)."
+        clean_bytecode
         exit 0
     fi
     say "'podman unshare' n'a pas suffi (container en mode root ?)."
@@ -78,6 +90,7 @@ if command -v sudo >/dev/null 2>&1; then
     say "Tentative avec sudo..."
     sudo chown -R "$MY_UID:$MY_GID" "$TARGET"
     echo "Repare via sudo."
+    clean_bytecode
     exit 0
 fi
 
