@@ -76,6 +76,23 @@ if [ -n "$ENGINE" ]; then
     echo "sans savoir quel volume il utilise."
 fi
 
+section "Reponse HTTP de SENAITE"
+# curl ignore HSTS et le cache du navigateur. Si curl repond en clair
+# alors que le navigateur bascule en https, le probleme est cote
+# navigateur, pas cote serveur.
+if command -v curl >/dev/null 2>&1; then
+    echo "GET http://localhost:$PORT/senaite"
+    curl -sS -o /dev/null -D - -m 5 "http://localhost:$PORT/senaite"         2>&1 | grep -i '^HTTP/\|^location:\|^strict-transport'         | sed 's/^/  /' || echo "  (pas de reponse)"
+    echo ""
+    echo "Si la reponse est 200 ou une redirection vers http://, le"
+    echo "serveur va bien: un navigateur qui force https le fait a cause"
+    echo "d'un en-tete HSTS memorise pour cette adresse. HSTS s'applique"
+    echo "a l'HOTE ENTIER, tous ports confondus: un https servi un jour"
+    echo "sur 8443 force ensuite https sur 8080."
+else
+    echo "curl absent, verification impossible"
+fi
+
 section "Droits sur $ADDON_DIR"
 if [ -d "$ADDON_DIR" ]; then
     MY_UID="$(id -u)"
