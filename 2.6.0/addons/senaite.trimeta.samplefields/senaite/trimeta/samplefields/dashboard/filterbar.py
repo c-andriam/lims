@@ -56,6 +56,62 @@ def escape(value):
     return _escape(to_text(value), True)
 
 
+# Mise en forme de la page.
+#
+# Ces regles ne sont PAS globales malgre leur apparence: le viewlet qui
+# les emet ne s'affiche que sur le tableau de bord, elles ne sont donc
+# chargees nulle part ailleurs.
+#
+# Le probleme qu'elles corrigent: vingt colonnes dont les en-tetes se
+# repliaient sur deux ou trois lignes, alignes chacun a une hauteur
+# differente. Les libelles ont d'abord ete raccourcis (voir columns.py);
+# ces regles font le reste.
+STYLE = u"""<style>
+/* En-tetes: une seule ligne, alignes sur la meme base. */
+.senaite-table thead th,
+#content table thead th,
+table thead th {
+  vertical-align: bottom;
+  white-space: nowrap;
+  font-size: .78rem;
+  line-height: 1.2;
+  padding: .45rem .55rem;
+}
+
+/* Cellules: un peu plus compactes, et une largeur bornee pour qu'un
+   nom de client a rallonge ne pousse pas tout le tableau. */
+#content table tbody td,
+table tbody td {
+  font-size: .82rem;
+  padding: .35rem .55rem;
+  vertical-align: middle;
+  max-width: 16rem;
+}
+
+/* Vingt colonnes ne tiennent pas dans une page: on defile
+   horizontalement plutot que de deborder.
+
+   Volontairement PAS sur #content: y poser overflow-x creerait un
+   contexte de formatage qui rognerait le menu de selection des
+   colonnes. Si aucun de ces conteneurs n'existe, on ne change
+   simplement rien -- aucun risque de regression. */
+.senaite-listing,
+.listing-container,
+.table-responsive {
+  overflow-x: auto;
+}
+
+/* Barre de filtres: les champs alignes sur leur base, quelle que soit
+   la hauteur de leur etiquette. */
+.trimeta-dashboard-filters .form-row {
+  align-items: flex-end;
+}
+.trimeta-dashboard-filters label {
+  margin-bottom: .15rem;
+}
+</style>"""
+
+
 class FilterBar(object):
     """Dessine le formulaire de recherche du tableau de bord."""
 
@@ -163,7 +219,7 @@ class FilterBar(object):
                 ).format(url=escape(self.get_action_url()),
                          label=escape(t(_(u"Reset"))))
 
-            return (
+            return STYLE + (
                 u'<form method="get" action="{url}" '
                 u'class="trimeta-dashboard-filters card mb-3">'
                 u'<div class="card-body py-2">'

@@ -25,6 +25,22 @@ from zope.i18nmessageid import MessageFactory
 _ = MessageFactory("senaite.trimeta.samplefields")
 
 
+def col(msgid, default):
+    """Libelle propre au tableau de bord.
+
+    Pourquoi des identifiants dedies plutot que ceux du formulaire:
+    un en-tete de colonne et une etiquette de champ n'ont pas les memes
+    contraintes. "Poids a la reception (g)" est juste sur un
+    formulaire; dans un en-tete, il se replie sur trois lignes et rend
+    la ligne d'en-tetes illisible.
+
+    Raccourcir les libelles existants aurait raccourci du meme coup
+    ceux du formulaire d'echantillon, ou la version longue est la
+    bonne. D'ou ce jeu d'identifiants prefixes `dashboard_`.
+    """
+    return _(msgid, default=default)
+
+
 # ---------------------------------------------------------------------
 # Les sept services d'analyse affiches en colonnes
 # ---------------------------------------------------------------------
@@ -50,13 +66,13 @@ _ = MessageFactory("senaite.trimeta.samplefields")
 #
 # (identifiant de colonne, mot-cle du service, intitule affiche)
 DASHBOARD_ANALYSES = (
-    ("Vanillin",        "VANILLINE",       _(u"Vanillin")),
-    ("GlucoVanillin",   "GLUCOVANILLINE",  _(u"Gluco-vanillin")),
-    ("VanillicAcid",    "ACVANILLIQUE",    _(u"Vanillic acid")),
-    ("PHB",             "PHB",             _(u"PHB")),
-    ("PHBAcid",         "ACPHB",           _(u"PHB acid")),
-    ("Moisture",        "TH",              _(u"Moisture (TH)")),
-    ("WaterActivity",   "AW",              _(u"Water activity (AW)")),
+    ("Vanillin",      "VANILLINE",      col("dashboard_vanillin", u"Vanillin")),
+    ("GlucoVanillin", "GLUCOVANILLINE", col("dashboard_gluco", u"Gluco-vanillin")),
+    ("VanillicAcid",  "ACVANILLIQUE",   col("dashboard_vanillic", u"Vanillic ac.")),
+    ("PHB",           "PHB",            col("dashboard_phb", u"PHB")),
+    ("PHBAcid",       "ACPHB",          col("dashboard_phb_acid", u"PHB ac.")),
+    ("Moisture",      "TH",             col("dashboard_th", u"TH")),
+    ("WaterActivity", "AW",             col("dashboard_aw", u"AW")),
 )
 
 # La colonne sur laquelle porte le filtre de plage du document.
@@ -86,24 +102,37 @@ def get_keyword_for(column_id):
 # la colonne de metadonnees lue sur le brain. Les deux different quand
 # le nom technique n'a rien a dire a l'utilisateur.
 METADATA_COLUMNS = (
-    ("SampleCode",    _(u"Sample Code"),      "getSampleCode",     "getSampleCode"),
-    ("Lot",           _(u"Lot"),              "getClientSampleID", "getClientSampleID"),
-    ("Client",        _(u"Client"),           "getClientTitle",    "getClientTitle"),
-    ("SampleType",    _(u"Sample Type"),      "getSampleTypeTitle", None),
-    ("Origin",        _(u"Origin"),           "getOrigin",         "getOrigin"),
-    ("ReceptionWeight", _(u"Reception Weight (g)"), "getReceptionWeight", None),
-    ("DateReceived",  _(u"Date Received"),    "getDateReceived",   "getDateReceived"),
-    ("AnalysisStart", _(u"Beginning of Analysis"), "getAnalysisStart", None),
-    ("AnalysisEnd",   _(u"End of Analysis"),  "getAnalysisEnd",    None),
-    ("DateVerified",  _(u"Date Validated"),   "getDateVerified",   "getDateVerified"),
+    ("SampleCode", col("dashboard_sample_code", u"Sample Code"),
+     "getSampleCode", "getSampleCode"),
+    ("Lot", col("dashboard_lot", u"Lot"),
+     "getClientSampleID", "getClientSampleID"),
+    ("Client", col("dashboard_client", u"Client"),
+     "getClientTitle", "getClientTitle"),
+    ("SampleType", col("dashboard_sample_type", u"Type"),
+     "getSampleTypeTitle", None),
+    ("Origin", col("dashboard_origin", u"Origin"),
+     "getOrigin", "getOrigin"),
+    ("ReceptionWeight", col("dashboard_weight", u"Weight (g)"),
+     "getReceptionWeight", None),
+    ("DateReceived", col("dashboard_received", u"Received"),
+     "getDateReceived", "getDateReceived"),
+    ("AnalysisStart", col("dashboard_start", u"Analysis start"),
+     "getAnalysisStart", None),
+    ("AnalysisEnd", col("dashboard_end", u"Analysis end"),
+     "getAnalysisEnd", None),
+    ("DateVerified", col("dashboard_validated", u"Validated"),
+     "getDateVerified", "getDateVerified"),
 )
 
 # Les trois operateurs, places apres les resultats qu'ils concernent
 # dans le document. Ils ferment donc le tableau.
 OPERATOR_COLUMNS = (
-    ("HPLCOperator",          _(u"HPLC operator"),           "getHPLCOperator"),
-    ("MoistureOperator",      _(u"Moisture operator"),       "getMoistureOperator"),
-    ("WaterActivityOperator", _(u"Water activity operator"), "getWaterActivityOperator"),
+    ("HPLCOperator", col("dashboard_op_hplc", u"Op. HPLC"),
+     "getHPLCOperator"),
+    ("MoistureOperator", col("dashboard_op_th", u"Op. TH"),
+     "getMoistureOperator"),
+    ("WaterActivityOperator", col("dashboard_op_aw", u"Op. AW"),
+     "getWaterActivityOperator"),
 )
 
 

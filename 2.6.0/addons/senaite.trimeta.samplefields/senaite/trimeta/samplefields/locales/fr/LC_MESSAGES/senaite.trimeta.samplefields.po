@@ -343,3 +343,67 @@ msgstr "TH (taux d'humidite)"
 
 msgid "Water activity (AW)"
 msgstr "AW (activite de l'eau)"
+
+# En-tetes de colonne du tableau de bord.
+# Identifiants dedies: un en-tete doit tenir sur une ligne,
+# la ou l'etiquette du meme champ sur le formulaire est longue.
+
+msgid "dashboard_sample_code"
+msgstr "Code echantillon"
+
+msgid "dashboard_lot"
+msgstr "Lot"
+
+msgid "dashboard_client"
+msgstr "Client"
+
+msgid "dashboard_sample_type"
+msgstr "Type"
+
+msgid "dashboard_origin"
+msgstr "Provenance"
+
+msgid "dashboard_weight"
+msgstr "Poids (g)"
+
+msgid "dashboard_received"
+msgstr "Reception"
+
+msgid "dashboard_start"
+msgstr "Debut analyse"
+
+msgid "dashboard_end"
+msgstr "Fin analyse"
+
+msgid "dashboard_validated"
+msgstr "Validation"
+
+msgid "dashboard_vanillin"
+msgstr "Vanilline"
+
+msgid "dashboard_gluco"
+msgstr "Gluco-vanilline"
+
+msgid "dashboard_vanillic"
+msgstr "Ac. vanillique"
+
+msgid "dashboard_phb"
+msgstr "PHB"
+
+msgid "dashboard_phb_acid"
+msgstr "Ac. PHB"
+
+msgid "dashboard_th"
+msgstr "TH"
+
+msgid "dashboard_aw"
+msgstr "AW"
+
+msgid "dashboard_op_hplc"
+msgstr "Op. HPLC"
+
+msgid "dashboard_op_th"
+msgstr "Op. TH"
+
+msgid "dashboard_op_aw"
+msgstr "Op. AW"
