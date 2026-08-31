@@ -48,7 +48,7 @@ RESOURCE_BASE = "++resource++senaite.trimeta.samplefields.static"
 #
 # Doit rester en accord avec la constante VERSION du script lui-meme,
 # lisible dans la console via window.TRIMETA_DASHBOARD_VERSION.
-SCRIPT_VERSION = 3
+SCRIPT_VERSION = 4
 
 SCRIPT_TAG = (
     u'<script type="text/javascript">'
