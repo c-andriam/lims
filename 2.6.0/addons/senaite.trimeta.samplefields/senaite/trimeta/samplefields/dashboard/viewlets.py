@@ -39,13 +39,6 @@ DASHBOARD_MARKER = "trimeta-dashboard"
 
 RESOURCE_BASE = "++resource++senaite.trimeta.samplefields.static"
 
-# Icones du theme SENAITE tentees dans cet ordre pour l'entree de barre
-# laterale. Le script s'arrete a la premiere qui repond et retombe sur
-# une icone livree avec l'add-on si aucune n'existe -- on ne peut pas
-# savoir d'ici lesquelles cette installation embarque.
-ICON_CANDIDATES = ("dashboard", "chart", "barchart", "report",
-                   "analysisreport", "table", "list")
-
 SCRIPT_TAG = (
     u'<script type="text/javascript">'
     u'window.TRIMETA_DASHBOARD = {config};'
@@ -97,9 +90,6 @@ class DashboardScriptViewlet(ViewletBase):
         return json.dumps({
             "url": self.get_dashboard_url(),
             "label": t(_(u"Dashboard"), context=self.request),
-            "iconBase": "{}/senaite_theme/icon/".format(
-                self.get_portal_url()),
-            "icons": list(ICON_CANDIDATES),
             "help": self.get_help_map(),
         })
 
