@@ -46,10 +46,17 @@ Vingt colonnes, six filtres et un bouton de recherche.
 |---|---|
 | Période (date de réception) | `getDateReceived`, natif, requête par plage |
 | Lot | `getClientSampleID`, natif |
-| Client | `getClientUID`, natif |
-| Type d'échantillon | `getSampleTypeUID`, natif |
+| Client | `getClientTitle` / `getClientUID`, natifs, indexés |
+| Type d'échantillon | **pas d'index natif** — voir ci-dessous |
 | Provenance | `getOrigin`, **créé par le profil 1002** |
 | Vanilline | résultat d'analyse, **plage min / max** |
+
+> **Corrigé après inventaire de l'instance.** Une version antérieure
+> de ce document annonçait `getSampleTypeUID` comme index natif du
+> `sample_catalog`. C'est faux : `getSampleTypeTitle` et
+> `getSampleTypeUID` y sont des **colonnes de métadonnées, pas des
+> index**. Le filtre « Type d'échantillon » demandera donc un index
+> supplémentaire, sur le modèle de `getOrigin`.
 
 ---
 
@@ -84,20 +91,54 @@ donc **après** la requête, sur les résultats déjà rapatriés.
 ### Les colonnes de résultats
 
 Les sept colonnes de résultats ne sont pas des champs de l'échantillon :
-ce sont des objets `Analysis` rattachés à lui. Deux façons de les
-obtenir :
+ce sont des objets `Analysis` rattachés à lui. L'inventaire de
+l'`analysis_catalog` a confirmé que tout ce qu'il faut y existe déjà,
+en index **et** en colonne de métadonnées :
 
-1. **Une requête groupée sur l'`analysis_catalog`** par page affichée :
-   on demande d'un coup les analyses des échantillons de la page, on
-   les range par échantillon et par mot-clé. Une requête catalogue de
-   plus par affichage, aucun réveil d'objet.
-2. **Dénormaliser** le résultat dans le `sample_catalog` au moment de
-   l'indexation. Plus rapide à l'affichage et filtrable directement,
-   mais il faut réindexer l'échantillon à chaque saisie de résultat —
-   et le tenir à jour devient une source de bugs silencieux.
+| Élément | Rôle | Statut |
+|---|---|---|
+| `getRequestID` | identifiant de l'échantillon parent | index + colonne |
+| `getKeyword` | mot-clé du service | index + colonne |
+| `getResult` | résultat saisi | colonne |
+| `getResultCaptureDate` | date de saisie | index + colonne |
 
-C'est l'option 1 qui est retenue : le coût est borné à la page
-affichée, et il n'y a pas d'état dupliqué à maintenir cohérent.
+Une **seule requête** ramène donc les résultats de toute la page
+affichée, sans réveiller un seul objet depuis la ZODB. Le coût ne
+dépend pas du nombre de lignes.
+
+L'alternative — dénormaliser le résultat dans le `sample_catalog` au
+moment de l'indexation — aurait été plus rapide encore à l'affichage,
+mais il aurait fallu réindexer l'échantillon à chaque saisie de
+résultat. Un état dupliqué à tenir cohérent est une source de valeurs
+fausses en silence ; c'est écarté.
+
+#### Le cas des reprises
+
+Un échantillon peut porter **plusieurs** analyses pour un même mot-clé,
+quand une première a été reprise. La règle retenue, testée :
+
+1. un résultat renseigné l'emporte sur une case vide ;
+2. entre deux résultats renseignés, le plus récemment saisi gagne ;
+3. sans date exploitable, le dernier rencontré gagne.
+
+#### Le cas des résultats censurés
+
+SENAITE enregistre les limites de détection sous la forme `<0.5` ou
+`>100`. Ces valeurs ne sont **pas** des nombres : le filtre de plage
+les écarte, et c'est délibéré. Traiter `<0.5` comme `0.5` le ferait
+entrer dans un intervalle auquel il n'appartient peut-être pas, sans
+que personne ne s'en aperçoive.
+
+Conséquence à connaître : un échantillon dont la vanilline vaut `<0.5`
+disparaît dès qu'une borne est posée sur cette colonne.
+
+#### Où s'applique le filtre de plage
+
+Avant la pagination, sinon le nombre de pages annoncé serait faux. La
+mécanique : requête sur l'`analysis_catalog` pour le seul mot-clé
+concerné → tri numérique en Python (`getResult` n'est qu'une colonne,
+pas un index) → liste d'identifiants passée au `sample_catalog` via
+`getId`, qui lui est indexé.
 
 ### Les services sont retrouvés par leur mot-clé
 
