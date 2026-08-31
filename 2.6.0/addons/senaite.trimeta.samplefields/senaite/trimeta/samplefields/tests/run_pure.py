@@ -197,7 +197,7 @@ def install_package_shims():
     make_module("senaite.trimeta.samplefields.tests.utils",
                 SampleFactory=object)
 
-    for sub in ("listings", "qualitydata"):
+    for sub in ("listings", "qualitydata", "dashboard"):
         module = make_module(
             "senaite.trimeta.samplefields.{}".format(sub))
         module.__path__ = [os.path.join(ROOT, sub)]
@@ -229,6 +229,7 @@ MODULES = [
     (P + "listings.samples", "listings/samples.py"),
     (P + "listings.worksheets", "listings/worksheets.py"),
     (P + "listings.reports", "listings/reports.py"),
+    (P + "dashboard.results", "dashboard/results.py"),
 ]
 
 # (fichier de test, classes qui n'ont pas besoin d'un site Plone)
@@ -237,10 +238,12 @@ PURE_CASES = [
      ["TestTemperatureVocabulary", "TestCodeArticleVocabulary"]),
     ("test_indexers.py", ["TestIndexStringNormalisation",
                           "TestIndexDateNormalisation",
-                          "TestContactTitleResolution"]),
+                          "TestContactTitleResolution",
+                          "TestReferenceUid"]),
     ("test_schema.py", ["TestExtenderDeclaration"]),
     ("test_qualitydata.py", ["TestQualityDataDeclaration"]),
     ("test_listings.py", None),   # tout le fichier est pur
+    ("test_dashboard.py", None),  # idem
 ]
 
 
