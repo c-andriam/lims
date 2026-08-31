@@ -30,4 +30,23 @@
       layer="senaite.core.interfaces.ISenaiteCore"
       />
 
+  <!-- Barre de filtres, posee DANS la zone de contenu.
+
+       Elle ne peut pas etre rendue par la vue elle-meme: senaite.app.
+       listing reutilise celle-ci pour ses requetes AJAX, et tout HTML
+       ajoute a son rendu se retrouve devant la reponse JSON. Symptome
+       constate: "JSON.parse: unexpected character at line 1 column 1"
+       et un tableau qui reste vide.
+
+       Le manager IAboveContentBody place le viewlet au-dessus du
+       contenu, sous le titre de la page. Meme paquet que les viewlets
+       de la section Assurance Qualite, deja en service ici. -->
+  <browser:viewlet
+      name="senaite.trimeta.samplefields.dashboard_filters"
+      manager="plone.app.layout.viewlets.interfaces.IAboveContentBody"
+      class=".viewlets.DashboardFiltersViewlet"
+      permission="zope2.View"
+      layer="senaite.core.interfaces.ISenaiteCore"
+      />
+
 </configure>

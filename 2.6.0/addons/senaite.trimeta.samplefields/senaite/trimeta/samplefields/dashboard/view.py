@@ -6,22 +6,27 @@ Vue du tableau de bord Trimeta.
 
 Assemblage
 ----------
-La page est une barre de filtres suivie d'un listing senaite standard.
-Plutot que de remplacer le gabarit de `ListingView` -- dont l'assemblage
-interne peut changer d'une version 2.x a l'autre -- on prefixe
-simplement son rendu par le formulaire. La vue reste donc un
-`ListingView` ordinaire, avec sa pagination, son tri, son bascule de
-colonnes et son export.
+Cette vue ne rend QUE le listing. La barre de filtres est dessinee par
+un viewlet (dashboard/viewlets.py), qui la place dans la zone de
+contenu.
 
-Le formulaire est un `<form method="get">` sans JavaScript: cliquer sur
-"Rechercher" recharge la page avec les criteres dans l'URL. Une
-recherche est ainsi partageable par copie du lien, et rien ne peut se
-desynchroniser entre ce qu'affiche le formulaire et ce que montre le
-tableau.
+Cette separation n'est pas cosmetique. Une premiere version prefixait
+le formulaire au rendu de `__call__`, avec deux consequences visibles a
+l'ecran:
 
-La pagination et le tri, eux, passent par AJAX. Les criteres sont donc
-aussi poses en champs caches (`additional_hidden_fields`), sans quoi la
-page 2 d'un resultat filtre afficherait tout le catalogue.
+- `senaite.app.listing` REUTILISE la meme vue pour ses requetes AJAX;
+  le HTML se retrouvait donc devant la reponse JSON, et le navigateur
+  affichait "JSON.parse: unexpected character at line 1 column 1" --
+  le tableau restait vide;
+- `__call__` rend la page COMPLETE, chrome compris: le formulaire
+  atterrissait au-dessus de la barre de navigation SENAITE.
+
+La vue reste donc un `ListingView` ordinaire, avec sa pagination, son
+tri, sa bascule de colonnes et son export.
+
+La pagination et le tri passent par AJAX. Les criteres du formulaire
+sont donc poses en champs caches (`additional_hidden_fields`), sans
+quoi la page 2 d'un resultat filtre afficherait tout le catalogue.
 
 Securite
 --------
@@ -31,16 +36,13 @@ client qui ouvrirait cette page n'y verrait que ses propres
 echantillons.
 """
 
-import collections
 import logging
 
 from bika.lims import api
 from DateTime import DateTime
 from senaite.app.listing import ListingView
 from senaite.core.catalog import ANALYSIS_CATALOG
-from senaite.core.catalog import CLIENT_CATALOG
 from senaite.core.catalog import SAMPLE_CATALOG
-from senaite.core.catalog import SETUP_CATALOG
 from senaite.core.i18n import translate as t
 from zope.i18nmessageid import MessageFactory
 
@@ -61,20 +63,9 @@ logger = logging.getLogger("senaite.trimeta.samplefields")
 # leve l'ambiguite.
 NO_MATCH = "__trimeta_aucun_resultat__"
 
-try:                                   # Python 2
-    from cgi import escape as _escape
-
-    def escape(value):
-        return _escape(to_text(value), True)
-except ImportError:                    # Python 3
-    from html import escape as _escape
-
-    def escape(value):
-        return _escape(to_text(value), True)
-
 
 class DashboardView(ListingView):
-    """Tableau de bord: 20 colonnes, 6 filtres, un bouton de recherche."""
+    """Tableau de bord: 20 colonnes, filtrables et exportables."""
 
     def __init__(self, context, request):
         super(DashboardView, self).__init__(context, request)
@@ -90,9 +81,9 @@ class DashboardView(ListingView):
         self.description = ""
         self.form_id = "trimeta_dashboard"
 
-        # Le tableau de bord est une vue de consultation: ni cases a
-        # cocher, ni boutons de transition. Les afficher laisserait
-        # croire qu'on peut agir sur les echantillons depuis ici.
+        # Vue de consultation: ni cases a cocher, ni boutons de
+        # transition. Les afficher laisserait croire qu'on peut agir
+        # sur les echantillons depuis ici.
         self.show_select_column = False
         self.show_select_all_checkbox = False
         self.show_workflow_action_buttons = False
@@ -114,7 +105,9 @@ class DashboardView(ListingView):
         self.additional_hidden_fields = flt.hidden_fields(self.filters)
         self.apply_filters()
 
-        # Rempli une fois par page rendue, dans folderitems().
+        # Identifiants de la page en cours, remplis par folderitem() et
+        # consommes par folderitems() pour la requete groupee.
+        self._page_ids = []
         self._results = {}
 
     # -- filtres --------------------------------------------------------
@@ -154,8 +147,8 @@ class DashboardView(ListingView):
         n'est qu'une colonne de metadonnees -- et il doit pourtant
         s'appliquer AVANT la pagination, sinon le nombre de pages
         annonce serait faux. D'ou cette resolution prealable en une
-        liste d'identifiants, passee ensuite au sample_catalog via
-        `getId`, qui lui est indexe.
+        liste d'identifiants, passee au sample_catalog via `getId`, qui
+        lui est indexe.
         """
         minimum = self.filters.get("van_min")
         maximum = self.filters.get("van_max")
@@ -170,136 +163,6 @@ class DashboardView(ListingView):
             return
         self.contentFilter["getId"] = matching or [NO_MATCH]
 
-    # -- vocabulaires du formulaire -------------------------------------
-
-    def get_options(self, catalog_id, portal_type):
-        """[(uid, intitule)] tries, pour une liste deroulante.
-
-        N'utilise que `UID` et `Title`, qui sont des colonnes de
-        metadonnees de TOUS les catalogues senaite (BASE_COLUMNS). Le
-        tri se fait en Python: `sortable_title` n'est pas garanti
-        present sur chaque catalogue.
-        """
-        try:
-            brains = api.search({"portal_type": portal_type,
-                                 "is_active": True}, catalog_id)
-            options = [(b.UID, to_text(b.Title)) for b in brains]
-            return sorted(options, key=lambda pair: pair[1].lower())
-        except Exception:
-            logger.exception("Liste %s indisponible", portal_type)
-            return []
-
-    def get_client_options(self):
-        return self.get_options(CLIENT_CATALOG, "Client")
-
-    def get_sample_type_options(self):
-        return self.get_options(SETUP_CATALOG, "SampleType")
-
-    def get_origin_options(self):
-        """Provenances reellement saisies, lues dans l'index.
-
-        Pas de liste de reference pour ce champ: la liste des choix est
-        donc celle des valeurs deja rencontrees.
-        """
-        try:
-            catalog = api.get_tool(SAMPLE_CATALOG)
-            values = catalog.uniqueValuesFor("getOrigin")
-            return sorted([to_text(v) for v in values if v])
-        except Exception:
-            logger.exception("Provenances indisponibles")
-            return []
-
-    # -- rendu -----------------------------------------------------------
-
-    def __call__(self):
-        """Barre de filtres, puis le listing standard."""
-        listing = super(DashboardView, self).__call__()
-        return self.render_filter_bar() + listing
-
-    def text_input(self, name, label, value, input_type="text"):
-        return (
-            u'<div class="col-md-2 mb-2">'
-            u'<label class="small mb-1" for="{id}">{label}</label>'
-            u'<input class="form-control form-control-sm" type="{type}" '
-            u'id="{id}" name="{id}" value="{value}"/>'
-            u'</div>'
-        ).format(id=flt.PREFIX + name, label=escape(label),
-                 value=escape(value), type=input_type)
-
-    def select_input(self, name, label, value, options):
-        rendered = [u'<option value=""></option>']
-        for option_value, option_label in options:
-            selected = u' selected="selected"' \
-                if to_text(option_value) == to_text(value) else u''
-            rendered.append(
-                u'<option value="{v}"{s}>{l}</option>'.format(
-                    v=escape(option_value), s=selected,
-                    l=escape(option_label)))
-        return (
-            u'<div class="col-md-2 mb-2">'
-            u'<label class="small mb-1" for="{id}">{label}</label>'
-            u'<select class="form-control form-control-sm" '
-            u'id="{id}" name="{id}">{options}</select>'
-            u'</div>'
-        ).format(id=flt.PREFIX + name, label=escape(label),
-                 options=u"".join(rendered))
-
-    def render_filter_bar(self):
-        """Le formulaire de recherche, dessine au-dessus du tableau."""
-        try:
-            get = self.filters.get
-            origins = [(o, o) for o in self.get_origin_options()]
-
-            fields = [
-                self.text_input("date_from", t(_(u"Received from")),
-                                get("date_from", ""), "date"),
-                self.text_input("date_to", t(_(u"Received to")),
-                                get("date_to", ""), "date"),
-                self.text_input("lot", t(_(u"Lot")), get("lot", "")),
-                self.select_input("client", t(_(u"Client")),
-                                  get("client", ""),
-                                  self.get_client_options()),
-                self.select_input("sample_type", t(_(u"Sample Type")),
-                                  get("sample_type", ""),
-                                  self.get_sample_type_options()),
-                self.select_input("origin", t(_(u"Origin")),
-                                  get("origin", ""), origins),
-                self.text_input("van_min", t(_(u"Vanillin min")),
-                                get("van_min", ""), "number"),
-                self.text_input("van_max", t(_(u"Vanillin max")),
-                                get("van_max", ""), "number"),
-            ]
-
-            reset = u""
-            if flt.is_active(self.filters):
-                reset = (
-                    u'<a class="btn btn-sm btn-outline-secondary ml-2" '
-                    u'href="{url}">{label}</a>'
-                ).format(url=escape(self.get_dashboard_url()),
-                         label=escape(t(_(u"Reset"))))
-
-            return (
-                u'<form method="get" action="{url}" '
-                u'class="trimeta-dashboard-filters card card-body mb-3">'
-                u'<div class="row">{fields}</div>'
-                u'<div class="row"><div class="col-md-12">'
-                u'<button type="submit" class="btn btn-sm btn-primary">'
-                u'{search}</button>{reset}'
-                u'</div></div>'
-                u'</form>'
-            ).format(url=escape(self.get_dashboard_url()),
-                     fields=u"".join(fields),
-                     search=escape(t(_(u"Search"))),
-                     reset=reset)
-        except Exception:
-            # Mieux vaut un tableau sans barre de filtres qu'aucun
-            # tableau du tout.
-            logger.exception("Barre de filtres non rendue")
-            return u""
-
-    def get_dashboard_url(self):
-        return "{}/trimeta-dashboard".format(api.get_url(self.context))
-
     # -- remplissage des lignes -------------------------------------------
 
     def folderitems(self):
@@ -307,16 +170,22 @@ class DashboardView(ListingView):
         self._page_ids = []
         items = super(DashboardView, self).folderitems()
 
-        keywords = cols.get_keywords()
-        self._results = fetch_results(
-            api.get_tool(ANALYSIS_CATALOG), self._page_ids, keywords)
+        try:
+            keywords = cols.get_keywords()
+            self._results = fetch_results(
+                api.get_tool(ANALYSIS_CATALOG), self._page_ids, keywords)
 
-        for item in items:
-            per_sample = self._results.get(item.get("_trimeta_id"), {})
-            for column_id, keyword, _label in cols.DASHBOARD_ANALYSES:
-                item[column_id] = per_sample.get(keyword, "")
+            for item in items:
+                per_sample = self._results.get(item.get("_trimeta_id"), {})
+                for column_id, keyword, _label in cols.DASHBOARD_ANALYSES:
+                    item[column_id] = per_sample.get(keyword, "")
 
-        self.warn_about_empty_columns()
+            self.warn_about_empty_columns()
+        except Exception:
+            # Des colonnes de resultats vides restent lisibles; une
+            # page d'erreur, non.
+            logger.exception("Resultats d'analyse non rapportes")
+
         return items
 
     def folderitem(self, obj, item, index):
@@ -332,19 +201,25 @@ class DashboardView(ListingView):
             self._page_ids.append(sample_id)
 
             for key, attr in cols.get_metadata_map().items():
-                value = getattr(obj, attr, "")
-                item[key] = self.format_value(value)
+                item[key] = self.format_value(getattr(obj, attr, ""))
         except Exception:
             logger.exception("Ligne %s incomplete", index)
         return item
 
     def format_value(self, value):
-        """Texte affichable, en respectant la langue du compte pour les
-        dates."""
+        """Texte affichable.
+
+        Les dates passent par `to_str_date`, fourni par ListingView:
+        c'est lui qui applique le format attendu par le listing, plutot
+        qu'une conversion maison qui figerait la langue.
+        """
         if not value:
             return ""
         if isinstance(value, DateTime):
-            return self.ulocalized_time(value, long_format=1)
+            try:
+                return self.to_str_date(value)
+            except Exception:
+                return to_text(value.strftime("%Y-%m-%d"))
         return to_text(value)
 
     def warn_about_empty_columns(self):

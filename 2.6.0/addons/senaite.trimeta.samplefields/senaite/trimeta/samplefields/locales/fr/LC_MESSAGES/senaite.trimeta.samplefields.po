@@ -284,3 +284,62 @@ msgstr "Lot"
 
 msgid "Lot number of the batch this sample was taken from."
 msgstr "Numero de lot du lot dont provient l'echantillon."
+
+# Tableau de bord (lot 5)
+
+msgid "Dashboard"
+msgstr "Tableau de bord"
+
+msgid "All"
+msgstr "Tous"
+
+msgid "Search"
+msgstr "Rechercher"
+
+msgid "Reset"
+msgstr "Reinitialiser"
+
+msgid "Received from"
+msgstr "Recu du"
+
+msgid "Received to"
+msgstr "Recu au"
+
+msgid "Client"
+msgstr "Client"
+
+msgid "Sample Type"
+msgstr "Type d'echantillon"
+
+msgid "Date Received"
+msgstr "Date de reception"
+
+msgid "Date Validated"
+msgstr "Date de validation"
+
+msgid "Vanillin"
+msgstr "Vanilline"
+
+msgid "Vanillin min"
+msgstr "Vanilline min"
+
+msgid "Vanillin max"
+msgstr "Vanilline max"
+
+msgid "Gluco-vanillin"
+msgstr "Gluco-vanilline"
+
+msgid "Vanillic acid"
+msgstr "Acide vanillique"
+
+msgid "PHB"
+msgstr "PHB"
+
+msgid "PHB acid"
+msgstr "Acide PHB"
+
+msgid "Moisture (TH)"
+msgstr "TH (taux d'humidite)"
+
+msgid "Water activity (AW)"
+msgstr "AW (activite de l'eau)"
