@@ -192,17 +192,26 @@ Un service absent donnera simplement une colonne vide, sans erreur.
 - **Tests** — 103 tests purs (`make test-pure`), plus les tests
   d'intégration des index et colonnes dans `make test`.
 
+- **La vue** — `dashboard/view.py`, déclarée en
+  `/senaite/trimeta-dashboard`. La barre de filtres est un
+  `<form method="get">` sans JavaScript : une recherche est partageable
+  par copie de l'URL, et rien ne peut se désynchroniser entre le
+  formulaire et le tableau. Les critères sont aussi posés en champs
+  cachés (`additional_hidden_fields`), sinon la page 2 d'un résultat
+  filtré — qui passe par AJAX — afficherait tout le catalogue.
+
 ### Reste à faire
 
-1. Lancer `make dashboard-info` sur le serveur et récupérer sa sortie.
-   Une vue de listing écrite en devinant l'API produit au mieux une
-   colonne vide, au pire un ZCML qui ne charge pas — donc une instance
-   qui ne démarre plus. C'est l'erreur que ce script existe pour
-   éviter, comme `impress-info.sh` avant lui pour le lot 4.
-2. Relever les mots-clés des sept services d'analyse.
-3. Écrire la vue `@@trimeta-dashboard` : les vingt colonnes, la barre de
-   filtres, le bouton de recherche.
-4. Ajouter l'entrée de menu.
+1. **Confirmer les sept mots-clés** dans `dashboard/columns.py`
+   (constante `DASHBOARD_ANALYSES`). Ils se lisent dans
+   Configuration › Analyses, colonne *Keyword*. Un mot-clé faux ne lève
+   aucune erreur : la colonne reste vide. La vue journalise donc un
+   avertissement quand un mot-clé ne ramène jamais rien.
+2. **Ajouter l'entrée de menu.** `actions.xml` de `senaite.core` ne
+   contient rien pour les échantillons : le menu se construit
+   autrement, à élucider. En attendant, la page s'atteint par son URL.
+3. **Valider sur des données réelles.** Un tableau vide ne prouve ni
+   qu'il marche, ni qu'il est cassé.
 
 ### À déployer
 

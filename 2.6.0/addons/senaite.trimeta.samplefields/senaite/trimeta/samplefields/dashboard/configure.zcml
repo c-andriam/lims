@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="senaite.trimeta.samplefields">
+
+  <!-- Tableau de bord: /senaite/trimeta-dashboard
+
+       La declaration reprend a l'identique celle des vues auxiliaires
+       de senaite.core (browser/samples/configure.zcml): un contexte
+       quelconque, la permission zope2.View et la couche ISenaiteCore.
+
+       Pourquoi zope2.View et non une permission plus restrictive: le
+       sample_catalog filtre deja par allowedRolesAndUsers. Un contact
+       client qui ouvrirait la page n'y verrait que ses propres
+       echantillons. C'est le meme raisonnement que senaite.core tient
+       pour partition_magic et dispatch_samples, ou une permission plus
+       fine empechait les roles partages d'atteindre la vue depuis le
+       listing global.
+
+       for="*" plutot qu'une interface precise: la page ne depend pas
+       de son contexte, elle interroge le catalogue. Une interface
+       devenue fausse au fil des versions 2.x ferait echouer le
+       chargement du ZCML, donc le demarrage complet de l'instance. -->
+  <browser:page
+      for="*"
+      name="trimeta-dashboard"
+      class=".view.DashboardView"
+      permission="zope2.View"
+      layer="senaite.core.interfaces.ISenaiteCore"
+      />
+
+</configure>

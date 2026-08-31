@@ -29,6 +29,8 @@ Add-on SENAITE 2.6 pour Trimeta Group.
 - **Colonnes de listing** — le code échantillon apparaît dans la liste
   des Échantillons (avec le Lot), dans la grille de saisie des Work
   Sheets et dans la liste des rapports d'analyse.
+- **Tableau de bord** — `/senaite/trimeta-dashboard` : 20 colonnes,
+  6 filtres et un bouton de recherche. Voir `docs/lot5-tableau-de-bord.md`.
 
 ## Configuration de la machine
 
@@ -163,6 +165,7 @@ l'hôte**, jamais dans le container, et peut donc utiliser `importlib`.
 | `patches/` | Correctif sur `after_receive` du workflow |
 | `compat.py` | Compatibilité Python 2 / 3 sur les chaînes |
 | `catalog.py` | Déclare les index et colonnes à créer |
+| `dashboard/` | Tableau de bord : colonnes, filtres, résultats, vue |
 | `indexers.py` | Indexeurs nommés pour les champs schemaextender |
 | `setuphandlers.py` | Création des index + réindexation à l'installation |
 | `upgrades/` | Étapes de mise à jour entre versions du profil |

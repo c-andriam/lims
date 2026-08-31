@@ -132,6 +132,9 @@
       handler=".suggestions.on_sample_modified"
       />
 
+  <!-- Tableau de bord (lot 5) -->
+  <include package=".dashboard" />
+
   <include package=".browser" />
 
 </configure>
