@@ -39,13 +39,24 @@ DASHBOARD_MARKER = "trimeta-dashboard"
 
 RESOURCE_BASE = "++resource++senaite.trimeta.samplefields.static"
 
+# Version du script, reportee en parametre d'URL.
+#
+# Sans elle, le navigateur continue de servir le fichier qu'il a en
+# cache: un correctif deploye sur le serveur reste alors invisible, et
+# on croit qu'il n'a pas fonctionne. L'incrementer a chaque
+# modification de dashboard.js force le rechargement.
+#
+# Doit rester en accord avec la constante VERSION du script lui-meme,
+# lisible dans la console via window.TRIMETA_DASHBOARD_VERSION.
+SCRIPT_VERSION = 3
+
 SCRIPT_TAG = (
     u'<script type="text/javascript">'
     u'window.TRIMETA_DASHBOARD = {config};'
     u'</script>'
     u'<script type="text/javascript" '
     u'id="trimeta-dashboard-script" '
-    u'src="{portal_url}/{resources}/dashboard.js"></script>'
+    u'src="{portal_url}/{resources}/dashboard.js?v={version}"></script>'
 )
 
 
@@ -99,6 +110,7 @@ class DashboardScriptViewlet(ViewletBase):
                 config=self.get_config_json(),
                 portal_url=self.get_portal_url(),
                 resources=RESOURCE_BASE,
+                version=SCRIPT_VERSION,
             )
         except Exception:
             logger.exception("Script du tableau de bord non injecte")
