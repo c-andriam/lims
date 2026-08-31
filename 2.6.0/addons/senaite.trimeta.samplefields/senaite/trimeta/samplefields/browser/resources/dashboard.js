@@ -25,6 +25,14 @@
   var CONFIG = window.TRIMETA_DASHBOARD || {};
   var MARKER = "trimeta-dashboard-link";
 
+  /* Marque de version. Elle sert a repondre a une question qui s'est
+   * posee: "le correctif est-il charge, ou le navigateur sert-il
+   * encore l'ancien fichier ?". Lisible dans la console:
+   *     window.TRIMETA_DASHBOARD_VERSION
+   */
+  var VERSION = 3;
+  window.TRIMETA_DASHBOARD_VERSION = VERSION;
+
 
   /* Trace de l'icone, dans le style trait fin des icones SENAITE:
    * un cadre, une separation horizontale, une verticale -- un tableau.
@@ -92,7 +100,7 @@
         continue;
       }
       if (!best || siblings > best.siblings) {
-        best = {item: node, list: list, siblings: siblings};
+        best = {item: node, link: link, list: list, siblings: siblings};
       }
     }
     return best;
@@ -181,7 +189,24 @@
       return;                            // pas de barre sur cette page
     }
 
-    var clone = found.item.cloneNode(true);
+    /* Garde-fou, et non simple precaution: c'est l'invariant qui
+     * definit une entree de barre laterale. Une version precedente
+     * clonait un conteneur portant TOUS les liens, et la barre
+     * apparaissait en double. Si le noeud retenu porte plus d'un lien,
+     * ce n'est pas une entree: on se rabat sur le lien seul, qui en
+     * est une a coup sur. */
+    var source = found.item;
+    if (source.querySelectorAll &&
+        source.querySelectorAll("a[href]").length > 1) {
+      source = found.link;
+    }
+
+    var clone = source.cloneNode(true);
+    if (clone.querySelectorAll &&
+        clone.querySelectorAll("a[href]").length > 1) {
+      log("entree non clonable: elle porte plusieurs liens");
+      return;
+    }
     clone.id = MARKER;
     // Un etat "actif" herite du clone allumerait deux entrees.
     clone.className = (clone.className || "").replace(/\bactive\b/g, "");
