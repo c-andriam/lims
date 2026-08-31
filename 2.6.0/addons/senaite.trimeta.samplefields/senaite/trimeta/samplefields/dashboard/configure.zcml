@@ -49,4 +49,23 @@
       layer="senaite.core.interfaces.ISenaiteCore"
       />
 
+  <!-- Entree de barre laterale et infobulles d'en-tete.
+
+       Sur IHtmlHead et sur TOUTES les pages: le raccourci vers le
+       tableau de bord doit exister partout, pas seulement une fois
+       qu'on y est. Meme manager et meme couche que les viewlets de la
+       section Assurance Qualite, deja en service ici.
+
+       La barre laterale de senaite.core n'offre pas de point
+       d'extension: le script CLONE une entree existante et n'en change
+       que le lien, le libelle et l'icone. Il herite ainsi du balisage
+       et des classes exacts du theme, au lieu de parier dessus. -->
+  <browser:viewlet
+      name="senaite.trimeta.samplefields.dashboard_script"
+      manager="plone.app.layout.viewlets.interfaces.IHtmlHead"
+      class=".viewlets.DashboardScriptViewlet"
+      permission="zope2.View"
+      layer="bika.lims.interfaces.IBikaLIMS"
+      />
+
 </configure>

@@ -30,7 +30,9 @@ Add-on SENAITE 2.6 pour Trimeta Group.
   des Échantillons (avec le Lot), dans la grille de saisie des Work
   Sheets et dans la liste des rapports d'analyse.
 - **Tableau de bord** — `/senaite/trimeta-dashboard` : 20 colonnes,
-  6 filtres et un bouton de recherche. Voir `docs/lot5-tableau-de-bord.md`.
+  6 filtres et un bouton de recherche. Une entrée est ajoutée à la barre
+  latérale, et le survol d'un en-tête en donne l'intitulé complet. Voir
+  `docs/lot5-tableau-de-bord.md`.
 
 ## Configuration de la machine
 
