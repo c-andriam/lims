@@ -96,8 +96,24 @@ section "Reponse HTTP de SENAITE"
 # alors que le navigateur bascule en https, le probleme est cote
 # navigateur, pas cote serveur.
 if command -v curl >/dev/null 2>&1; then
-    echo "GET http://localhost:$PORT/senaite"
-    curl -sS -o /dev/null -D - -m 5 "http://localhost:$PORT/senaite"         2>&1 | grep -i '^HTTP/\|^location:\|^strict-transport'         | sed 's/^/  /' || echo "  (pas de reponse)"
+    URL="http://localhost:$PORT/senaite"
+    echo "GET $URL"
+    # On capture AVANT d'afficher, en deux temps.
+    #
+    # Le pipeline se terminait par `sed`, qui reussit meme sans rien
+    # recevoir: le `|| echo "(pas de reponse)"` place en bout de
+    # chaine ne se declenchait donc jamais, et une absence de reponse
+    # s'affichait comme une section vide. C'est le meme piege qui, dans
+    # require-running.sh, a fait chercher un port occupe alors qu'il
+    # etait libre.
+    RAW="$(curl -sS -o /dev/null -D - -m 5 "$URL" 2>&1)"
+    HEADERS="$(echo "$RAW" | grep -i '^HTTP/\|^location:\|^strict-transport')"
+    if [ -n "$HEADERS" ]; then
+        echo "$HEADERS" | sed 's/^/  /'
+    else
+        echo "  (pas de reponse)"
+        echo "$RAW" | sed 's/^/  /'
+    fi
     echo ""
     echo "Si la reponse est 200 ou une redirection vers http://, le"
     echo "serveur va bien et la bascule vers https vient du navigateur."
