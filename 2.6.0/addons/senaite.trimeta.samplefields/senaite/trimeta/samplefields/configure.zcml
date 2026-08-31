@@ -81,6 +81,10 @@
       factory=".indexers.getOrigin"
       />
   <adapter
+      name="getTrimetaSampleTypeUID"
+      factory=".indexers.getTrimetaSampleTypeUID"
+      />
+  <adapter
       name="getReceptionWeight"
       factory=".indexers.getReceptionWeight"
       />

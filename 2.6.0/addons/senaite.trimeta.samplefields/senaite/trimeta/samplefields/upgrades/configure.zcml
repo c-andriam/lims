@@ -38,4 +38,20 @@
       profile="senaite.trimeta.samplefields:default"
       />
 
+  <!-- 1002 -> 1003 : index du type d'echantillon
+
+       Filtre "Type d'echantillon" du tableau de bord. senaite.core
+       n'indexe pas ce champ sur le sample_catalog: on ajoute le
+       notre. Reindexe les echantillons existants. -->
+  <genericsetup:upgradeStep
+      title="Trimeta 1002 -> 1003 : index du type d'echantillon"
+      description="Cree l'index getTrimetaSampleTypeUID dans le
+                   sample_catalog, puis reindexe les echantillons
+                   existants."
+      source="1002"
+      destination="1003"
+      handler=".v1003.upgrade"
+      profile="senaite.trimeta.samplefields:default"
+      />
+
 </configure>

@@ -17,6 +17,7 @@ from senaite.trimeta.samplefields import indexers
 from senaite.trimeta.samplefields.indexers import to_contact_title
 from senaite.trimeta.samplefields.indexers import to_index_date
 from senaite.trimeta.samplefields.indexers import to_index_string
+from senaite.trimeta.samplefields.indexers import to_reference_uid
 from senaite.trimeta.samplefields.tests.base import TrimetaTestCase
 from senaite.trimeta.samplefields.tests.utils import SampleFactory
 
@@ -75,8 +76,9 @@ class TestIndexDateNormalisation(unittest.TestCase):
 class FakeContact(object):
     """Doublure d'un LabContact: juste de quoi repondre a get_title."""
 
-    def __init__(self, title):
+    def __init__(self, title, uid=""):
         self.title = title
+        self.uid = uid
 
 
 class FakeAPI(object):
@@ -95,6 +97,11 @@ class FakeAPI(object):
             return self.uids[uid]
         raise LookupError(uid)
 
+    def get_uid(self, obj):
+        if not isinstance(obj, FakeContact):
+            raise TypeError(obj)
+        return obj.uid
+
     def get_title(self, obj):
         # Le vrai api.get_title leve sur ce qui n'est pas un contenu.
         # La doublure fait pareil, sinon to_contact_title paraitrait
@@ -108,8 +115,8 @@ class TestContactTitleResolution(unittest.TestCase):
     """Fonction pure: bika.lims.api est remplace le temps du test."""
 
     def setUp(self):
-        self.marie = FakeContact(u"Marie Rakoto")
-        self.jean = FakeContact(u"Jean Dupont")
+        self.marie = FakeContact(u"Marie Rakoto", "uid-marie")
+        self.jean = FakeContact(u"Jean Dupont", "uid-jean")
         self._real_api = indexers.api
         indexers.api = FakeAPI({
             "uid-marie": self.marie,
@@ -152,6 +159,42 @@ class TestContactTitleResolution(unittest.TestCase):
         from senaite.trimeta.samplefields.compat import text_type
         for value in (None, "uid-marie", "uid-inconnu", ["uid-jean"]):
             self.assertIsInstance(to_contact_title(value), text_type)
+
+
+class TestReferenceUid(unittest.TestCase):
+    """Fonction pure: bika.lims.api est remplace le temps du test."""
+
+    def setUp(self):
+        self.vanille = FakeContact(u"Vanille verte", "uid-type")
+        self._real_api = indexers.api
+        indexers.api = FakeAPI({"uid-type": self.vanille})
+
+    def tearDown(self):
+        indexers.api = self._real_api
+
+    def test_empty_value_gives_empty_string(self):
+        for value in (None, u"", [], ()):
+            self.assertEqual(to_reference_uid(value), u"")
+
+    def test_an_object_is_resolved_to_its_uid(self):
+        self.assertEqual(to_reference_uid(self.vanille), u"uid-type")
+
+    def test_a_uid_is_returned_as_is(self):
+        """L'accesseur rend parfois deja l'UID: rien a resoudre."""
+        self.assertEqual(to_reference_uid("uid-type"), u"uid-type")
+
+    def test_a_list_keeps_the_first_entry(self):
+        self.assertEqual(to_reference_uid([self.vanille]), u"uid-type")
+
+    def test_an_unreadable_value_gives_empty_string(self):
+        """Ne jamais lever: l'indexation de tout l'echantillon en
+        dependrait, pour un seul champ."""
+        self.assertEqual(to_reference_uid(object()), u"")
+
+    def test_result_is_always_text(self):
+        from senaite.trimeta.samplefields.compat import text_type
+        for value in (None, "uid-type", self.vanille, object()):
+            self.assertIsInstance(to_reference_uid(value), text_type)
 
 
 class TestSampleCodeIndex(TrimetaTestCase):
@@ -259,6 +302,21 @@ class TestDashboardColumns(TrimetaTestCase):
         self.assertEqual(brains[0].UID, sample.UID())
         self.assertEqual(brains[0].getOrigin, u"Sava")
 
+    def test_sample_type_is_indexed_by_uid(self):
+        """Filtre "Type d'echantillon" du tableau de bord.
+
+        L'UID plutot que l'intitule: renommer un type d'echantillon ne
+        doit pas casser un filtre enregistre."""
+        from bika.lims import api
+        self.assertIn("getTrimetaSampleTypeUID",
+                      capi.get_indexes(self.catalog))
+
+        sample = self.factory.create()
+        uid = api.get_uid(self.factory.sampletype)
+
+        brains = self.catalog(getTrimetaSampleTypeUID=uid)
+        self.assertIn(sample.UID(), [b.UID for b in brains])
+
     def test_reception_weight_keeps_its_decimals(self):
         """Une pesee arrondie serait une perte de donnee analytique."""
         sample = self.factory.create()
@@ -313,6 +371,7 @@ def test_suite():
     suite.addTest(loader.loadTestsFromTestCase(TestIndexStringNormalisation))
     suite.addTest(loader.loadTestsFromTestCase(TestIndexDateNormalisation))
     suite.addTest(loader.loadTestsFromTestCase(TestContactTitleResolution))
+    suite.addTest(loader.loadTestsFromTestCase(TestReferenceUid))
     suite.addTest(loader.loadTestsFromTestCase(TestSampleCodeIndex))
     suite.addTest(loader.loadTestsFromTestCase(TestDashboardColumns))
     return suite

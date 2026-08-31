@@ -238,7 +238,8 @@ PURE_CASES = [
      ["TestTemperatureVocabulary", "TestCodeArticleVocabulary"]),
     ("test_indexers.py", ["TestIndexStringNormalisation",
                           "TestIndexDateNormalisation",
-                          "TestContactTitleResolution"]),
+                          "TestContactTitleResolution",
+                          "TestReferenceUid"]),
     ("test_schema.py", ["TestExtenderDeclaration"]),
     ("test_qualitydata.py", ["TestQualityDataDeclaration"]),
     ("test_listings.py", None),   # tout le fichier est pur

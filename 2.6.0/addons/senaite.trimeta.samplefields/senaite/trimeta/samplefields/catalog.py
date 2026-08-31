@@ -47,6 +47,20 @@ SAMPLE_INDEXES = (
     ("getSampleCode", "FieldIndex", None),
     # Filtre "Provenance" du tableau de bord (lot 5).
     ("getOrigin", "FieldIndex", None),
+    # Filtre "Type d'echantillon" du tableau de bord.
+    #
+    # Pourquoi un index a nous plutot que le natif: senaite.core
+    # expose bien getSampleTypeTitle et getSampleTypeUID en COLONNES
+    # du sample_catalog, mais ni l'un ni l'autre n'est un index, et
+    # AnalysisRequest ne definit aucun accesseur getSampleTypeUID
+    # (les seuls existants sont sur Analysis et sur SampleType).
+    # Un index a nous, alimente par notre propre indexeur, ne depend
+    # d'aucun detail interne de SENAITE et ne peut entrer en
+    # collision avec un index que senaite.core ajouterait plus tard.
+    #
+    # C'est l'UID qui est indexe, pas l'intitule: renommer un type
+    # d'echantillon ne doit pas casser les filtres enregistres.
+    ("getTrimetaSampleTypeUID", "FieldIndex", None),
 )
 
 # Colonnes de metadonnees: permettent aux listings d'afficher la valeur

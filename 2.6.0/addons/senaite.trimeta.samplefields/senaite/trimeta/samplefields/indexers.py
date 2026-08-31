@@ -110,6 +110,33 @@ def to_contact_title(value):
         return u""
 
 
+def to_reference_uid(value):
+    """UID de l'objet reference par un champ, quelle que soit la forme.
+
+    Meme prudence que to_contact_title: UIDReferenceField et les
+    accesseurs Archetypes rendent tantot l'objet, tantot son UID,
+    tantot une liste. Une reference morte donne une chaine vide plutot
+    que de faire echouer l'indexation de tout l'echantillon.
+    """
+    if not value:
+        return u""
+
+    if isinstance(value, (list, tuple)):
+        value = value[0] if value else None
+        if not value:
+            return u""
+
+    if isinstance(value, string_types):
+        # Deja un UID: rien a resoudre.
+        return to_text(value).strip()
+
+    try:
+        return to_text(api.get_uid(value)).strip()
+    except Exception:
+        logger.debug("UID illisible sur %r", value)
+        return u""
+
+
 # ---------------------------------------------------------------------
 # Section Reception / Analyse
 # ---------------------------------------------------------------------
@@ -124,6 +151,18 @@ def getSampleCode(instance):
 def getOrigin(instance):
     """Index et colonne `getOrigin` -- filtre Provenance du tableau."""
     return to_index_string(get_field_value(instance, "Origin"))
+
+
+@indexer(IAnalysisRequest)
+def getTrimetaSampleTypeUID(instance):
+    """Index `getTrimetaSampleTypeUID` -- filtre Type d'echantillon.
+
+    Le champ SampleType est natif, mais il n'est pas indexe dans le
+    sample_catalog et AnalysisRequest n'expose pas d'accesseur
+    getSampleTypeUID (voir catalog.py). On lit donc le champ
+    directement et on en tire l'UID.
+    """
+    return to_reference_uid(get_field_value(instance, "SampleType", None))
 
 
 @indexer(IAnalysisRequest)

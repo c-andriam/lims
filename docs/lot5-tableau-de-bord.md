@@ -47,7 +47,7 @@ Vingt colonnes, six filtres et un bouton de recherche.
 | Période (date de réception) | `getDateReceived`, natif, requête par plage |
 | Lot | `getClientSampleID`, natif |
 | Client | `getClientTitle` / `getClientUID`, natifs, indexés |
-| Type d'échantillon | **pas d'index natif** — voir ci-dessous |
+| Type d'échantillon | `getTrimetaSampleTypeUID`, **créé par le profil 1003** |
 | Provenance | `getOrigin`, **créé par le profil 1002** |
 | Vanilline | résultat d'analyse, **plage min / max** |
 
@@ -55,8 +55,24 @@ Vingt colonnes, six filtres et un bouton de recherche.
 > de ce document annonçait `getSampleTypeUID` comme index natif du
 > `sample_catalog`. C'est faux : `getSampleTypeTitle` et
 > `getSampleTypeUID` y sont des **colonnes de métadonnées, pas des
-> index**. Le filtre « Type d'échantillon » demandera donc un index
-> supplémentaire, sur le modèle de `getOrigin`.
+> index**, et `AnalysisRequest` n'expose même aucun accesseur
+> `getSampleTypeUID` — les seuls existants sont sur `Analysis` et sur
+> `SampleType`. D'où l'index propre à l'add-on, décrit ci-dessous.
+
+#### Pourquoi un index à nous pour le type d'échantillon
+
+`getTrimetaSampleTypeUID` est alimenté par notre propre indexeur, qui
+lit le champ natif `SampleType` et en tire l'UID. Trois raisons :
+
+1. il ne dépend d'aucun détail interne de SENAITE ;
+2. il ne peut pas entrer en collision avec un index que `senaite.core`
+   ajouterait dans une version future ;
+3. c'est l'**UID** qui est indexé, pas l'intitulé : renommer un type
+   d'échantillon ne casse aucun filtre enregistré.
+
+C'est le même raisonnement que pour `getOrigin`, et l'inverse de celui
+retenu pour le « Lot » — là, le champ natif `ClientSampleID` était déjà
+indexé, il n'y avait rien à créer.
 
 ---
 
@@ -164,12 +180,17 @@ Un service absent donnera simplement une colonne vide, sans erreur.
 - **Profil 1002** — index `getOrigin`, sept colonnes de métadonnées,
   indexeurs nommés, étape de mise à jour 1001 → 1002 qui réindexe les
   échantillons existants.
+- **Profil 1003** — index `getTrimetaSampleTypeUID` pour le filtre
+  « Type d'échantillon », et son étape 1002 → 1003.
+- **Lecture des résultats d'analyse** — `dashboard/results.py` : une
+  requête par page sur l'`analysis_catalog`, la règle des reprises, le
+  filtre de plage.
 - **`make dashboard-info`** — inventorie depuis le serveur l'API de
   `senaite.app.listing`, les index et métadonnées réellement présents
   sur les deux catalogues, et une vue de listing existante prise comme
   modèle.
-- **Tests** — 66 tests purs (`make test-pure`), plus les tests
-  d'intégration des nouvelles colonnes dans `make test`.
+- **Tests** — 103 tests purs (`make test-pure`), plus les tests
+  d'intégration des index et colonnes dans `make test`.
 
 ### Reste à faire
 

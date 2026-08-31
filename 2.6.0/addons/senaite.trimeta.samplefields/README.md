@@ -250,3 +250,4 @@ d'un bloc, pour éviter un fichier à moitié accentué.
 | 1000 | Champs Réception et Analyse (avant profil GenericSetup) |
 | 1001 | Index et colonne `getSampleCode` dans le `sample_catalog` |
 | 1002 | Index `getOrigin` et colonnes du tableau de bord (lot 5) |
+| 1003 | Index `getTrimetaSampleTypeUID` (filtre Type d'echantillon) |
