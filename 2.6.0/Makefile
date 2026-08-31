@@ -51,7 +51,7 @@ ARGS ?=
 
 .PHONY: help debug up down restart logs ps pull shell status \
         clean fclean re install backup restore redeploy-addon \
-        first-setup test test-list test-pure check-engine fix-perms doctor require-running test-env impress-info dashboard-info sync
+        first-setup redeploy-instance test test-list test-pure check-engine fix-perms doctor require-running test-env impress-info dashboard-info sync
 
 check-engine:
 	@if [ -z "$(ENGINE)" ]; then \
@@ -105,9 +105,9 @@ shell: check-engine ## Ouvre un shell dans le container
 # ---------------------------------------------------------------------
 
 redeploy-addon: require-running ## Recharge l'add-on apres modification dans addons/
-	$(ENGINE) exec -i $(SERVICE) bash -c \
-		"cd $(INSTANCE_DIR) && buildout -c custom.cfg"
-	@ENGINE=$(ENGINE) TARGET=addons QUIET=1 sh scripts/fix-perms.sh
+	@# Le script repare les droits MEME si buildout echoue: c'est
+	@# justement dans ce cas que la reparation manquait.
+	@ENGINE=$(ENGINE) SERVICE=$(SERVICE) INSTANCE_DIR=$(INSTANCE_DIR) sh scripts/redeploy.sh
 	$(MAKE) restart
 	@echo ""
 	@echo "Add-on redeploye. Verifie les logs avec: make logs"
@@ -118,6 +118,17 @@ redeploy-addon: require-running ## Recharge l'add-on apres modification dans add
 	@echo "Si l'add-on etait deja installe dans une version anterieure :"
 	@echo "  $(SITE_URL)/portal_setup/manage_upgrades"
 	@echo "  -> jouer les etapes de mise a jour de $(ADDON)"
+
+redeploy-instance: require-running ## Comme redeploy-addon, sans reconstruire le site
+	@# 'buildout install instance' ne joue que la partie qui prend
+	@# l'add-on en compte, en sautant 'plonesite' -- lourde en
+	@# memoire et sans rapport avec l'add-on. A utiliser quand
+	@# redeploy-addon se fait tuer (code 137) sur un serveur juste
+	@# en memoire.
+	$(ENGINE) exec -i $(SERVICE) bash -c \
+		"cd $(INSTANCE_DIR) && buildout -c custom.cfg install instance"
+	@ENGINE=$(ENGINE) TARGET=addons QUIET=1 sh scripts/fix-perms.sh
+	$(MAKE) restart
 
 first-setup: ## Premiere installation complete sur une nouvelle machine
 	@echo "=== Installation initiale SENAITE + add-on Trimeta ==="
@@ -145,7 +156,7 @@ test: require-running ## Lance les tests de l'add-on dans le container
 	    echo "est disponible dans le container."; \
 	    echo ""; \
 	    echo "En attendant, 'make test-pure' tourne sans container"; \
-	    echo "et couvre 103 tests de logique pure."; \
+	    echo "et couvre 129 tests de logique pure."; \
 	    exit 1; \
 	  fi; \
 	  echo "Runner: $$RUNNER"; \
