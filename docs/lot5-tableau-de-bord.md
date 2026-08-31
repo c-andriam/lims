@@ -178,40 +178,75 @@ Un service absent donnera simplement une colonne vide, sans erreur.
 ### Fait
 
 - **Profil 1002** — index `getOrigin`, sept colonnes de métadonnées,
-  indexeurs nommés, étape de mise à jour 1001 → 1002 qui réindexe les
-  échantillons existants.
+  indexeurs nommés, étape 1001 → 1002 qui réindexe l'historique.
 - **Profil 1003** — index `getTrimetaSampleTypeUID` pour le filtre
   « Type d'échantillon », et son étape 1002 → 1003.
-- **Lecture des résultats d'analyse** — `dashboard/results.py` : une
-  requête par page sur l'`analysis_catalog`, la règle des reprises, le
-  filtre de plage.
-- **`make dashboard-info`** — inventorie depuis le serveur l'API de
-  `senaite.app.listing`, les index et métadonnées réellement présents
-  sur les deux catalogues, et une vue de listing existante prise comme
-  modèle.
-- **Tests** — 103 tests purs (`make test-pure`), plus les tests
-  d'intégration des index et colonnes dans `make test`.
+- **Lecture des résultats** — `dashboard/results.py` : une requête par
+  page sur l'`analysis_catalog`, la règle des reprises, le filtre de
+  plage.
+- **La vue** — `dashboard/view.py`, sur `/senaite/trimeta-dashboard`.
+- **La barre de filtres** — `dashboard/filterbar.py`, posée dans la
+  zone de contenu par un viewlet.
+- **Entrée de barre latérale et infobulles** — `dashboard.js`.
+- **`make dashboard-info`** — inventaire de l'API depuis le serveur.
+- **Tests** — 134 tests purs (`make test-pure`).
 
-- **La vue** — `dashboard/view.py`, déclarée en
-  `/senaite/trimeta-dashboard`. La barre de filtres est un
-  `<form method="get">` sans JavaScript : une recherche est partageable
-  par copie de l'URL, et rien ne peut se désynchroniser entre le
-  formulaire et le tableau. Les critères sont aussi posés en champs
-  cachés (`additional_hidden_fields`), sinon la page 2 d'un résultat
-  filtré — qui passe par AJAX — afficherait tout le catalogue.
+### Trois erreurs commises, et ce qu'elles ont appris
+
+Elles sont notées ici parce qu'elles se reproduiraient sur toute autre
+page bâtie sur `senaite.app.listing`.
+
+**1. Ne rien ajouter au rendu d'une vue de listing.** La barre de
+filtres était d'abord préfixée dans `DashboardView.__call__`. Or
+`senaite.app.listing` réutilise la *même vue* pour ses requêtes AJAX :
+le HTML se retrouvait devant la réponse JSON, et le navigateur affichait
+`JSON.parse: unexpected character at line 1 column 1`, tableau vide.
+`__call__` rend par ailleurs la page complète, chrome compris — le
+formulaire atterrissait donc au-dessus de la barre de navigation.
+**Un viewlet règle les deux.**
+
+**2. Un en-tête de colonne n'est pas une étiquette de formulaire.**
+« Poids à la réception (g) » se replie sur trois lignes dans un en-tête.
+Raccourcir les libellés existants aurait raccourci du même coup ceux du
+formulaire d'échantillon, où la version longue est la bonne. D'où un jeu
+d'identifiants dédiés, préfixés `dashboard_`, et le sens complet rendu
+au survol.
+
+**3. Cloner, plutôt que parier sur un balisage.** La barre latérale
+appartient à `senaite.core` et n'offre pas de point d'extension. Une
+première version la cherchait par sélecteurs, dont un très large
+(`[class*='sidebar']`) : il attrapait un conteneur externe dont l'unique
+enfant direct était la liste entière, et la barre apparaissait en
+double. La règle retenue n'exige aucune connaissance du balisage :
+
+> On remonte depuis un lien tant que l'ancêtre ne contient **qu'un
+> seul** lien. Le dernier ancêtre qui satisfait cela est l'entrée ; son
+> parent est la liste.
+
+Un garde-fou refuse d'insérer tout bloc portant plus d'un lien.
+
+### Deux détails qui coûtent cher
+
+**Le cache du navigateur.** `dashboard.js` est servi avec un paramètre
+de version (`?v=N`). Sans lui, un correctif déployé reste invisible et
+l'on croit qu'il n'a pas fonctionné. La version existe à deux endroits —
+le script et le viewlet — et un test vérifie qu'elles concordent.
+
+**Les caractères de contrôle invisibles.** Un `` d'expression
+régulière s'est retrouvé écrit dans `dashboard.js` comme un véritable
+caractère backspace (0x08). Illisible à l'œil, silencieux à
+l'exécution. Un test balaie désormais le fichier.
 
 ### Reste à faire
 
 1. **Confirmer les sept mots-clés** dans `dashboard/columns.py`
-   (constante `DASHBOARD_ANALYSES`). Ils se lisent dans
-   Configuration › Analyses, colonne *Keyword*. Un mot-clé faux ne lève
-   aucune erreur : la colonne reste vide. La vue journalise donc un
-   avertissement quand un mot-clé ne ramène jamais rien.
-2. **Ajouter l'entrée de menu.** `actions.xml` de `senaite.core` ne
-   contient rien pour les échantillons : le menu se construit
-   autrement, à élucider. En attendant, la page s'atteint par son URL.
-3. **Valider sur des données réelles.** Un tableau vide ne prouve ni
-   qu'il marche, ni qu'il est cassé.
+   (constante `DASHBOARD_ANALYSES`), lus dans Configuration › Analyses,
+   colonne *Keyword*. Un mot-clé faux ne lève aucune erreur : la colonne
+   reste vide. La vue journalise donc un avertissement quand un mot-clé
+   ne ramène jamais rien.
+2. **Valider sur des données réelles.** Le `sample_catalog` de
+   l'instance de test est vide (0 objet à la réindexation) : un tableau
+   vide ne prouve ni qu'il marche, ni qu'il est cassé.
 
 ### À déployer
 

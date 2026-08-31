@@ -7,10 +7,16 @@ est injecte, ce qui permet de verifier la construction de la requete
 sans DateTime.
 """
 
+import io
+import os
+import re
 import unittest
 
+from senaite.trimeta.samplefields.dashboard.columns import COLUMN_HELP
 from senaite.trimeta.samplefields.dashboard.columns import DASHBOARD_ANALYSES
 from senaite.trimeta.samplefields.dashboard.columns import build_columns
+from senaite.trimeta.samplefields.dashboard.columns import get_column_help
+from senaite.trimeta.samplefields.dashboard.columns import get_column_labels
 from senaite.trimeta.samplefields.dashboard.columns import get_keyword_for
 from senaite.trimeta.samplefields.dashboard.columns import get_keywords
 from senaite.trimeta.samplefields.dashboard.columns import get_metadata_map
@@ -209,10 +215,81 @@ class TestColumns(unittest.TestCase):
                           "colonne sans attribut de brain: %s" % key)
 
 
+class TestColumnHelp(unittest.TestCase):
+    """Infobulles: chaque en-tete court doit avoir sa version longue."""
+
+    def test_every_column_has_help(self):
+        """Un en-tete abrege sans infobulle serait une perte seche: le
+        sens complet n'existerait plus nulle part dans l'interface."""
+        help_texts = get_column_help()
+        for key in build_columns():
+            self.assertIn(key, help_texts,
+                          "colonne sans infobulle: %s" % key)
+
+    def test_help_covers_exactly_the_columns(self):
+        """Une entree d'aide orpheline signale une colonne supprimee
+        dont l'infobulle a survecu."""
+        self.assertEqual(sorted(dict(COLUMN_HELP).keys()),
+                         sorted(build_columns().keys()))
+
+    def test_labels_cover_exactly_the_columns(self):
+        self.assertEqual(sorted(get_column_labels().keys()),
+                         sorted(build_columns().keys()))
+
+
+class TestScriptVersion(unittest.TestCase):
+    """La version du script existe a DEUX endroits, et doit concorder.
+
+    Le viewlet la reporte en parametre d'URL (`dashboard.js?v=N`) pour
+    forcer le navigateur a recharger le fichier apres une modification;
+    le script la publie dans `window.TRIMETA_DASHBOARD_VERSION` pour
+    qu'on puisse verifier depuis la console ce qui tourne reellement.
+
+    Si les deux divergent, l'invalidation du cache cesse d'etre fiable
+    -- en silence, et c'est exactement le genre de panne qui fait
+    croire qu'un correctif deploye n'a pas fonctionne.
+    """
+
+    def setUp(self):
+        self.root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    def read(self, *parts):
+        path = os.path.join(self.root, *parts)
+        self.assertTrue(os.path.exists(path), "fichier absent: %s" % path)
+        return io.open(path, encoding="utf-8").read()
+
+    def test_versions_match(self):
+        script = self.read("browser", "resources", "dashboard.js")
+        viewlet = self.read("dashboard", "viewlets.py")
+
+        in_js = re.search(r"var VERSION = (\d+);", script)
+        in_py = re.search(r"SCRIPT_VERSION = (\d+)", viewlet)
+
+        self.assertIsNotNone(in_js, "VERSION introuvable dans dashboard.js")
+        self.assertIsNotNone(
+            in_py, "SCRIPT_VERSION introuvable dans viewlets.py")
+        self.assertEqual(
+            in_js.group(1), in_py.group(1),
+            "dashboard.js annonce la version %s, le viewlet sert la %s: "
+            "le cache du navigateur ne sera plus invalide correctement."
+            % (in_js.group(1), in_py.group(1)))
+
+    def test_script_carries_no_control_characters(self):
+        """Une limite de mot d'expression reguliere, ecrite par megarde comme un
+        vrai caractere backspace s'est deja glisse dans ce fichier. Il
+        ne se voit pas a la lecture."""
+        script = self.read("browser", "resources", "dashboard.js")
+        for code in (7, 8, 11, 12, 27):
+            self.assertNotIn(
+                chr(code), script,
+                "caractere de controle %d present dans dashboard.js" % code)
+
+
 def test_suite():
     suite = unittest.TestSuite()
     loader = unittest.TestLoader()
     for case in (TestReadFilters, TestBuildQuery, TestHiddenFields,
-                 TestIsActive, TestColumns):
+                 TestIsActive, TestColumns, TestColumnHelp,
+                 TestScriptVersion):
         suite.addTest(loader.loadTestsFromTestCase(case))
     return suite

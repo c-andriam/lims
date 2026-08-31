@@ -156,7 +156,7 @@ test: require-running ## Lance les tests de l'add-on dans le container
 	    echo "est disponible dans le container."; \
 	    echo ""; \
 	    echo "En attendant, 'make test-pure' tourne sans container"; \
-	    echo "et couvre 129 tests de logique pure."; \
+	    echo "et couvre 134 tests de logique pure."; \
 	    exit 1; \
 	  fi; \
 	  echo "Runner: $$RUNNER"; \
