@@ -25,26 +25,22 @@
   var CONFIG = window.TRIMETA_DASHBOARD || {};
   var MARKER = "trimeta-dashboard-link";
 
-  // Conteneurs possibles de la barre laterale, du plus precis au plus
-  // large. On s'arrete au premier qui contient au moins un lien.
-  var SIDEBAR_SELECTORS = [
-    "#sidebar",
-    "nav#sidebar",
-    ".sidebar",
-    "#portal-sidebar",
-    "[class*='sidebar']"
-  ];
 
-  // Icone de repli, dans le style trait fin des icones SENAITE.
-  // Utilisee seulement si aucune icone du theme ne repond.
-  var FALLBACK_SVG =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" ' +
-    'viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-    'stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
+  /* Trace de l'icone, dans le style trait fin des icones SENAITE:
+   * un cadre, une separation horizontale, une verticale -- un tableau.
+   * `currentColor` la fait suivre la couleur des autres entrees, etat
+   * survole et actif compris. */
+  var ICON_PATHS =
     '<rect x="3" y="3" width="18" height="18" rx="2"/>' +
     '<line x1="3" y1="9" x2="21" y2="9"/>' +
-    '<line x1="9" y1="9" x2="9" y2="21"/>' +
-    "</svg>";
+    '<line x1="9" y1="9" x2="9" y2="21"/>';
+
+  function svgWithSize(size) {
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="' + size +
+      '" height="' + size + '" viewBox="0 0 24 24" fill="none" ' +
+      'stroke="currentColor" stroke-width="1.5" stroke-linecap="round" ' +
+      'stroke-linejoin="round">' + ICON_PATHS + "</svg>";
+  }
 
   function log(message, error) {
     if (window.console && window.console.debug) {
@@ -56,33 +52,65 @@
   // 1. Entree de barre laterale
   // ------------------------------------------------------------------
 
-  function findSidebar() {
-    for (var i = 0; i < SIDEBAR_SELECTORS.length; i++) {
-      var nodes = document.querySelectorAll(SIDEBAR_SELECTORS[i]);
-      for (var j = 0; j < nodes.length; j++) {
-        if (nodes[j].querySelector("a[href]")) {
-          return nodes[j];
-        }
+  /* Trouver l'ENTREE a cloner, sans rien savoir du balisage.
+   *
+   * Regle: on remonte depuis un lien tant que l'ancetre ne contient
+   * qu'UN SEUL lien. Le dernier ancetre qui satisfait cela est l'entree
+   * complete (icone + libelle); son parent est la liste des entrees.
+   *
+   * C'est la correction d'un vrai defaut: la premiere version cherchait
+   * la barre par une liste de selecteurs, dont un tres large
+   * ([class*='sidebar']). Celui-ci attrapait un conteneur EXTERNE dont
+   * l'unique enfant direct etait la liste entiere -- on clonait donc
+   * toute la barre, qui apparaissait en double.
+   *
+   * La regle du "un seul lien" ne peut pas commettre cette erreur: des
+   * qu'un ancetre contient deux liens, il n'est plus une entree. */
+  function findItemAndList() {
+    var links = document.querySelectorAll("a[href]");
+    var best = null;
+
+    for (var i = 0; i < links.length; i++) {
+      var link = links[i];
+      if (!isSidebarCandidate(link)) {
+        continue;
+      }
+      var node = link;
+      while (node.parentNode &&
+             node.parentNode !== document.body &&
+             node.parentNode.querySelectorAll("a[href]").length === 1) {
+        node = node.parentNode;
+      }
+      var list = node.parentNode;
+      if (!list) {
+        continue;
+      }
+      // La liste doit contenir plusieurs entrees: c'est ce qui
+      // distingue une barre de navigation d'un lien isole.
+      var siblings = list.querySelectorAll("a[href]").length;
+      if (siblings < 2) {
+        continue;
+      }
+      if (!best || siblings > best.siblings) {
+        best = {item: node, list: list, siblings: siblings};
       }
     }
-    return null;
+    return best;
   }
 
-  /* Entree a cloner: la DERNIERE de la barre, pour que la nouvelle
-   * vienne se poser a la suite sans s'intercaler au milieu. */
-  function findTemplateItem(sidebar) {
-    var links = sidebar.querySelectorAll("a[href]");
-    if (!links.length) {
-      return null;
+  /* Un lien de la barre laterale est etroit et colle a gauche. Le test
+   * geometrique evite de confondre la barre avec le menu horizontal du
+   * haut ou avec les liens de pied de page. */
+  function isSidebarCandidate(link) {
+    try {
+      var box = link.getBoundingClientRect();
+      if (!box.width || !box.height) {
+        return false;                    // masque
+      }
+      return box.left < 260 && box.top > 40;
+    } catch (error) {
+      return false;
     }
-    var link = links[links.length - 1];
-    // On remonte au bloc qui porte l'entree entiere (icone + libelle),
-    // sans jamais depasser la barre elle-meme.
-    var node = link;
-    while (node.parentNode && node.parentNode !== sidebar) {
-      node = node.parentNode;
-    }
-    return node;
   }
 
   function setLabel(clone, label) {
@@ -95,8 +123,8 @@
     link.setAttribute("title", label);
     link.setAttribute("aria-label", label);
 
-    // Les libelles textuels de la barre sont remplaces; l'icone, elle,
-    // est un element et n'est pas touchee ici.
+    // Les libelles textuels sont remplaces; l'icone est un element et
+    // n'est pas concernee ici.
     var walker = document.createTreeWalker(
       link, NodeFilter.SHOW_TEXT, null, false);
     var replaced = false;
@@ -110,86 +138,63 @@
     return link;
   }
 
-  /* Essaie les icones du theme l'une apres l'autre; garde celle du
-   * clone si aucune ne repond, et l'icone de repli si le clone n'en
-   * avait pas. */
+  /* Icone: on remplace le CONTENU de celle du clone, en gardant son
+   * element et donc ses classes, sa taille et sa couleur. C'est ce qui
+   * garantit l'alignement avec les autres entrees.
+   *
+   * On ne tente plus de charger une icone du theme: un nom inconnu
+   * renvoyait une reponse que le navigateur acceptait comme image sans
+   * pouvoir la dessiner, d'ou le "?" observe a l'ecran. Un trace fourni
+   * par l'add-on, lui, s'affiche toujours. */
   function setIcon(link) {
-    var holder = link.querySelector("img, svg");
-    var candidates = CONFIG.icons || [];
+    var holder = link.querySelector("svg");
+    if (holder) {
+      holder.setAttribute("viewBox", "0 0 24 24");
+      holder.setAttribute("fill", "none");
+      holder.setAttribute("stroke", "currentColor");
+      holder.setAttribute("stroke-width", "1.5");
+      holder.innerHTML = ICON_PATHS;
+      return;
+    }
 
-    function useFallback() {
-      if (holder) {
-        return;                       // l'icone du clone fait l'affaire
-      }
+    var img = link.querySelector("img");
+    if (img) {
       var span = document.createElement("span");
-      span.innerHTML = FALLBACK_SVG;
-      link.insertBefore(span, link.firstChild);
+      span.innerHTML = svgWithSize(img.clientWidth || 24);
+      // Reprend les classes de l'image pour heriter des marges.
+      span.className = img.className || "";
+      img.parentNode.replaceChild(span, img);
+      return;
     }
 
-    function tryNext(index) {
-      if (index >= candidates.length) {
-        useFallback();
-        return;
-      }
-      var url = CONFIG.iconBase + candidates[index];
-      var probe = new Image();
-      probe.onload = function () {
-        try {
-          if (holder && holder.tagName.toLowerCase() === "img") {
-            holder.setAttribute("src", url);
-          } else if (holder) {
-            var img = document.createElement("img");
-            img.setAttribute("src", url);
-            img.setAttribute("alt", "");
-            // Reprend la taille rendue de l'icone remplacee, pour
-            // rester aligne sur les autres entrees.
-            img.style.width = holder.clientWidth
-              ? holder.clientWidth + "px" : "24px";
-            holder.parentNode.replaceChild(img, holder);
-          } else {
-            var solo = document.createElement("img");
-            solo.setAttribute("src", url);
-            solo.setAttribute("alt", "");
-            link.insertBefore(solo, link.firstChild);
-          }
-        } catch (error) {
-          log("icone non posee", error);
-          useFallback();
-        }
-      };
-      probe.onerror = function () {
-        tryNext(index + 1);
-      };
-      probe.src = url;
-    }
-
-    tryNext(0);
+    var solo = document.createElement("span");
+    solo.innerHTML = svgWithSize(24);
+    link.insertBefore(solo, link.firstChild);
   }
 
   function addSidebarEntry() {
     if (!CONFIG.url || document.getElementById(MARKER)) {
       return;
     }
-    var sidebar = findSidebar();
-    if (!sidebar) {
-      return;                          // barre absente sur cette page
-    }
-    var template = findTemplateItem(sidebar);
-    if (!template) {
-      return;
+    var found = findItemAndList();
+    if (!found) {
+      return;                            // pas de barre sur cette page
     }
 
-    var clone = template.cloneNode(true);
+    var clone = found.item.cloneNode(true);
     clone.id = MARKER;
-    // Un etat "actif" herite du clone donnerait deux entrees allumees.
+    // Un etat "actif" herite du clone allumerait deux entrees.
     clone.className = (clone.className || "").replace(/\bactive\b/g, "");
+    if (clone.removeAttribute) {
+      clone.removeAttribute("aria-current");
+    }
 
     var link = setLabel(clone, CONFIG.label || "Dashboard");
     if (!link) {
       return;
     }
     setIcon(link);
-    sidebar.appendChild(clone);
+    found.list.appendChild(clone);
   }
 
   // ------------------------------------------------------------------
