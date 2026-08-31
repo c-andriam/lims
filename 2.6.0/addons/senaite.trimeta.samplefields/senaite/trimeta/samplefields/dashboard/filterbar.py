@@ -56,6 +56,92 @@ def escape(value):
     return _escape(to_text(value), True)
 
 
+# Mise en forme de la page.
+#
+# Ces regles ne sont PAS globales malgre leur apparence: le viewlet qui
+# les emet ne s'affiche que sur le tableau de bord, elles ne sont donc
+# chargees nulle part ailleurs.
+#
+# Le probleme qu'elles corrigent: vingt colonnes dont les en-tetes se
+# repliaient sur deux ou trois lignes, alignes chacun a une hauteur
+# differente. Les libelles ont d'abord ete raccourcis (voir columns.py);
+# ces regles font le reste.
+STYLE = u"""<style>
+/* ------------------------------------------------------------------
+   En-tetes: une seule ligne, tous alignes sur la meme base.
+
+   C'est la regle qui compte. Sans `nowrap`, "Poids a la reception (g)"
+   se repliait sur trois lignes et "PHB" sur une seule: chaque en-tete
+   commencait a une hauteur differente, et la ligne devenait illisible.
+   Les libelles ont d'abord ete raccourcis (voir columns.py); ceci
+   garantit le reste, meme si un intitule reste long.
+   ------------------------------------------------------------------ */
+.senaite-table thead th,
+#content table thead th,
+table thead th {
+  vertical-align: bottom;
+  white-space: nowrap;
+  font-size: .72rem;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: .01em;
+  padding: .5rem .6rem;
+}
+
+/* Cellules: compactes, et sur une seule ligne elles aussi. Une ligne
+   de tableau de bord se lit en balayant horizontalement; un retour a
+   la ligne casse ce balayage. */
+#content table tbody td,
+table tbody td {
+  font-size: .78rem;
+  padding: .35rem .6rem;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Le tableau prend la largeur qu'il lui faut plutot que de comprimer
+   vingt colonnes dans la fenetre. */
+#content table {
+  width: max-content;
+  min-width: 100%;
+}
+
+/* ------------------------------------------------------------------
+   Defilement horizontal.
+
+   Deux mecanismes complementaires, parce qu'on ne peut pas savoir
+   d'avance dans quel conteneur senaite.app.listing pose sa table:
+
+   1. les conteneurs nommes, s'ils existent;
+   2. `:has()`, qui vise le parent DIRECT de n'importe quelle table.
+      Reconnu par les navigateurs recents; ignore par les anciens,
+      auquel cas le point 1 prend le relais.
+
+   Volontairement PAS sur #content lui-meme: y poser overflow-x
+   creerait un contexte de formatage qui rognerait le menu de
+   selection des colonnes.
+   ------------------------------------------------------------------ */
+.senaite-listing,
+.listing-container,
+.table-responsive,
+#content div:has(> table) {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* ------------------------------------------------------------------
+   Barre de filtres
+   ------------------------------------------------------------------ */
+.trimeta-dashboard-filters .form-row {
+  align-items: flex-end;
+}
+.trimeta-dashboard-filters label {
+  margin-bottom: .15rem;
+  font-size: .75rem;
+}
+</style>"""
+
+
 class FilterBar(object):
     """Dessine le formulaire de recherche du tableau de bord."""
 
@@ -163,7 +249,7 @@ class FilterBar(object):
                 ).format(url=escape(self.get_action_url()),
                          label=escape(t(_(u"Reset"))))
 
-            return (
+            return STYLE + (
                 u'<form method="get" action="{url}" '
                 u'class="trimeta-dashboard-filters card mb-3">'
                 u'<div class="card-body py-2">'
