@@ -67,47 +67,77 @@ def escape(value):
 # differente. Les libelles ont d'abord ete raccourcis (voir columns.py);
 # ces regles font le reste.
 STYLE = u"""<style>
-/* En-tetes: une seule ligne, alignes sur la meme base. */
+/* ------------------------------------------------------------------
+   En-tetes: une seule ligne, tous alignes sur la meme base.
+
+   C'est la regle qui compte. Sans `nowrap`, "Poids a la reception (g)"
+   se repliait sur trois lignes et "PHB" sur une seule: chaque en-tete
+   commencait a une hauteur differente, et la ligne devenait illisible.
+   Les libelles ont d'abord ete raccourcis (voir columns.py); ceci
+   garantit le reste, meme si un intitule reste long.
+   ------------------------------------------------------------------ */
 .senaite-table thead th,
 #content table thead th,
 table thead th {
   vertical-align: bottom;
   white-space: nowrap;
-  font-size: .78rem;
-  line-height: 1.2;
-  padding: .45rem .55rem;
+  font-size: .72rem;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: .01em;
+  padding: .5rem .6rem;
 }
 
-/* Cellules: un peu plus compactes, et une largeur bornee pour qu'un
-   nom de client a rallonge ne pousse pas tout le tableau. */
+/* Cellules: compactes, et sur une seule ligne elles aussi. Une ligne
+   de tableau de bord se lit en balayant horizontalement; un retour a
+   la ligne casse ce balayage. */
 #content table tbody td,
 table tbody td {
-  font-size: .82rem;
-  padding: .35rem .55rem;
+  font-size: .78rem;
+  padding: .35rem .6rem;
   vertical-align: middle;
-  max-width: 16rem;
+  white-space: nowrap;
 }
 
-/* Vingt colonnes ne tiennent pas dans une page: on defile
-   horizontalement plutot que de deborder.
+/* Le tableau prend la largeur qu'il lui faut plutot que de comprimer
+   vingt colonnes dans la fenetre. */
+#content table {
+  width: max-content;
+  min-width: 100%;
+}
 
-   Volontairement PAS sur #content: y poser overflow-x creerait un
-   contexte de formatage qui rognerait le menu de selection des
-   colonnes. Si aucun de ces conteneurs n'existe, on ne change
-   simplement rien -- aucun risque de regression. */
+/* ------------------------------------------------------------------
+   Defilement horizontal.
+
+   Deux mecanismes complementaires, parce qu'on ne peut pas savoir
+   d'avance dans quel conteneur senaite.app.listing pose sa table:
+
+   1. les conteneurs nommes, s'ils existent;
+   2. `:has()`, qui vise le parent DIRECT de n'importe quelle table.
+      Reconnu par les navigateurs recents; ignore par les anciens,
+      auquel cas le point 1 prend le relais.
+
+   Volontairement PAS sur #content lui-meme: y poser overflow-x
+   creerait un contexte de formatage qui rognerait le menu de
+   selection des colonnes.
+   ------------------------------------------------------------------ */
 .senaite-listing,
 .listing-container,
-.table-responsive {
+.table-responsive,
+#content div:has(> table) {
   overflow-x: auto;
+  max-width: 100%;
 }
 
-/* Barre de filtres: les champs alignes sur leur base, quelle que soit
-   la hauteur de leur etiquette. */
+/* ------------------------------------------------------------------
+   Barre de filtres
+   ------------------------------------------------------------------ */
 .trimeta-dashboard-filters .form-row {
   align-items: flex-end;
 }
 .trimeta-dashboard-filters label {
   margin-bottom: .15rem;
+  font-size: .75rem;
 }
 </style>"""
 
