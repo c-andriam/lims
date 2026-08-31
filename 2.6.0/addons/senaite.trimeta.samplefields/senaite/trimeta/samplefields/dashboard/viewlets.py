@@ -20,16 +20,99 @@ avere peu fiable sur les pages qui font des appels AJAX -- ce qui est
 precisement le cas ici.
 """
 
+import json
 import logging
 
 from plone.app.layout.viewlets import ViewletBase
+from senaite.core.i18n import translate as t
+from zope.i18nmessageid import MessageFactory
 
+from senaite.trimeta.samplefields.dashboard import columns as cols
 from senaite.trimeta.samplefields.dashboard.filterbar import FilterBar
+
+_ = MessageFactory("senaite.trimeta.samplefields")
 
 logger = logging.getLogger("senaite.trimeta.samplefields")
 
 # Fragment d'URL identifiant la page du tableau de bord.
 DASHBOARD_MARKER = "trimeta-dashboard"
+
+RESOURCE_BASE = "++resource++senaite.trimeta.samplefields.static"
+
+# Icones du theme SENAITE tentees dans cet ordre pour l'entree de barre
+# laterale. Le script s'arrete a la premiere qui repond et retombe sur
+# une icone livree avec l'add-on si aucune n'existe -- on ne peut pas
+# savoir d'ici lesquelles cette installation embarque.
+ICON_CANDIDATES = ("dashboard", "chart", "barchart", "report",
+                   "analysisreport", "table", "list")
+
+SCRIPT_TAG = (
+    u'<script type="text/javascript">'
+    u'window.TRIMETA_DASHBOARD = {config};'
+    u'</script>'
+    u'<script type="text/javascript" '
+    u'id="trimeta-dashboard-script" '
+    u'src="{portal_url}/{resources}/dashboard.js"></script>'
+)
+
+
+class DashboardScriptViewlet(ViewletBase):
+    """Entree de barre laterale et infobulles d'en-tete.
+
+    Rendu sur TOUTES les pages, contrairement au viewlet de la barre de
+    filtres: le raccourci vers le tableau de bord doit etre disponible
+    partout, pas seulement une fois qu'on y est deja.
+
+    Le script lui-meme decide de ce qu'il applique: l'entree de barre
+    laterale toujours, les infobulles seulement s'il trouve un tableau.
+    """
+
+    def get_portal_url(self):
+        return self.portal_state.portal_url()
+
+    def get_dashboard_url(self):
+        return "{}/trimeta-dashboard".format(self.get_portal_url())
+
+    def get_help_map(self):
+        """{intitule court affiche: intitule complet}.
+
+        L'appariement cote JavaScript se fait sur le texte rendu. Les
+        deux faces viennent donc du meme catalogue de traduction, lu au
+        meme instant: elles ne peuvent pas diverger.
+        """
+        labels = cols.get_column_labels()
+        help_texts = cols.get_column_help()
+        mapping = {}
+        for key, short in labels.items():
+            full = help_texts.get(key)
+            if not full:
+                continue
+            short_text = t(short, context=self.request)
+            full_text = t(full, context=self.request)
+            if short_text and full_text and short_text != full_text:
+                mapping[short_text] = full_text
+        return mapping
+
+    def get_config_json(self):
+        return json.dumps({
+            "url": self.get_dashboard_url(),
+            "label": t(_(u"Dashboard"), context=self.request),
+            "iconBase": "{}/senaite_theme/icon/".format(
+                self.get_portal_url()),
+            "icons": list(ICON_CANDIDATES),
+            "help": self.get_help_map(),
+        })
+
+    def render(self):
+        try:
+            return SCRIPT_TAG.format(
+                config=self.get_config_json(),
+                portal_url=self.get_portal_url(),
+                resources=RESOURCE_BASE,
+            )
+        except Exception:
+            logger.exception("Script du tableau de bord non injecte")
+            return ""
 
 
 class DashboardFiltersViewlet(ViewletBase):

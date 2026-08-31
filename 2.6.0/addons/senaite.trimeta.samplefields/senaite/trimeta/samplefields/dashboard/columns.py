@@ -166,6 +166,57 @@ def build_columns():
     return columns
 
 
+# ---------------------------------------------------------------------
+# Infobulles
+# ---------------------------------------------------------------------
+#
+# Les en-tetes sont courts par necessite: vingt colonnes ne tiennent pas
+# autrement. Le sens complet est donc rendu au survol.
+#
+# On reutilise ici les msgid LONGS -- ceux du formulaire d'echantillon,
+# deja traduits. C'est exactement ce a quoi ils servent: dire la chose
+# en entier quand la place ne manque pas.
+COLUMN_HELP = (
+    ("SampleCode",      _(u"Sample Code")),
+    ("Lot",             _(u"Lot")),
+    ("Client",          _(u"Client")),
+    ("SampleType",      _(u"Sample Type")),
+    ("Origin",          _(u"Origin")),
+    ("ReceptionWeight", _(u"Reception Weight (g)")),
+    ("DateReceived",    _(u"Date Received")),
+    ("AnalysisStart",   _(u"Beginning of Analysis")),
+    ("AnalysisEnd",     _(u"End of Analysis")),
+    ("DateVerified",    _(u"Date Validated")),
+    ("Vanillin",              _(u"Vanillin")),
+    ("GlucoVanillin",         _(u"Gluco-vanillin")),
+    ("VanillicAcid",          _(u"Vanillic acid")),
+    ("PHB",                   _(u"PHB")),
+    ("PHBAcid",               _(u"PHB acid")),
+    ("Moisture",              _(u"Moisture (TH)")),
+    ("WaterActivity",         _(u"Water activity (AW)")),
+    ("HPLCOperator",          _(u"HPLC operator")),
+    ("MoistureOperator",      _(u"Moisture operator")),
+    ("WaterActivityOperator", _(u"Water activity operator")),
+)
+
+
+def get_column_help():
+    """{cle de colonne: libelle complet} pour les infobulles."""
+    return dict(COLUMN_HELP)
+
+
+def get_column_labels():
+    """{cle de colonne: intitule court affiche en en-tete}."""
+    labels = {}
+    for key, title, _attr, _index in METADATA_COLUMNS:
+        labels[key] = title
+    for key, _keyword, title in DASHBOARD_ANALYSES:
+        labels[key] = title
+    for key, title, _attr in OPERATOR_COLUMNS:
+        labels[key] = title
+    return labels
+
+
 def get_metadata_map():
     """{cle de colonne: attribut du brain} pour les colonnes catalogue."""
     mapping = {}
