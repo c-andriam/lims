@@ -1,14 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configure
     xmlns="http://namespaces.zope.org/zope"
-    xmlns:five="http://namespaces.zope.org/five"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:i18n="http://namespaces.zope.org/i18n"
     i18n_domain="senaite.trimeta.samplefields">
 
   <!-- Enregistre le dossier locales/ pour la traduction automatique -->
   <i18n:registerTranslations directory="locales" />
 
-  <!-- Enregistre l'extender comme adapter sur IAnalysisRequest -->
+  <!-- =============================================================
+       Profil d'installation
+       ============================================================= -->
+  <genericsetup:registerProfile
+      name="default"
+      title="SENAITE Trimeta - champs personnalises"
+      description="Champs Reception/Analyse et index de catalogue
+                   associes pour Trimeta Group."
+      directory="profiles/default"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      post_handler=".setuphandlers.post_install"
+      />
+
+  <genericsetup:registerProfile
+      name="uninstall"
+      title="SENAITE Trimeta - desinstallation"
+      description="Retire les index de catalogue ajoutes par l'add-on.
+                   Les valeurs saisies sur les echantillons sont
+                   conservees."
+      directory="profiles/uninstall"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      post_handler=".setuphandlers.post_uninstall"
+      />
+
+  <include package=".upgrades" />
+
+  <!-- =============================================================
+       Schema du type Sample (AnalysisRequest)
+       ============================================================= -->
+
+  <!-- Ajoute les champs des sections Reception et Analyse -->
   <adapter
       factory=".extender.ReceptionFieldsExtender"
       provides="archetypes.schemaextender.interfaces.IOrderableSchemaExtender"
@@ -23,12 +53,79 @@
       for="bika.lims.interfaces.IAnalysisRequest"
       />
 
+  <!-- Section Assurance Qualite (41 champs facultatifs) -->
+  <include package=".qualitydata" />
+
+  <!-- =============================================================
+       Indexation
+       ============================================================= -->
+
+  <!-- Indexeur nomme: alimente a la fois l'index et la colonne de
+       metadonnees `getSampleCode` du sample_catalog. Indispensable
+       car les champs schemaextender n'ont pas d'accesseur de classe
+       (voir catalog.py).
+
+       Le `name` doit valoir exactement l'identifiant declare dans
+       catalog.py: c'est par ce nom que Plone retrouve l'adaptateur.
+       Une faute de frappe ne leve rien, elle laisse simplement la
+       colonne vide. -->
+  <adapter
+      name="getSampleCode"
+      factory=".indexers.getSampleCode"
+      />
+
+  <!-- Colonnes du tableau de bord (lot 5). getOrigin est en plus un
+       index: c'est le filtre "Provenance". -->
+  <adapter
+      name="getOrigin"
+      factory=".indexers.getOrigin"
+      />
+  <adapter
+      name="getReceptionWeight"
+      factory=".indexers.getReceptionWeight"
+      />
+  <adapter
+      name="getAnalysisStart"
+      factory=".indexers.getAnalysisStart"
+      />
+  <adapter
+      name="getAnalysisEnd"
+      factory=".indexers.getAnalysisEnd"
+      />
+  <adapter
+      name="getHPLCOperator"
+      factory=".indexers.getHPLCOperator"
+      />
+  <adapter
+      name="getMoistureOperator"
+      factory=".indexers.getMoistureOperator"
+      />
+  <adapter
+      name="getWaterActivityOperator"
+      factory=".indexers.getWaterActivityOperator"
+      />
+
+  <!-- Colonnes Code echantillon / Lot dans les listings -->
+  <include package=".listings" />
+
+  <!-- =============================================================
+       Suggestions partagees
+       ============================================================= -->
+
   <!-- A chaque creation d'un Sample, enregistre les valeurs des
-       champs Reception en tant que suggestions futures -->
+       champs libres en tant que suggestions futures -->
   <subscriber
       for="bika.lims.interfaces.IAnalysisRequest
            zope.lifecycleevent.interfaces.IObjectAddedEvent"
       handler=".suggestions.on_sample_added"
+      />
+
+  <!-- Les champs Assurance Qualite sont saisis APRES la creation:
+       sans cet abonne, leurs valeurs ne seraient jamais memorisees. -->
+  <subscriber
+      for="bika.lims.interfaces.IAnalysisRequest
+           zope.lifecycleevent.interfaces.IObjectModifiedEvent"
+      handler=".suggestions.on_sample_modified"
       />
 
   <include package=".browser" />

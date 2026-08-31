@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    i18n_domain="senaite.trimeta.samplefields">
+
+  <!-- Extender NOMME: archetypes.schemaextender collecte tous les
+       adaptateurs via getAdapters(), y compris l'anonyme deja
+       enregistre pour les sections Reception/Analyse. Sans nom
+       distinct, le second ecraserait le premier. -->
+  <adapter
+      name="senaite.trimeta.qualitydata"
+      factory=".extender.QualityDataExtender"
+      provides="archetypes.schemaextender.interfaces.IOrderableSchemaExtender"
+      for="bika.lims.interfaces.IAnalysisRequest"
+      />
+
+</configure>

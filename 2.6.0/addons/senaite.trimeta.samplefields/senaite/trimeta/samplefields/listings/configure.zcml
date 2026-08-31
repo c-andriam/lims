@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    i18n_domain="senaite.trimeta.samplefields">
+
+  <!-- Les adaptateurs de listing sont des SOUSCRIPTEURS: plusieurs
+       add-ons peuvent enrichir le meme listing sans se marcher dessus.
+
+       L'ordre des arguments de `for` est impose par senaite.app.listing:
+       la vue de listing D'ABORD, le contexte ENSUITE.
+
+       On adapte l'interface IListingView plutot qu'une classe de vue
+       precise, et un contexte quelconque. Chaque adaptateur verifie
+       lui-meme qu'il s'applique, via sa liste `portal_types`. Voir le
+       docstring de listings/base.py pour le raisonnement: un chemin de
+       classe devenu faux empecherait l'instance de demarrer, la ou une
+       verification en Python fait au pire disparaitre une colonne. -->
+
+  <!-- Liste des Echantillons: Code echantillon + Lot -->
+  <subscriber
+      for="senaite.app.listing.interfaces.IListingView
+           *"
+      provides="senaite.app.listing.interfaces.IListingViewAdapter"
+      factory=".samples.SamplesListingAdapter"
+      />
+
+  <!-- Grille de saisie des Work Sheets: Code echantillon -->
+  <subscriber
+      for="senaite.app.listing.interfaces.IListingView
+           *"
+      provides="senaite.app.listing.interfaces.IListingViewAdapter"
+      factory=".worksheets.WorksheetAnalysesAdapter"
+      />
+
+  <!-- Liste des rapports d'analyse: Code echantillon -->
+  <subscriber
+      for="senaite.app.listing.interfaces.IListingView
+           *"
+      provides="senaite.app.listing.interfaces.IListingViewAdapter"
+      factory=".reports.ReportsListingAdapter"
+      />
+
+</configure>

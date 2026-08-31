@@ -1,17 +1,31 @@
-from setuptools import setup, find_packages
+# -*- coding: utf-8 -*-
+from setuptools import find_packages, setup
 
-version = "1.0.0"
+version = "1.1.0"
+
+long_description = (
+    "Add-on SENAITE pour Trimeta Group.\n\n"
+    "Ajoute au type Sample les champs des sections Reception et "
+    "Analyse, un magasin de suggestions partagees pour les champs "
+    "libres, et les index de catalogue permettant de les afficher, "
+    "trier et rechercher dans les listings."
+)
 
 setup(
     name="senaite.trimeta.samplefields",
     version=version,
-    description="Champs personnalises Reception/Analyse pour SENAITE LIMS - Trimeta Group",
-    long_description="Add-on ajoutant les champs obligatoires et facultatifs "
-                      "requis dans les sections Reception et Analyse des "
-                      "caracteristiques des echantillons.",
+    description="Champs personnalises Reception/Analyse pour SENAITE LIMS "
+                "- Trimeta Group",
+    long_description=long_description,
     classifiers=[
+        "Environment :: Web Environment",
         "Framework :: Plone",
+        "Framework :: Zope2",
         "Programming Language :: Python",
+        # L'image senaite/senaite:v2.6.0 deployee tourne en Python 2.7
+        # (eggs cp27mu). Le code doit rester compatible avec les deux.
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
     ],
     keywords="senaite lims trimeta samplefields",
     author="Trimeta Group / Juvence Andriamampionona (candriam)",
@@ -25,7 +39,17 @@ setup(
         "setuptools",
         "senaite.core",
         "archetypes.schemaextender",
+        # Fournit les indexeurs nommes. Deja present dans tout site
+        # Plone, mais declare ici car l'add-on ne peut pas s'en passer.
+        "plone.indexer",
     ],
+    extras_require={
+        "test": [
+            "Products.PloneTestCase",
+            "plone.app.testing",
+            "senaite.core[test]",
+        ],
+    },
     entry_points="""
     [z3c.autoinclude.plugin]
     target = plone

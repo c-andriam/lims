@@ -147,3 +147,140 @@ msgstr "Agent reception 2"
 
 msgid "Lab Manager"
 msgstr "Responsable laboratoire"
+
+# --- Section Assurance Qualite et champs natifs retouches ---
+
+msgid "Extraction"
+msgstr "Extraction"
+
+msgid "HPLC assay"
+msgstr "Dosage HPLC"
+
+msgid "Desiccator"
+msgstr "Dessiccateur"
+
+msgid "AW meter"
+msgstr "AW metre"
+
+msgid "Instrument performance check"
+msgstr "Verification performance des appareils"
+
+msgid "Consumables"
+msgstr "Consommables"
+
+msgid "Validation and results"
+msgstr "Validation et resultats"
+
+msgid "Extraction start date"
+msgstr "Date debut extraction"
+
+msgid "Extraction operator"
+msgstr "Operateur extraction"
+
+msgid "Number of extractions"
+msgstr "Nombre d'extractions"
+
+msgid "HPLC assay date"
+msgstr "Date dosage HPLC"
+
+msgid "HPLC operator"
+msgstr "Operateur HPLC"
+
+msgid "Number of HPLC analyses"
+msgstr "Nombre d'analyses en HPLC"
+
+msgid "HPLC blank check"
+msgstr "Verification blanc HPLC"
+
+msgid "Moisture analysis date"
+msgstr "Date analyse TH"
+
+msgid "Moisture operator"
+msgstr "Operateur TH"
+
+msgid "Number of moisture analyses"
+msgstr "Nombre d'analyses en TH"
+
+msgid "Water activity date"
+msgstr "Date analyse AW"
+
+msgid "Water activity operator"
+msgstr "Operateur AW"
+
+msgid "Number of water activity analyses"
+msgstr "Nombre d'analyses en AW"
+
+msgid "${name} - check date"
+msgstr "${name} - date de verification"
+
+msgid "${name} - conformity"
+msgstr "${name} - conformite"
+
+msgid "Extractor temperature"
+msgstr "Temperature extracteurs"
+
+msgid "Balance"
+msgstr "Balance"
+
+msgid "Desiccator weights"
+msgstr "Poids dessiccateurs"
+
+msgid "Desiccator temperature"
+msgstr "Temperature dessiccateurs"
+
+msgid "Smartcal"
+msgstr "Smartcal"
+
+msgid "Pipettes"
+msgstr "Pipettes"
+
+msgid "HPLC standard"
+msgstr "Etalon HPLC"
+
+msgid "Ethanol lot"
+msgstr "Lot ethanol"
+
+msgid "Remembered and suggested on later samples."
+msgstr "Memorise et propose sur les echantillons suivants."
+
+msgid "Acetonitrile lot"
+msgstr "Lot acetonitrile"
+
+msgid "HPLC water lot"
+msgstr "Lot eau HPLC"
+
+msgid "Isopropanol lot"
+msgstr "Lot isopropanol"
+
+msgid "Solvent conformity"
+msgstr "Conformite des solvants"
+
+msgid "Column serial number"
+msgstr "Numero de serie colonne"
+
+msgid "Lamp serial number"
+msgstr "Numero de serie lampe"
+
+msgid "Technical validator"
+msgstr "Validateur technique"
+
+msgid "Final validation and report signatory"
+msgstr "Validation finale et signataire du rapport"
+
+msgid "Remarks and action if NOK"
+msgstr "Remarques et action si NOK"
+
+msgid "Corrective action taken when a check came back NOK."
+msgstr "Action corrective menee lorsqu'un controle est revenu NOK."
+
+msgid "Results transmission mode"
+msgstr "Mode de transmission des resultats"
+
+msgid "Results transmission date"
+msgstr "Date de transmission des resultats"
+
+msgid "Lot"
+msgstr "Lot"
+
+msgid "Lot number of the batch this sample was taken from."
+msgstr "Numero de lot du lot dont provient l'echantillon."

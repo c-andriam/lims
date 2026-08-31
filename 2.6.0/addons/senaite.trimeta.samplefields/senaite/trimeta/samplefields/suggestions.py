@@ -26,15 +26,13 @@ STORAGE_KEY = "senaite.trimeta.samplefields.suggestions"
 # The free-text fields that get dynamic suggestions. "Receptionist"
 # was removed: it is now a reference field pointing to existing
 # LabContacts, not a free-text suggestion field.
-# The free-text fields that get dynamic suggestions. "Receptionist"
-# was removed: it is now a reference field pointing to existing
-# LabContacts, not a free-text suggestion field.
 #
 # Deliberately EXCLUDED: SampleCode, AnalysisSheetNumber, EntryVoucher.
 # These must stay unique per record; surfacing old values as
 # suggestions would risk encouraging accidental duplicate reuse of
 # a unique identifier.
 SUGGESTION_FIELDS = (
+    # Section Reception / Analyse
     "Designation",
     "SampleCondition",
     "PackagingCondition",
@@ -45,6 +43,16 @@ SUGGESTION_FIELDS = (
     "Color",
     "Texture",
     "AromaDevelopment",
+    # Section Assurance Qualite. Le cahier des charges demande
+    # explicitement un "rajout memorise" sur les lots de solvants: un
+    # meme lot sert a des dizaines d'echantillons, le retaper a chaque
+    # fois serait une source d'erreur de saisie.
+    "EthanolLot",
+    "AcetonitrileLot",
+    "HPLCWaterLot",
+    "IsopropanolLot",
+    "ColumnSerialNumber",
+    "LampSerialNumber",
 )
 
 
@@ -100,38 +108,55 @@ def list_suggestions(fieldname):
     return sorted(bucket.keys(), key=lambda s: s.lower())
 
 
-def on_sample_added(obj, event):
-    """Event subscriber: fired when a Sample (AnalysisRequest) is
-    created. Reads the 5 free-text fields and remembers any non-empty
-    value as a future suggestion.
+def remember_field_values(obj):
+    """Parcourt les champs a suggestion et memorise les valeurs saisies.
+
+    Ne leve jamais: memoriser une suggestion est un confort de saisie,
+    pas une donnee metier. Une panne du magasin ne doit ni empecher la
+    creation d'un echantillon, ni faire echouer un enregistrement.
+
+    :returns: la liste des champs effectivement memorises.
     """
-    logger.warning(
-        "### TRIMETA: on_sample_added APPELE pour obj=%r (id=%s) ###",
-        obj, getattr(obj, "getId", lambda: "?")(),
-    )
+    remembered = []
     try:
         for fieldname in SUGGESTION_FIELDS:
             field = obj.getField(fieldname)
             if field is None:
-                logger.warning(
-                    "### TRIMETA: champ %s introuvable sur l'objet ###",
-                    fieldname,
-                )
+                # Champ absent du schema: l'objet a ete cree avant
+                # l'ajout du champ, ou le schema n'est pas etendu.
                 continue
             value = field.get(obj)
-            logger.warning(
-                "### TRIMETA: champ %s = %r ###", fieldname, value
-            )
             if value:
                 add_suggestion(fieldname, value)
-                logger.warning(
-                    "### TRIMETA: suggestion ajoutee pour %s: %r ###",
-                    fieldname, value,
-                )
+                remembered.append(fieldname)
     except Exception:
-        # Never let suggestion-tracking break sample creation.
         logger.exception(
-            "### TRIMETA: erreur non bloquante lors de l'enregistrement "
-            "des suggestions pour l'echantillon %s ###",
+            "Enregistrement des suggestions impossible pour "
+            "l'echantillon %s",
             getattr(obj, "getId", lambda: "?")(),
         )
+        return remembered
+
+    if remembered:
+        logger.debug("Suggestions enregistrees pour %s: %s",
+                     getattr(obj, "getId", lambda: "?")(),
+                     ", ".join(remembered))
+    return remembered
+
+
+def on_sample_added(obj, event):
+    """Creation d'un echantillon: memorise les champs de reception."""
+    remember_field_values(obj)
+
+
+def on_sample_modified(obj, event):
+    """Modification d'un echantillon: memorise les champs saisis apres
+    coup.
+
+    Indispensable pour la section Assurance Qualite: les lots de
+    solvants et les numeros de serie sont renseignes une fois l'analyse
+    faite, donc bien apres la creation de l'echantillon. Sans cet
+    abonne, le "rajout memorise" demande sur ces champs ne se
+    declencherait jamais.
+    """
+    remember_field_values(obj)

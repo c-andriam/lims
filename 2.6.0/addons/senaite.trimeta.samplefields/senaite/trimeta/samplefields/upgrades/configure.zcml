@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    i18n_domain="senaite.trimeta.samplefields">
+
+  <!-- 1000 -> 1001 : creation de l'index/colonne getSampleCode
+
+       Cette etape n'est utile que pour une instance ou le profil avait
+       ete installe AVANT l'introduction du catalogue (version 1000).
+       Une installation neuve arrive directement en 1001 et n'execute
+       pas cette etape. -->
+  <genericsetup:upgradeStep
+      title="Trimeta 1000 -> 1001 : index catalogue getSampleCode"
+      description="Cree l'index et la colonne getSampleCode dans le
+                   sample_catalog, puis reindexe les echantillons
+                   existants."
+      source="1000"
+      destination="1001"
+      handler=".v1001.upgrade"
+      profile="senaite.trimeta.samplefields:default"
+      />
+
+  <!-- 1001 -> 1002 : colonnes du tableau de bord (lot 5)
+
+       Provenance (index + colonne), poids a la reception, dates de
+       debut et de fin d'analyse, operateurs HPLC / humidite /
+       activite de l'eau. Reindexe les echantillons existants: sans
+       cela le tableau de bord serait vide pour tout l'historique. -->
+  <genericsetup:upgradeStep
+      title="Trimeta 1001 -> 1002 : colonnes du tableau de bord"
+      description="Cree l'index getOrigin et les colonnes de
+                   metadonnees utilisees par le tableau de bord, puis
+                   reindexe les echantillons existants."
+      source="1001"
+      destination="1002"
+      handler=".v1002.upgrade"
+      profile="senaite.trimeta.samplefields:default"
+      />
+
+</configure>
