@@ -51,7 +51,7 @@ ARGS ?=
 
 .PHONY: help debug up down restart logs ps pull shell status \
         clean fclean re install backup restore redeploy-addon \
-        first-setup test test-list test-pure check-engine fix-perms doctor require-running test-env impress-info sync
+        first-setup test test-list test-pure check-engine fix-perms doctor require-running test-env impress-info dashboard-info sync
 
 check-engine:
 	@if [ -z "$(ENGINE)" ]; then \
@@ -145,7 +145,7 @@ test: require-running ## Lance les tests de l'add-on dans le container
 	    echo "est disponible dans le container."; \
 	    echo ""; \
 	    echo "En attendant, 'make test-pure' tourne sans container"; \
-	    echo "et couvre 54 tests de logique pure."; \
+	    echo "et couvre 66 tests de logique pure."; \
 	    exit 1; \
 	  fi; \
 	  echo "Runner: $$RUNNER"; \
@@ -153,6 +153,9 @@ test: require-running ## Lance les tests de l'add-on dans le container
 
 impress-info: require-running ## Inventorie senaite.impress (prepare le gabarit COA)
 	@ENGINE=$(ENGINE) SERVICE=$(SERVICE) INSTANCE_DIR=$(INSTANCE_DIR) sh scripts/impress-info.sh
+
+dashboard-info: require-running ## Inventorie l'API de listing (prepare le tableau de bord)
+	@ENGINE=$(ENGINE) SERVICE=$(SERVICE) INSTANCE_DIR=$(INSTANCE_DIR) sh scripts/dashboard-info.sh
 
 test-env: require-running ## Inventorie ce qui permet de lancer les tests
 	@ENGINE=$(ENGINE) SERVICE=$(SERVICE) INSTANCE_DIR=$(INSTANCE_DIR) sh scripts/test-env.sh

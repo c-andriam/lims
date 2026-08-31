@@ -63,10 +63,46 @@
   <!-- Indexeur nomme: alimente a la fois l'index et la colonne de
        metadonnees `getSampleCode` du sample_catalog. Indispensable
        car les champs schemaextender n'ont pas d'accesseur de classe
-       (voir catalog.py). -->
+       (voir catalog.py).
+
+       Le `name` doit valoir exactement l'identifiant declare dans
+       catalog.py: c'est par ce nom que Plone retrouve l'adaptateur.
+       Une faute de frappe ne leve rien, elle laisse simplement la
+       colonne vide. -->
   <adapter
       name="getSampleCode"
       factory=".indexers.getSampleCode"
+      />
+
+  <!-- Colonnes du tableau de bord (lot 5). getOrigin est en plus un
+       index: c'est le filtre "Provenance". -->
+  <adapter
+      name="getOrigin"
+      factory=".indexers.getOrigin"
+      />
+  <adapter
+      name="getReceptionWeight"
+      factory=".indexers.getReceptionWeight"
+      />
+  <adapter
+      name="getAnalysisStart"
+      factory=".indexers.getAnalysisStart"
+      />
+  <adapter
+      name="getAnalysisEnd"
+      factory=".indexers.getAnalysisEnd"
+      />
+  <adapter
+      name="getHPLCOperator"
+      factory=".indexers.getHPLCOperator"
+      />
+  <adapter
+      name="getMoistureOperator"
+      factory=".indexers.getMoistureOperator"
+      />
+  <adapter
+      name="getWaterActivityOperator"
+      factory=".indexers.getWaterActivityOperator"
       />
 
   <!-- Colonnes Code echantillon / Lot dans les listings -->

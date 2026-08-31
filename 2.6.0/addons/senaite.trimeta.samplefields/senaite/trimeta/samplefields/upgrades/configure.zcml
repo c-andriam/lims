@@ -21,4 +21,21 @@
       profile="senaite.trimeta.samplefields:default"
       />
 
+  <!-- 1001 -> 1002 : colonnes du tableau de bord (lot 5)
+
+       Provenance (index + colonne), poids a la reception, dates de
+       debut et de fin d'analyse, operateurs HPLC / humidite /
+       activite de l'eau. Reindexe les echantillons existants: sans
+       cela le tableau de bord serait vide pour tout l'historique. -->
+  <genericsetup:upgradeStep
+      title="Trimeta 1001 -> 1002 : colonnes du tableau de bord"
+      description="Cree l'index getOrigin et les colonnes de
+                   metadonnees utilisees par le tableau de bord, puis
+                   reindexe les echantillons existants."
+      source="1001"
+      destination="1002"
+      handler=".v1002.upgrade"
+      profile="senaite.trimeta.samplefields:default"
+      />
+
 </configure>

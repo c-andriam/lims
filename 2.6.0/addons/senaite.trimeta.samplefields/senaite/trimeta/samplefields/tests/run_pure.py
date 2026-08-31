@@ -235,7 +235,9 @@ MODULES = [
 PURE_CASES = [
     ("test_vocabularies.py",
      ["TestTemperatureVocabulary", "TestCodeArticleVocabulary"]),
-    ("test_indexers.py", ["TestIndexStringNormalisation"]),
+    ("test_indexers.py", ["TestIndexStringNormalisation",
+                          "TestIndexDateNormalisation",
+                          "TestContactTitleResolution"]),
     ("test_schema.py", ["TestExtenderDeclaration"]),
     ("test_qualitydata.py", ["TestQualityDataDeclaration"]),
     ("test_listings.py", None),   # tout le fichier est pur
