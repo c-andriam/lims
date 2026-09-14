@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    i18n_domain="senaite.trimeta.samplefields">
+
+  <!-- Gabarit COA Trimeta: ajoute au selecteur "Gabarit" de l'ecran de
+       publication, a cote de Default.pt/MultiDefault.pt.
+
+       Decouvert par le meme mecanisme que senaite.impress utilise pour
+       ses propres gabarits: un repertoire de ressources Plone du type
+       "senaite.impress.reports" (voir senaite.impress.template.
+       TemplateFinder). Rien n'est modifie dans senaite.impress: le
+       gabarit existant reste disponible et reste le choix par defaut. -->
+  <plone:static
+      directory="templates/reports"
+      type="senaite.impress.reports"
+      name="senaite.trimeta.samplefields"
+      />
+
+</configure>

@@ -135,6 +135,9 @@
   <!-- Tableau de bord (lot 5) -->
   <include package=".dashboard" />
 
+  <!-- Gabarit COA (lot 4) -->
+  <include package=".coa" />
+
   <include package=".browser" />
 
 </configure>

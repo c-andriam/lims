@@ -152,10 +152,10 @@ test: require-running ## Lance les tests de l'add-on dans le container
 	    RUNNER="bin/zope-testrunner"; \
 	  else \
 	    echo "ERREUR: aucun testrunner dans $(INSTANCE_DIR)/bin."; \
-	    echo "Lance 'make test-env' pour inventorier ce qui"; \
+	    echo "Lance '"'"'make test-env'"'"' pour inventorier ce qui"; \
 	    echo "est disponible dans le container."; \
 	    echo ""; \
-	    echo "En attendant, 'make test-pure' tourne sans container"; \
+	    echo "En attendant, '"'"'make test-pure'"'"' tourne sans container"; \
 	    echo "et couvre 134 tests de logique pure."; \
 	    exit 1; \
 	  fi; \
