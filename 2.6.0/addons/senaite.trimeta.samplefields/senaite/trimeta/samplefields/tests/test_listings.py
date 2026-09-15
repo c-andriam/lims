@@ -17,6 +17,8 @@ import unittest
 from collections import OrderedDict
 from contextlib import contextmanager
 
+from senaite.core.catalog import SAMPLE_CATALOG
+
 from senaite.trimeta.samplefields.listings.base import BaseListingAdapter
 from senaite.trimeta.samplefields.listings.base import insert_column_after
 from senaite.trimeta.samplefields.listings.base import show_in_all_states
@@ -184,6 +186,20 @@ class TestDiscrimination(unittest.TestCase):
         """Certains listings ne filtrent pas par type: ne rien supposer
         plutot que d'ajouter une colonne au hasard."""
         listing = FakeListing()
+        self.assertFalse(SamplesListingAdapter(listing, None).applies())
+
+    def test_samples_listing_filters_on_catalog_only(self):
+        """senaite.core SamplesView: sample_catalog, sans portal_type."""
+        listing = FakeListing()
+        listing.catalog = SAMPLE_CATALOG
+        listing.contentFilter = {"sort_on": "created", "isRootAncestor": True}
+        self.assertTrue(SamplesListingAdapter(listing, None).applies())
+        self.assertFalse(WorksheetAnalysesAdapter(listing, None).applies())
+        self.assertFalse(ReportsListingAdapter(listing, None).applies())
+
+    def test_unknown_catalog_without_portal_type_is_skipped(self):
+        listing = FakeListing()
+        listing.catalog = "portal_catalog"
         self.assertFalse(SamplesListingAdapter(listing, None).applies())
 
     def test_portal_type_as_a_list(self):
