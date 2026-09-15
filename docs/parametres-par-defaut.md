@@ -131,9 +131,23 @@ s'affichaient au format ISO (2026-09-12 14:03).
 
 Dates : jj/mm/aaaa, et jj/mm/aaaa hh:mm pour le format long.
 
+### Vérification (15/09/2026)
+
+Nouveau relevé sur les 15 écrans après redémarrage : 4 libellés sans
+traduction, contre 162 au départ. Contrôlé à l'écran : en-tête de
+l'échantillon (« Date de prélèvement », « Série », « Profils
+d'analyse », « Enregistrer »), dates jj/mm/aaaa dans les listes, aucune
+erreur JavaScript.
+
 ### Ce qui reste en anglais
 
-- Les liens du pied de page (« Browse the Docs », « Visit the Website »…)
-  sont écrits en dur dans le gabarit de SENAITE, sans message traduisible.
+- **Onglets et tuiles de la configuration** (« Accounting »,
+  « Appearance », « Sticker », « Analysis Services »…) : ces écrans ne
+  passent pas par les messages traduits de senaite.core ni de plone. À
+  traiter à part si le laboratoire y travaille souvent.
+- **Barre de l'éditeur de texte** (File, Edit, Insert, Undo…) : TinyMCE a
+  ses propres fichiers de langue.
+- **Pied de page** (« Browse the Docs », « Visit the Website »…) : écrit
+  en dur dans le gabarit de SENAITE, sans message traduisible.
 - Un écran non relevé peut encore montrer un libellé non traduit : le
   signaler, il suffit de l'ajouter au `.po` concerné puis `make i18n`.
