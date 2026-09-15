@@ -17,11 +17,13 @@ besoins ni le meme rendu:
 import json
 import logging
 
+from bika.lims.interfaces import IAnalysisRequest
 from plone.app.layout.viewlets import ViewletBase
 from zope.i18n import translate
 
 from senaite.trimeta.samplefields.qualitydata.extender import (
     get_section_map)
+from senaite.trimeta.samplefields.suggestions import SUGGESTION_FIELDS
 
 logger = logging.getLogger("senaite.trimeta.samplefields")
 
@@ -84,6 +86,44 @@ class ReceptionSeparatorViewlet(TrimetaViewletBase):
         return STYLE_TAG + SCRIPT_TAG.format(
             portal_url=self.get_portal_url(),
             resources=RESOURCE_BASE,
+        )
+
+
+SUGGESTIONS_SCRIPT_TAG = (
+    '<script type="text/javascript">'
+    'window.TRIMETA_SUGGEST_FIELDS = {fields};'
+    '</script>'
+    '<script type="text/javascript" '
+    'id="trimeta-suggestions-script" '
+    'data-portal-url="{portal_url}" '
+    'src="{portal_url}/{resources}/field_suggestions.js?v={version}"></script>'
+)
+
+# A incrementer a chaque modification de field_suggestions.js: le
+# navigateur garde sinon l'ancienne version en cache.
+SUGGESTIONS_SCRIPT_VERSION = 3
+
+
+class FieldSuggestionsViewlet(TrimetaViewletBase):
+    """Suggestions des champs libres, partout ou ils se saisissent.
+
+    Formulaire de creation, page de l'echantillon (en-tete modifiable) et
+    base_edit. Les champs Assurance Qualite (lots de solvants...) ne se
+    saisissent qu'apres la creation.
+    """
+
+    def is_sample_page(self):
+        return IAnalysisRequest.providedBy(self.context)
+
+    def render(self):
+        if "/ar_add" not in self.get_request_url() and \
+                not self.is_sample_page():
+            return ""
+        return SUGGESTIONS_SCRIPT_TAG.format(
+            fields=json.dumps(list(SUGGESTION_FIELDS)),
+            portal_url=self.get_portal_url(),
+            resources=RESOURCE_BASE,
+            version=SUGGESTIONS_SCRIPT_VERSION,
         )
 
 
