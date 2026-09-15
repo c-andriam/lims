@@ -192,6 +192,18 @@ L'onglet Maintenance de l'instrument liste les interventions, avec leur
 type et leur état. Une tâche non clôturée dont la date de fin est
 dépassée ressort en retard.
 
+### Essai local (15/09/2026)
+
+Instrument « AW Metre 1 » (Novasina, type AW-Metre) créé avec deux
+tâches : « Remplacement du capteur » (Réparation) et « Entretien annuel »
+(Préventif). Les deux apparaissent dans l'onglet Maintenance, avec leurs
+dates d'immobilisation et l'intervenant.
+
+Défaut corrigé au passage : senaite.core 2.6 affiche `getType()[0]`,
+c'est-à-dire la **première lettre** du type (« R », « P »). L'add-on
+remplace ce contenu par le libellé complet et traduit
+(`listings/instruments.py`), sans surcharger la vue.
+
 > Si, à l'usage, le laboratoire a besoin de champs qui n'existent pas
 > ici — numéro de bon d'intervention, prestataire externe, pièces
 > remplacées — cela redevient du développement : une extension de schéma

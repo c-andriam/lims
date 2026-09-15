@@ -22,6 +22,8 @@ from senaite.core.catalog import SAMPLE_CATALOG
 from senaite.trimeta.samplefields.listings.base import BaseListingAdapter
 from senaite.trimeta.samplefields.listings.base import insert_column_after
 from senaite.trimeta.samplefields.listings.base import show_in_all_states
+from senaite.trimeta.samplefields.listings.instruments import (
+    InstrumentMaintenanceAdapter, maintenance_type_value)
 from senaite.trimeta.samplefields.listings.reports import (
     ReportsListingAdapter)
 from senaite.trimeta.samplefields.listings.samples import (
@@ -370,6 +372,62 @@ class TestReportsColumns(unittest.TestCase):
         self.assertEqual(item["Lot"], "")
 
 
+class FakeTask(object):
+    def __init__(self, value):
+        self.value = value
+
+    def getType(self):
+        return self.value
+
+
+class FakeInstrument(object):
+    """Contexte du listing: traduit un msgid comme le ferait Plone."""
+
+    LABELS = {"Repair": u"Réparation", "Preventive": u"Préventif"}
+
+    def translate(self, msgid):
+        return self.LABELS.get(msgid, msgid)
+
+
+class TestInstrumentMaintenanceType(unittest.TestCase):
+    """senaite.core affichait obj.getType()[0], soit "R" ou "P"."""
+
+    def make_adapter(self, context=None):
+        listing = FakeListing(portal_type="InstrumentMaintenanceTask",
+                              columns=[("Title", {}), ("getType", {})])
+        listing.context = context
+        return InstrumentMaintenanceAdapter(listing, context)
+
+    def test_applies_only_to_maintenance_tasks(self):
+        self.assertTrue(self.make_adapter().applies())
+        other = FakeListing(portal_type="InstrumentCalibration")
+        self.assertFalse(InstrumentMaintenanceAdapter(other, None).applies())
+
+    def test_full_translated_label(self):
+        adapter = self.make_adapter(FakeInstrument())
+        item = adapter.folder_item(FakeTask("Repair"), {"getType": "R"}, 0)
+        self.assertEqual(item["getType"], u"Réparation")
+
+    def test_legacy_list_value(self):
+        adapter = self.make_adapter(FakeInstrument())
+        item = adapter.folder_item(FakeTask(["Preventive"]), {}, 0)
+        self.assertEqual(item["getType"], u"Préventif")
+
+    def test_without_translation_keeps_the_whole_word(self):
+        item = self.make_adapter().folder_item(FakeTask("Repair"), {}, 0)
+        self.assertEqual(item["getType"], "Repair")
+
+    def test_empty_type_gives_empty_cell(self):
+        item = self.make_adapter(FakeInstrument()).folder_item(
+            FakeTask(None), {"getType": "N"}, 0)
+        self.assertEqual(item["getType"], "")
+
+    def test_value_normalisation(self):
+        self.assertEqual(maintenance_type_value(" Repair "), "Repair")
+        self.assertEqual(maintenance_type_value([]), "")
+        self.assertEqual(maintenance_type_value(None), "")
+
+
 class TestFailureIsolation(unittest.TestCase):
     """Un adaptateur cassé ne doit jamais empêcher un listing de
     s'afficher: mieux vaut une colonne vide qu'un écran d'erreur."""
@@ -412,6 +470,6 @@ def test_suite():
     for case in (TestInsertColumnAfter, TestShowInAllStates,
                  TestDiscrimination, TestSamplesColumns,
                  TestWorksheetColumn, TestReportsColumns,
-                 TestFailureIsolation):
+                 TestInstrumentMaintenanceType, TestFailureIsolation):
         suite.addTest(loader.loadTestsFromTestCase(case))
     return suite

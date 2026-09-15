@@ -141,7 +141,8 @@ def install_stubs():
             raise LookupError(uid)
 
     bika = make_module("bika")
-    bika.lims = make_module("bika.lims", api=FakeAPI())
+    bika.lims = make_module("bika.lims", api=FakeAPI(),
+                            senaiteMessageFactory=lambda msgid: msgid)
     make_module("bika.lims.interfaces", IAnalysisRequest=Interface)
     make_module("bika.lims.browser")
     make_module("bika.lims.browser.fields", UIDReferenceField=StubField)
@@ -229,6 +230,7 @@ MODULES = [
     (P + "listings.samples", "listings/samples.py"),
     (P + "listings.worksheets", "listings/worksheets.py"),
     (P + "listings.reports", "listings/reports.py"),
+    (P + "listings.instruments", "listings/instruments.py"),
     (P + "dashboard.results", "dashboard/results.py"),
     (P + "dashboard.filters", "dashboard/filters.py"),
     (P + "dashboard.columns", "dashboard/columns.py"),
