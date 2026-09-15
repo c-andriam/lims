@@ -170,7 +170,6 @@ def setup_catalogs(portal):
             created[catalog_id] = new_indexes
     return created
 
-
 def reindex_catalog(catalog_id, indexes):
     """Reindexe tous les objets d'un catalogue pour les index donnes.
 
