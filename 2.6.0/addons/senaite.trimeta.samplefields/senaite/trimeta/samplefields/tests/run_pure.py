@@ -251,6 +251,7 @@ PURE_CASES = [
     ("test_dashboard_filters.py", None),
     ("test_coa_filename.py", None),
     ("test_catalog_wiring.py", None),
+    ("test_field_references.py", None),
 ]
 
 
@@ -277,6 +278,11 @@ def main():
     src = open(os.path.join(ROOT, "suggestions.py"),
                encoding="utf-8").read()
     block = re.search(r"SUGGESTION_FIELDS = \((.*?)\)", src, re.S).group(1)
+    # Les lignes de commentaire d'abord: le bloc en contient, et une
+    # chaine citee dans un commentaire ("rajout memorise") se
+    # retrouverait sinon dans la liste des champs.
+    block = "\n".join(line for line in block.splitlines()
+                      if not line.lstrip().startswith("#"))
     fields = tuple(re.findall(r'"([^"]+)"', block))
     make_module(P + "suggestions", SUGGESTION_FIELDS=fields)
 
