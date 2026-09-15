@@ -55,6 +55,16 @@ IMPRESS_TEMPLATES_RECORD = "senaite.impress.templates"
 IMPRESS_DEFAULT_RECORD = "senaite.impress.default_template"
 IMPRESS_FACTORY_DEFAULT = u"senaite.impress:MultiDefault.pt"
 
+# Valeurs par defaut du laboratoire dans Configuration > Setup, onglet
+# Accounting: {champ: (valeur voulue, valeurs d'usine remplacables)}.
+#
+# Seules les valeurs d'usine sont remplacees: un choix fait ensuite par
+# le laboratoire dans l'ecran de configuration est conserve.
+LAB_SETUP_DEFAULTS = {
+    "Currency": ("MGA", ("", "EUR")),       # Ariary malgache (ISO 4217)
+    "DefaultCountry": ("MG", ("",)),        # Madagascar (ISO 3166 alpha-2)
+}
+
 
 def post_install(portal_setup):
     """Post-installation du profil `default`."""
@@ -67,7 +77,42 @@ def post_install(portal_setup):
             reindex_catalog(catalog_id, indexes)
     register_coa_template()
     set_coa_as_default_template()
+    set_lab_defaults()
     logger.info("senaite.trimeta.samplefields: post_install termine")
+
+
+def set_lab_defaults():
+    """Devise et pays du laboratoire dans le Setup SENAITE.
+
+    Idempotent. Une valeur absente du vocabulaire du champ (version de
+    SENAITE differente) n'est pas ecrite: elle est journalisee, plutot
+    que d'enregistrer une valeur que l'ecran ne saurait pas afficher.
+
+    :returns: {champ: (ancienne valeur, nouvelle valeur)} des changements
+    """
+    setup = api.get_setup()
+    changes = {}
+    for name, (wanted, factory_values) in sorted(LAB_SETUP_DEFAULTS.items()):
+        field = setup.getField(name)
+        if field is None:
+            logger.warning("Setup: champ %s introuvable", name)
+            continue
+        current = field.get(setup) or ""
+        if current == wanted:
+            continue
+        if current not in factory_values:
+            logger.info("Setup: %s=%r conserve (choix du laboratoire)",
+                        name, current)
+            continue
+        allowed = field.Vocabulary(setup).keys()
+        if wanted not in allowed:
+            logger.warning("Setup: %r absent du vocabulaire de %s",
+                           wanted, name)
+            continue
+        field.set(setup, wanted)
+        changes[name] = (current, wanted)
+        logger.info("Setup: %s %r -> %r", name, current, wanted)
+    return changes
 
 
 def register_coa_template():

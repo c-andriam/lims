@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<registry>
+
+  <!-- Langue du site: francais par defaut.
+
+       Jusqu'ici reglee a la main dans Configuration > Langue, donc
+       absente d'un serveur neuf ou reinstalle. Ce fichier la rend
+       reproductible (installation et etape de mise a jour 1005).
+
+       Seules les cles listees sont ecrites: les autres reglages du
+       registre ne sont pas touches.
+
+       Choix:
+       - langues proposees: francais et anglais seulement;
+       - la langue du NAVIGATEUR est ignoree (use_request_negotiation):
+         un poste configure en anglais affiche quand meme le francais;
+       - le selecteur de langue reste utilisable (cookie), pour qui veut
+         basculer en anglais ponctuellement;
+       - pas de variantes regionales (fr-fr): le catalogue "fr" est le
+         plus complet. -->
+  <records interface="plone.i18n.interfaces.ILanguageSchema" prefix="plone">
+    <value key="default_language">fr</value>
+    <value key="available_languages">
+      <element>fr</element>
+      <element>en</element>
+    </value>
+    <value key="use_combined_language_codes">False</value>
+    <value key="display_flags">False</value>
+    <value key="always_show_selector">False</value>
+    <value key="use_content_negotiation">False</value>
+    <value key="use_path_negotiation">False</value>
+    <value key="use_cookie_negotiation">True</value>
+    <value key="authenticated_users_only">False</value>
+    <value key="set_cookie_always">False</value>
+    <value key="use_subdomain_negotiation">False</value>
+    <value key="use_cctld_negotiation">False</value>
+    <value key="use_request_negotiation">False</value>
+  </records>
+
+  <!-- Fuseau horaire du portail: heure de Madagascar.
+
+       Doit concorder avec TZ=Indian/Antananarivo du conteneur
+       (compose.yml). senaite.core compare certaines dates sans convertir
+       les fuseaux (Date de prelevement / date de creation): un ecart
+       entre les deux fait refuser des enregistrements valides. -->
+  <records interface="Products.CMFPlone.interfaces.controlpanel.IDateAndTimeSchema"
+           prefix="plone">
+    <value key="portal_timezone">Indian/Antananarivo</value>
+  </records>
+
+</registry>
