@@ -305,6 +305,71 @@ class TestWorksheetColumn(unittest.TestCase):
         self.assertFalse(listing.columns["SampleCode"]["sortable"])
 
 
+class FakeField(object):
+    def __init__(self, value):
+        self.value = value
+
+    def get(self, instance):
+        return self.value
+
+
+class FakeSample(object):
+    def __init__(self, code, lot):
+        self.code = code
+        self.lot = lot
+
+    def getField(self, name):
+        return FakeField(self.code) if name == "SampleCode" else None
+
+    def getClientSampleID(self):
+        return self.lot
+
+
+class TestReportsColumns(unittest.TestCase):
+    """Colonnes reelles de bika.lims.browser.publish.reports_listing."""
+
+    def make_listing(self):
+        return FakeListing(
+            portal_type="ARReport",
+            columns=[("Info", {}), ("AnalysisRequest", {}),
+                     ("Batch", {"title": "Batch"}), ("State", {})],
+            review_states=[{"id": "default",
+                            "columns": ["Info", "AnalysisRequest", "Batch",
+                                        "State"]}],
+        )
+
+    def test_columns_follow_the_primary_sample(self):
+        listing = self.make_listing()
+        ReportsListingAdapter(listing, None).before_render()
+        self.assertEqual(list(listing.columns.keys()),
+                         ["Info", "AnalysisRequest", "SampleCode", "Lot",
+                          "Batch", "State"])
+        self.assertIn("Lot", listing.review_states[0]["columns"])
+
+    def test_native_batch_column_is_hidden_by_default(self):
+        """Traduite "Lot", elle affichait le lot de travail, toujours vide."""
+        listing = self.make_listing()
+        ReportsListingAdapter(listing, None).before_render()
+        self.assertIs(listing.columns["Batch"]["toggle"], False)
+
+    def test_lot_and_code_come_from_the_sample(self):
+        listing = self.make_listing()
+        adapter = ReportsListingAdapter(listing, None)
+        adapter.before_render()
+        adapter.get_cached_sample = lambda uid: FakeSample("ECH-1", "LOT-1")
+        item = adapter.folder_item(FakeBrain(getAnalysisRequestUID="u1"), {}, 0)
+        self.assertEqual(item["SampleCode"], "ECH-1")
+        self.assertEqual(item["Lot"], "LOT-1")
+
+    def test_unknown_sample_gives_empty_cells(self):
+        listing = self.make_listing()
+        adapter = ReportsListingAdapter(listing, None)
+        adapter.before_render()
+        adapter.get_cached_sample = lambda uid: None
+        item = adapter.folder_item(FakeBrain(getAnalysisRequestUID="u1"), {}, 0)
+        self.assertEqual(item["Lot"], "")
+
+
 class TestFailureIsolation(unittest.TestCase):
     """Un adaptateur cassé ne doit jamais empêcher un listing de
     s'afficher: mieux vaut une colonne vide qu'un écran d'erreur."""
@@ -346,6 +411,7 @@ def test_suite():
     loader = unittest.TestLoader()
     for case in (TestInsertColumnAfter, TestShowInAllStates,
                  TestDiscrimination, TestSamplesColumns,
-                 TestWorksheetColumn, TestFailureIsolation):
+                 TestWorksheetColumn, TestReportsColumns,
+                 TestFailureIsolation):
         suite.addTest(loader.loadTestsFromTestCase(case))
     return suite
