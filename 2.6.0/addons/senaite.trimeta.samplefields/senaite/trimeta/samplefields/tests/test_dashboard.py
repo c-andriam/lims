@@ -10,7 +10,11 @@ catalogue de doublure suffit -- ce qui rend ces tests executables par
 
 import unittest
 
+from senaite.trimeta.samplefields.dashboard.columns import normalize_title
+from senaite.trimeta.samplefields.dashboard.columns import resolve_column_keywords
+from senaite.trimeta.samplefields.dashboard.columns import title_candidates
 from senaite.trimeta.samplefields.dashboard.results import fetch_results
+from senaite.trimeta.samplefields.dashboard.results import pick_result
 from senaite.trimeta.samplefields.dashboard.results import group_by_sample
 from senaite.trimeta.samplefields.dashboard.results import in_range
 from senaite.trimeta.samplefields.dashboard.results import sample_ids_in_range
@@ -277,10 +281,87 @@ class TestSampleIdsInRange(unittest.TestCase):
         self.assertEqual(len(records), 1)
 
 
+class TestColumnKeywordResolution(unittest.TestCase):
+    """Colonnes de resultats: mot-cle configure, sinon intitule du service."""
+
+    DEMO = [("VANILLINE", u"Vanilline"),
+            ("GLUCOVANILLINE", u"Gluco-vanilline"),
+            ("ACVANILLIQUE", u"Acide vanillique"),
+            ("PHB", u"PHB"),
+            ("ACPHB", u"Acide PHB"),
+            ("TH", u"Taux d'humidite (TH)"),
+            ("AW", u"Activite de l'eau (AW)")]
+
+    def test_configured_keywords_are_kept(self):
+        resolved = resolve_column_keywords(self.DEMO)
+        self.assertEqual(list(resolved.keys())[0], "Vanillin")
+        self.assertEqual(resolved["Vanillin"], ["VANILLINE"])
+        self.assertEqual(resolved["WaterActivity"], ["AW"])
+
+    def test_titles_replace_unknown_keywords(self):
+        """Serveur ou le laboratoire a choisi ses propres mots-cles."""
+        services = [("VAN", u"Vanilline"),
+                    ("GLUCO", u"Glucovanilline"),
+                    ("AVAN", u"Ac. vanillique"),
+                    ("P1", u"PHB"),
+                    ("P2", u"AC PHB"),
+                    ("H", u"Taux d’humidité (TH)"),
+                    ("A", u"Activité de l'eau (AW)")]
+        self.assertEqual(dict(resolve_column_keywords(services)), {
+            "Vanillin": ["VAN"], "GlucoVanillin": ["GLUCO"],
+            "VanillicAcid": ["AVAN"], "PHB": ["P1"], "PHBAcid": ["P2"],
+            "Moisture": ["H"], "WaterActivity": ["A"]})
+
+    def test_real_server_service_names(self):
+        """Noms vus sur les captures du serveur reel, sans Gluco-vanilline."""
+        services = [("V1", u"Vanillin"), ("V2", u"Vanillic Acid"),
+                    ("P1", u"PHB Aldehyde"), ("P2", u"pHB Acid"),
+                    ("W", u"Water Activity"), ("M", u"Moisture"),
+                    ("R", u"Ratio Vanillin / PHB")]
+        resolved = resolve_column_keywords(services)
+        self.assertEqual(resolved["Vanillin"], ["V1"])
+        self.assertEqual(resolved["VanillicAcid"], ["V2"])
+        self.assertEqual(resolved["PHB"], ["P1"])
+        self.assertEqual(resolved["PHBAcid"], ["P2"])
+        self.assertEqual(resolved["WaterActivity"], ["W"])
+        self.assertEqual(resolved["Moisture"], ["M"])
+        # absent du serveur: la colonne garde son mot-cle, et reste vide
+        self.assertEqual(resolved["GlucoVanillin"], ["GLUCOVANILLINE"])
+
+    def test_average_service_is_not_taken_for_vanillin(self):
+        """Le texte hors parentheses n'est jamais compare seul."""
+        resolved = resolve_column_keywords(
+            [("VANMOY", u"Vanilline (moyenne 3 rep.)"), ("X", u"Autre")])
+        self.assertEqual(resolved["Vanillin"], ["VANILLINE"])
+
+    def test_unreadable_services_keep_the_configuration(self):
+        for column_id, keywords in resolve_column_keywords([]).items():
+            self.assertEqual(len(keywords), 1)
+
+    def test_normalize_title(self):
+        self.assertEqual(normalize_title(u"Activité de l’eau"),
+                         u"activite de l eau")
+
+    def test_title_candidates(self):
+        self.assertEqual(title_candidates(u"Taux d'humidité (TH)"),
+                         set([u"taux d humidite th", u"th"]))
+
+
+class TestPickResult(unittest.TestCase):
+
+    def test_first_filled_result_wins(self):
+        self.assertEqual(pick_result({"A": "", "B": "12"}, ["A", "B"]), "12")
+
+    def test_nothing_gives_empty_cell(self):
+        self.assertEqual(pick_result({}, ["A"]), "")
+        self.assertEqual(pick_result(None, None), "")
+
+
 def test_suite():
     suite = unittest.TestSuite()
     loader = unittest.TestLoader()
     for case in (TestToNumber, TestInRange, TestGroupBySample,
-                 TestFetchResults, TestSampleIdsInRange):
+                 TestFetchResults, TestSampleIdsInRange,
+                 TestColumnKeywordResolution, TestPickResult):
         suite.addTest(loader.loadTestsFromTestCase(case))
     return suite

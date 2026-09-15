@@ -171,6 +171,19 @@ dans :
 
 Un service absent donnera simplement une colonne vide, sans erreur.
 
+**Repli sur l'intitulé.** Quand le mot-clé configuré ne correspond à
+aucun service actif du site, la colonne se rabat sur les services dont
+l'intitulé correspond aux noms du cahier des charges ou à leurs
+variantes (`TITLE_ALIASES` dans `dashboard/columns.py`) : « Vanilline »
+ou « Vanillin », « Ac. vanillique » ou « Vanillic Acid », « AC PHB » ou
+« pHB Acid », « PHB » ou « PHB Aldehyde », « Taux d'humidité (TH) » ou
+« Moisture », « Activité de l'eau (AW) » ou « Water Activity ». Sont
+comparés l'intitulé complet et le contenu de ses parenthèses, sans
+accents ni ponctuation ; le texte hors parenthèses n'est jamais comparé
+seul, pour que « Vanilline (moyenne 3 rep.) » ne soit pas pris pour la
+Vanilline. Les services du serveur réel, vus sur les captures jointes au
+document, sont ainsi reconnus sans connaître leurs mots-clés.
+
 ---
 
 ## Où on en est
@@ -283,19 +296,16 @@ l'exécution. Un test balaie désormais le fichier.
 
 ### Reste à faire
 
-1. **Confirmer les sept mots-clés** dans `dashboard/columns.py`
-   (constante `DASHBOARD_ANALYSES`), lus dans Configuration › Analyses,
-   colonne *Keyword*. Un mot-clé faux ne lève aucune erreur : la colonne
-   reste vide. La vue journalise donc un avertissement quand un mot-clé
-   ne ramène jamais rien.
-
-   **Attention** : les captures du serveur réel jointes au document
-   montrent des services nommés *Vanillin*, *pHB Acid*, *Vanillic Acid*,
+1. **Mots-clés : plus bloquant.** Les captures du serveur réel montrent
+   des services nommés *Vanillin*, *pHB Acid*, *Vanillic Acid*,
    *PHB Aldehyde*, *Water Activity* et *Moisture*, plus des ratios
-   calculés, et **aucune Gluco-vanilline**. Les mots-clés provisoires
-   (`VANILLINE`, `GLUCOVANILLINE`…) sont donc très probablement faux, et
-   la correspondance « PHB » / « AC PHB » du document reste à préciser
-   avec le laboratoire.
+   calculés, et **aucune Gluco-vanilline**. Le repli sur l'intitulé
+   (ci-dessus) les reconnaît : les colonnes se remplissent sans
+   connaître les mots-clés. La colonne Gluco-vanilline restera vide tant
+   que ce service n'existe pas. Correspondance retenue, conforme à la
+   chimie de la vanille : « PHB » = p-hydroxybenzaldéhyde (*PHB
+   Aldehyde*), « AC PHB » = acide p-hydroxybenzoïque (*pHB Acid*). À
+   vérifier d'un coup d'œil sur le premier tableau de bord réel.
 2. **Valider sur des données réelles.** Le `sample_catalog` de
    l'instance de test est vide (0 objet à la réindexation) : un tableau
    vide ne prouve ni qu'il marche, ni qu'il est cassé.
