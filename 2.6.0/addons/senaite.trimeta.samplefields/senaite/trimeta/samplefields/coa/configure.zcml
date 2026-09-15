@@ -5,6 +5,11 @@
     xmlns:plone="http://namespaces.plone.org/plone"
     i18n_domain="senaite.trimeta.samplefields">
 
+  <!-- Declare senaite.core.permissions.* avant les vues ci-dessous: sans
+       cela Zope refuse de demarrer (ComponentLookupError sur
+       IPermission), l'add-on etant charge avant senaite.core. -->
+  <include package="senaite.core.permissions" />
+
   <!-- Gabarit COA Trimeta: ajoute au selecteur "Gabarit" de l'ecran de
        publication, a cote de Default.pt/MultiDefault.pt.
 
