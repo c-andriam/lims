@@ -21,7 +21,7 @@ déjà dans SENAITE, elle n'était simplement pas configurée.
 |---|---|---|---|
 | D7 | Analyste assigné à chaque analyse | Contacts du laboratoire | rôle automatique, compte manuel |
 | D9 | Répétitions et moyenne automatique | Calculs + Analyses | **posé par le code** |
-| D6 | Historique des pannes et des entretiens | Instruments | convention à tenir |
+| D6 | Historique des pannes et des entretiens | Instruments | **onglet activé par le code**, convention à tenir |
 | D11 | Export de plusieurs COA au contenu identique | Écran de publication | **posé par le code** |
 
 Les noms de menus sont donnés en français puis en anglais entre
@@ -201,6 +201,34 @@ C'est le champ **Type** qui sépare les deux historiques demandés :
 
 Cette convention est la seule chose à faire respecter. Sans elle, les
 deux historiques se mélangent dans une liste unique.
+
+### L'onglet était invisible — correction
+
+> **Cette section indiquait d'ouvrir un onglet qui n'existe pas dans
+> votre interface.** La consigne était donc littéralement impossible à
+> suivre, et c'est la capture d'écran du cahier des charges qui l'a
+> révélé : elle montre la barre d'onglets de l'équipement *AW Mètre 1*
+> — `Edit | View | QC Results | Calibrations | Certificat
+> d'étalonnage | Validations | Documents` — **sans Maintenance**.
+
+La fonctionnalité n'est pas absente pour autant. `senaite.core` v2.6.0
+embarque le type `InstrumentMaintenanceTask`, la vue
+`InstrumentMaintenanceView` et son enregistrement. Tout fonctionne.
+Seul l'**onglet** est masqué, dans le profil de `senaite.core`
+lui-même :
+
+```xml
+<action action_id="calibrations" ... visible="True">
+<action action_id="maintenance"  ... visible="False">
+```
+
+SENAITE livre cette fonction désactivée. **Le profil de l'add-on la
+rend désormais visible** (`defaults.show_instrument_maintenance_tab`,
+étape 1004 → 1005) : l'onglet **Maintenance** apparaît dans la barre,
+à côté de *Validations*. Rien à faire à la main.
+
+`Schedule`, masqué lui aussi, est laissé tel quel : le cahier des
+charges ne demande pas de planification.
 
 ### La manipulation
 

@@ -406,3 +406,118 @@ def grant_analyst_role(portal):
         except Exception:
             logger.exception("Attribution du role Analyst impossible")
     return granted
+
+
+# ---------------------------------------------------------------------
+# D6 -- historique des pannes et des entretiens
+# ---------------------------------------------------------------------
+#
+# Ce que le cahier des charges montre vraiment
+# --------------------------------------------
+# La capture qui accompagne la demande est la fiche d'un equipement
+# (AW Metre 1), et ce qu'elle donne a voir est sa BARRE D'ONGLETS:
+#
+#     Edit | View | QC Results | Calibrations |
+#     Certificat d'etalonnage | Validations | Documents
+#
+# Il n'y a pas d'onglet "Maintenance". La demande "ajouter un champ
+# pour Historique des pannes et Historique des entretiens dans le
+# module Equipements" designe donc cet emplacement precis: il manque
+# une entree dans cette barre.
+#
+# Pourquoi elle manque
+# --------------------
+# Pas parce que la fonctionnalite est absente. senaite.core v2.6.0
+# embarque le type de contenu InstrumentMaintenanceTask, la vue
+# InstrumentMaintenanceView, et son enregistrement:
+#
+#     <browser:page for="...IInstrument" name="maintenance"
+#         class="...instrument.InstrumentMaintenanceView" ... />
+#
+# Tout fonctionne. Seul l'ONGLET est masque, dans le profil de
+# senaite.core lui-meme (profiles/default/types/Instrument.xml):
+#
+#     <action action_id="calibrations" ... visible="True">
+#     <action action_id="maintenance"  ... visible="False">
+#     <action action_id="schedule"     ... visible="False">
+#
+# SENAITE livre donc cette fonction desactivee.
+#
+# Consequence sur notre documentation
+# -----------------------------------
+# docs/lot1-parametrage.md indiquait "Onglet Maintenance > Ajouter".
+# Cet onglet n'existe pas dans l'interface du laboratoire: la
+# manipulation etait litteralement impossible a suivre. C'est corrige
+# ici, en rendant l'onglet visible, plutot que dans le mode d'emploi.
+#
+# On ne touche pas a "schedule": le cahier des charges ne demande pas
+# de planification, et afficher un onglet dont personne n'a l'usage
+# encombre la barre sans rien apporter.
+INSTRUMENT_TYPE = "Instrument"
+MAINTENANCE_ACTION = "maintenance"
+
+
+def show_instrument_maintenance_tab():
+    """Rend visible l'onglet Maintenance sur la fiche d'un equipement.
+
+    Idempotent: si l'onglet est deja visible -- parce que le profil a
+    deja tourne, ou parce que le laboratoire l'a active a la main --
+    on ne fait rien.
+
+    :returns: True si la visibilite a ete changee
+    """
+    try:
+        portal_types = api.get_tool("portal_types")
+        fti = getattr(portal_types, INSTRUMENT_TYPE, None)
+    except Exception:
+        logger.exception("portal_types illisible")
+        return False
+
+    if fti is None:
+        logger.warning(
+            "Type de contenu '%s' introuvable: onglet Maintenance "
+            "inchange.", INSTRUMENT_TYPE)
+        return False
+
+    for action in fti.listActions():
+        try:
+            if action.getId() != MAINTENANCE_ACTION:
+                continue
+        except Exception:
+            continue
+        if getattr(action, "visible", False):
+            logger.info("Onglet Maintenance deja visible")
+            return False
+        action.visible = True
+        logger.info(
+            "Onglet Maintenance rendu visible sur les equipements. "
+            "senaite.core le livre masque (visible=False dans son "
+            "Instrument.xml); la vue existait deja et fonctionnait, "
+            "seule l'entree de barre manquait (demande D6).")
+        return True
+
+    logger.warning(
+        "Aucune action '%s' sur le type %s: la structure de SENAITE a "
+        "peut-etre change.", MAINTENANCE_ACTION, INSTRUMENT_TYPE)
+    return False
+
+
+def hide_instrument_maintenance_tab():
+    """Remet l'onglet Maintenance dans l'etat ou senaite.core le livre.
+
+    Appele a la desinstallation: l'add-on ne doit pas laisser derriere
+    lui une interface qu'il est le seul a expliquer.
+    """
+    try:
+        portal_types = api.get_tool("portal_types")
+        fti = getattr(portal_types, INSTRUMENT_TYPE, None)
+        if fti is None:
+            return False
+        for action in fti.listActions():
+            if action.getId() == MAINTENANCE_ACTION:
+                action.visible = False
+                logger.info("Onglet Maintenance remasque")
+                return True
+    except Exception:
+        logger.exception("Remasquage de l'onglet Maintenance impossible")
+    return False

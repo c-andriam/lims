@@ -92,6 +92,13 @@ def apply_defaults(portal):
     except Exception:
         logger.exception("Role Analyst: echec")
 
+    # D6 -- onglet Maintenance sur la fiche equipement. senaite.core le
+    # livre masque; la vue existe et fonctionne.
+    try:
+        defaults.show_instrument_maintenance_tab()
+    except Exception:
+        logger.exception("Onglet Maintenance: echec")
+
 
 def register_coa_template():
     """Ajoute le gabarit COA Trimeta a la liste des gabarits actifs.
@@ -143,6 +150,16 @@ def post_uninstall(portal_setup):
     """
     logger.info("senaite.trimeta.samplefields: post_uninstall")
     unregister_coa_template()
+
+    # L'onglet Maintenance retrouve l'etat ou senaite.core le livre:
+    # masque. Les taches de maintenance deja saisies sont conservees,
+    # seule l'entree de barre disparait.
+    from senaite.trimeta.samplefields import defaults
+    try:
+        defaults.hide_instrument_maintenance_tab()
+    except Exception:
+        logger.exception("Remasquage de l'onglet Maintenance: echec")
+
     for catalog_id, indexes, columns in CATALOGS:
         catalog = capi.get_catalog(catalog_id)
         for index_id, _index_type, _attrs in indexes:
