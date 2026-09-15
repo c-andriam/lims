@@ -54,4 +54,19 @@
       profile="senaite.trimeta.samplefields:default"
       />
 
+  <!-- 1003 -> 1004 : COA (lot 4)
+
+       Couche navigateur qui nomme les PDF d'apres le Code echantillon,
+       et enregistrement du gabarit COA Trimeta parmi les gabarits
+       actifs de senaite.impress. -->
+  <genericsetup:upgradeStep
+      title="Trimeta 1003 -> 1004 : COA, gabarit et nom des PDF"
+      description="Importe la couche navigateur de l'add-on et ajoute
+                   le gabarit COA Trimeta aux gabarits actifs."
+      source="1003"
+      destination="1004"
+      handler=".v1004.upgrade"
+      profile="senaite.trimeta.samplefields:default"
+      />
+
 </configure>

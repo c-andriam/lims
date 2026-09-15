@@ -33,7 +33,7 @@ class TestProfileInstallation(TrimetaTestCase):
         """
         setup_tool = self.portal.portal_setup
         version = setup_tool.getLastVersionForProfile(PROFILE)
-        self.assertEqual(version, ("1001",))
+        self.assertEqual(version, ("1004",))
 
     def test_indexes_are_created(self):
         for catalog_id, indexes, _columns in CATALOGS:

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configure
     xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
     xmlns:plone="http://namespaces.plone.org/plone"
     i18n_domain="senaite.trimeta.samplefields">
 
@@ -16,6 +17,57 @@
       directory="templates/reports"
       type="senaite.impress.reports"
       name="senaite.trimeta.samplefields"
+      />
+
+  <!-- Nom des PDF: Code echantillon au lieu de l'ID (voir views.py).
+
+       Memes noms, memes "for" et memes permissions que dans
+       bika/lims/browser/publish/configure.zcml et
+       bika/lims/browser/workflow/configure.zcml. Seule la couche change:
+       ISenaiteTrimetaLayer etend IBikaLIMS, elle est donc plus
+       specifique et gagne. Tant que browserlayer.xml n'a pas ete importe
+       (profil non installe ou etape 1004 non jouee), les vues de
+       senaite.core restent actives. -->
+  <browser:page
+      for="*"
+      name="download_pdf"
+      class=".views.TrimetaDownloadView"
+      permission="senaite.core.permissions.ManageAnalysisRequests"
+      layer="senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
+      />
+
+  <browser:page
+      for="bika.lims.interfaces.IClient"
+      name="email"
+      class=".views.TrimetaEmailView"
+      permission="senaite.core.permissions.ManageAnalysisRequests"
+      layer="senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
+      />
+
+  <browser:page
+      for="bika.lims.interfaces.IAnalysisRequest"
+      name="email"
+      class=".views.TrimetaEmailView"
+      permission="senaite.core.permissions.ManageAnalysisRequests"
+      layer="senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
+      />
+
+  <adapter
+      name="workflow_action_download_reports"
+      for="bika.lims.interfaces.IClient
+           senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
+      factory=".views.TrimetaDownloadReportsAdapter"
+      provides="bika.lims.interfaces.IWorkflowActionAdapter"
+      permission="zope.Public"
+      />
+
+  <adapter
+      name="workflow_action_download_reports"
+      for="bika.lims.interfaces.IAnalysisRequest
+           senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
+      factory=".views.TrimetaDownloadReportsAdapter"
+      provides="bika.lims.interfaces.IWorkflowActionAdapter"
+      permission="zope.Public"
       />
 
 </configure>
