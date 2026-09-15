@@ -1,0 +1,30 @@
+# senaite.impress 2.6 n'a aucun catalogue français: écran de publication
+# des rapports. Libellés relevés à l'écran.
+msgid ""
+msgstr ""
+"Project-Id-Version: senaite.trimeta.samplefields 1.0.0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: fr\n"
+"Language-Team: Trimeta Group\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Domain: senaite.impress\n"
+
+msgid "Client"
+msgstr "Client"
+
+msgid "Contact"
+msgstr "Contact"
+
+msgid "Date Sampled"
+msgstr "Date de prélèvement"
+
+msgid "Email sent"
+msgstr "Courriel envoyé"
+
+msgid "Sample Point"
+msgstr "Point de prélèvement"
+
+msgid "Sample Type"
+msgstr "Type d'échantillon"

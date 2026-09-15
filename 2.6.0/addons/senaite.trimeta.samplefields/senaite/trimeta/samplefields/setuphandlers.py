@@ -14,6 +14,7 @@ duplique rien et ne casse rien.
 """
 
 import logging
+import os
 
 import transaction
 from bika.lims import api
@@ -63,7 +64,28 @@ IMPRESS_FACTORY_DEFAULT = u"senaite.impress:MultiDefault.pt"
 LAB_SETUP_DEFAULTS = {
     "Currency": ("MGA", ("", "EUR")),       # Ariary malgache (ISO 4217)
     "DefaultCountry": ("MG", ("",)),        # Madagascar (ISO 3166 alpha-2)
+    # Virgule decimale sur les rapports (COA), usage francais. Affichage
+    # seulement: la saisie des resultats (ResultsDecimalMark) n'est pas
+    # modifiee.
+    "DecimalMark": (",", (".",)),
 }
+
+# Logo de la barre d'outils SENAITE (fond sombre): version blanche du logo
+# Trimeta Group. Source, en PNG d'origine de la meme image:
+#   https://trimetagroup.com/wp-content/uploads/2024/08/
+#   LOGO-GROUPE_BLANC-SANS-SINCE-RECTANGLE-180x92.png(.webp)
+# Embarque dans l'add-on: l'affichage ne depend pas du site du groupe, et
+# PNG plutot que WebP, que la chaine d'images Python 2 ne garantit pas.
+SITE_LOGO_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                              "setup_data", "logo-trimeta-groupe-blanc.png")
+SITE_LOGO_CSS = "height:32px;"
+
+# Premier jour de la semaine des calendriers: lundi (0), usage francais.
+FIRST_WEEKDAY_RECORD = "plone.first_weekday"
+FIRST_WEEKDAY = 0
+# Valeurs d'usine remplacables: non renseigne, ou dimanche (6), que Plone
+# pose lui-meme a la creation du site (constate sur l'instance).
+FIRST_WEEKDAY_FACTORY = (None, 6)
 
 
 def post_install(portal_setup):
@@ -78,7 +100,50 @@ def post_install(portal_setup):
     register_coa_template()
     set_coa_as_default_template()
     set_lab_defaults()
+    set_first_weekday()
+    set_site_logo()
     logger.info("senaite.trimeta.samplefields: post_install termine")
+
+
+def set_site_logo():
+    """Logo Trimeta dans la barre d'outils, si aucun logo n'est defini.
+
+    Le logo est stocke par SENAITE dans le Setup (champ site_logo), au
+    format "filenameb64:...;datab64:..." du widget de fichier Plone. Un
+    logo deja choisi dans Configuration > Apparence est conserve.
+
+    :returns: True si le logo a ete pose
+    """
+    from plone.formwidget.namedfile.converter import b64encode_file
+
+    setup = api.get_senaite_setup()
+    if setup is None:
+        logger.warning("Setup SENAITE introuvable: logo non pose")
+        return False
+    if setup.getSiteLogo():
+        logger.info("Logo du site conserve (deja defini)")
+        return False
+    with open(SITE_LOGO_FILE, "rb") as logo_file:
+        data = logo_file.read()
+    setup.setSiteLogo(b64encode_file(os.path.basename(SITE_LOGO_FILE), data))
+    if not setup.getSiteLogoCSS():
+        setup.setSiteLogoCSS(SITE_LOGO_CSS)
+    logger.info("Logo Trimeta pose dans la barre d'outils")
+    return True
+
+
+def set_first_weekday():
+    """Lundi comme premier jour de semaine, a la place de l'usine."""
+    try:
+        current = ploneapi.portal.get_registry_record(FIRST_WEEKDAY_RECORD)
+    except Exception:
+        logger.warning("Registre %s introuvable", FIRST_WEEKDAY_RECORD)
+        return
+    if current not in FIRST_WEEKDAY_FACTORY:
+        logger.info("%s=%r conserve", FIRST_WEEKDAY_RECORD, current)
+        return
+    ploneapi.portal.set_registry_record(FIRST_WEEKDAY_RECORD, FIRST_WEEKDAY)
+    logger.info("%s -> %r", FIRST_WEEKDAY_RECORD, FIRST_WEEKDAY)
 
 
 def set_lab_defaults():

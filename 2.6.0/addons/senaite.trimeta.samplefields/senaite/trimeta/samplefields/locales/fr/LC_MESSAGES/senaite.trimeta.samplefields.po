@@ -11,61 +11,61 @@ msgstr ""
 "Domain: senaite.trimeta.samplefields\n"
 
 msgid "Sample Code"
-msgstr "Code echantillon"
+msgstr "Code échantillon"
 
 msgid "Unique internal code assigned to the sample."
-msgstr "Code interne unique attribue a l'echantillon."
+msgstr "Code interne unique attribué à l'échantillon."
 
 msgid "Item Code"
 msgstr "Code article"
 
 msgid "Select the lab contact who received the sample."
-msgstr "Selectionner le contact labo ayant receptionne l'echantillon."
+msgstr "Sélectionner le contact du laboratoire ayant réceptionné l'échantillon."
 
 msgid "Designation"
-msgstr "Designation"
+msgstr "Désignation"
 
 msgid "Reception Weight (g)"
-msgstr "Poids a la reception (g)"
+msgstr "Poids à la réception (g)"
 
 msgid "Quantity Received"
-msgstr "Quantite recue"
+msgstr "Quantité reçue"
 
 msgid "Quantity Under Analysis (g)"
-msgstr "Quantite mise sous analyse (g)"
+msgstr "Quantité mise sous analyse (g)"
 
 msgid "Technical Sample Weight (g)"
-msgstr "Poids de l'echantillon-tech (g)"
+msgstr "Poids de l'échantillon technique (g)"
 
 msgid "Reception Temperature (deg C)"
-msgstr "Temperature a la reception (deg C)"
+msgstr "Température à la réception (°C)"
 
 msgid "Must be between 15 and 31 deg C."
-msgstr "Doit etre comprise entre 15 et 31 deg C."
+msgstr "Doit être comprise entre 15 et 31 °C."
 
 msgid "Analysis Sheet Number"
-msgstr "Numero fiche d'analyse"
+msgstr "Numéro de fiche d'analyse"
 
 msgid "Beginning of Analysis"
-msgstr "Debut d'analyse"
+msgstr "Début d'analyse"
 
 msgid "End of Analysis"
-msgstr "Fin de l'analyse"
+msgstr "Fin d'analyse"
 
 msgid "Analysis Preparer"
-msgstr "Preparateur d'analyse"
+msgstr "Préparateur d'analyse"
 
 msgid "One or more people who prepared this analysis."
-msgstr "Une ou plusieurs personnes ayant prepare cette analyse."
+msgstr "Une ou plusieurs personnes ayant préparé cette analyse."
 
 msgid "Pod Length (cm)"
 msgstr "Longueur des gousses (cm)"
 
 msgid "Aroma Development"
-msgstr "Developpement de l'arome"
+msgstr "Développement de l'arôme"
 
 msgid "Aroma"
-msgstr "Arome"
+msgstr "Arôme"
 
 msgid "Color"
 msgstr "Couleur"
@@ -74,25 +74,25 @@ msgid "Texture"
 msgstr "Texture"
 
 msgid "Sample Condition"
-msgstr "Condition de l'echantillon"
+msgstr "Condition de l'échantillon"
 
 msgid "Packaging Condition"
-msgstr "Etat de l'emballage"
+msgstr "État de l'emballage"
 
 msgid "Origin"
 msgstr "Provenance"
 
 msgid "Supplier / Customer Details"
-msgstr "Detail fournisseur / client"
+msgstr "Détail fournisseur / client"
 
 msgid "Contract"
 msgstr "Contrat"
 
 msgid "Lab Entry Voucher"
-msgstr "BE LABO (bon d'entree)"
+msgstr "BE LABO (bon d'entrée)"
 
 msgid "Raw material"
-msgstr "Matiere premiere"
+msgstr "Matière première"
 
 msgid "Finished product"
 msgstr "Produit fini"
@@ -140,15 +140,15 @@ msgid "External / Client"
 msgstr "Externe / Client"
 
 msgid "Reception Agent 1"
-msgstr "Agent reception 1"
+msgstr "Agent de réception 1"
 
 msgid "Reception Agent 2"
-msgstr "Agent reception 2"
+msgstr "Agent de réception 2"
 
 msgid "Lab Manager"
-msgstr "Responsable laboratoire"
+msgstr "Responsable du laboratoire"
 
-# --- Section Assurance Qualite et champs natifs retouches ---
+# --- Section Assurance Qualité et champs natifs retouchés ---
 
 msgid "Extraction"
 msgstr "Extraction"
@@ -160,73 +160,73 @@ msgid "Desiccator"
 msgstr "Dessiccateur"
 
 msgid "AW meter"
-msgstr "AW metre"
+msgstr "AW-mètre"
 
 msgid "Instrument performance check"
-msgstr "Verification performance des appareils"
+msgstr "Vérification des performances des appareils"
 
 msgid "Consumables"
 msgstr "Consommables"
 
 msgid "Validation and results"
-msgstr "Validation et resultats"
+msgstr "Validation et résultats"
 
 msgid "Extraction start date"
-msgstr "Date debut extraction"
+msgstr "Date de début d'extraction"
 
 msgid "Extraction operator"
-msgstr "Operateur extraction"
+msgstr "Opérateur extraction"
 
 msgid "Number of extractions"
 msgstr "Nombre d'extractions"
 
 msgid "HPLC assay date"
-msgstr "Date dosage HPLC"
+msgstr "Date du dosage HPLC"
 
 msgid "HPLC operator"
-msgstr "Operateur HPLC"
+msgstr "Opérateur HPLC"
 
 msgid "Number of HPLC analyses"
 msgstr "Nombre d'analyses en HPLC"
 
 msgid "HPLC blank check"
-msgstr "Verification blanc HPLC"
+msgstr "Vérification du blanc HPLC"
 
 msgid "Moisture analysis date"
-msgstr "Date analyse TH"
+msgstr "Date d'analyse TH"
 
 msgid "Moisture operator"
-msgstr "Operateur TH"
+msgstr "Opérateur TH"
 
 msgid "Number of moisture analyses"
 msgstr "Nombre d'analyses en TH"
 
 msgid "Water activity date"
-msgstr "Date analyse AW"
+msgstr "Date d'analyse AW"
 
 msgid "Water activity operator"
-msgstr "Operateur AW"
+msgstr "Opérateur AW"
 
 msgid "Number of water activity analyses"
 msgstr "Nombre d'analyses en AW"
 
 msgid "${name} - check date"
-msgstr "${name} - date de verification"
+msgstr "${name} - date de vérification"
 
 msgid "${name} - conformity"
-msgstr "${name} - conformite"
+msgstr "${name} - conformité"
 
 msgid "Extractor temperature"
-msgstr "Temperature extracteurs"
+msgstr "Température des extracteurs"
 
 msgid "Balance"
 msgstr "Balance"
 
 msgid "Desiccator weights"
-msgstr "Poids dessiccateurs"
+msgstr "Poids des dessiccateurs"
 
 msgid "Desiccator temperature"
-msgstr "Temperature dessiccateurs"
+msgstr "Température des dessiccateurs"
 
 msgid "Smartcal"
 msgstr "Smartcal"
@@ -235,16 +235,16 @@ msgid "Pipettes"
 msgstr "Pipettes"
 
 msgid "HPLC standard"
-msgstr "Etalon HPLC"
+msgstr "Étalon HPLC"
 
 msgid "Ethanol lot"
-msgstr "Lot ethanol"
+msgstr "Lot éthanol"
 
 msgid "Remembered and suggested on later samples."
-msgstr "Memorise et propose sur les echantillons suivants."
+msgstr "Mémorisé et proposé sur les échantillons suivants."
 
 msgid "Acetonitrile lot"
-msgstr "Lot acetonitrile"
+msgstr "Lot acétonitrile"
 
 msgid "HPLC water lot"
 msgstr "Lot eau HPLC"
@@ -253,13 +253,13 @@ msgid "Isopropanol lot"
 msgstr "Lot isopropanol"
 
 msgid "Solvent conformity"
-msgstr "Conformite des solvants"
+msgstr "Conformité des solvants"
 
 msgid "Column serial number"
-msgstr "Numero de serie colonne"
+msgstr "Numéro de série de la colonne"
 
 msgid "Lamp serial number"
-msgstr "Numero de serie lampe"
+msgstr "Numéro de série de la lampe"
 
 msgid "Technical validator"
 msgstr "Validateur technique"
@@ -271,19 +271,19 @@ msgid "Remarks and action if NOK"
 msgstr "Remarques et action si NOK"
 
 msgid "Corrective action taken when a check came back NOK."
-msgstr "Action corrective menee lorsqu'un controle est revenu NOK."
+msgstr "Action corrective menée lorsqu'un contrôle est revenu NOK."
 
 msgid "Results transmission mode"
-msgstr "Mode de transmission des resultats"
+msgstr "Mode de transmission des résultats"
 
 msgid "Results transmission date"
-msgstr "Date de transmission des resultats"
+msgstr "Date de transmission des résultats"
 
 msgid "Lot"
 msgstr "Lot"
 
 msgid "Lot number of the batch this sample was taken from."
-msgstr "Numero de lot du lot dont provient l'echantillon."
+msgstr "Numéro du lot dont provient l'échantillon."
 
 # Tableau de bord (lot 5)
 
@@ -297,22 +297,22 @@ msgid "Search"
 msgstr "Rechercher"
 
 msgid "Reset"
-msgstr "Reinitialiser"
+msgstr "Réinitialiser"
 
 msgid "Received from"
-msgstr "Recu du"
+msgstr "Reçu du"
 
 msgid "Received to"
-msgstr "Recu au"
+msgstr "Reçu au"
 
 msgid "Client"
 msgstr "Client"
 
 msgid "Sample Type"
-msgstr "Type d'echantillon"
+msgstr "Type d'échantillon"
 
 msgid "Date Received"
-msgstr "Date de reception"
+msgstr "Date de réception"
 
 msgid "Date Validated"
 msgstr "Date de validation"
@@ -339,17 +339,17 @@ msgid "PHB acid"
 msgstr "Acide PHB"
 
 msgid "Moisture (TH)"
-msgstr "TH (taux d'humidite)"
+msgstr "TH (taux d'humidité)"
 
 msgid "Water activity (AW)"
-msgstr "AW (activite de l'eau)"
+msgstr "AW (activité de l'eau)"
 
-# En-tetes de colonne du tableau de bord.
-# Identifiants dedies: un en-tete doit tenir sur une ligne,
-# la ou l'etiquette du meme champ sur le formulaire est longue.
+# En-têtes de colonne du tableau de bord.
+# Identifiants dédiés: un en-tête doit tenir sur une ligne,
+# là où l'étiquette du même champ sur le formulaire est longue.
 
 msgid "dashboard_sample_code"
-msgstr "Code echantillon"
+msgstr "Code échantillon"
 
 msgid "dashboard_lot"
 msgstr "Lot"
@@ -367,10 +367,10 @@ msgid "dashboard_weight"
 msgstr "Poids (g)"
 
 msgid "dashboard_received"
-msgstr "Reception"
+msgstr "Réception"
 
 msgid "dashboard_start"
-msgstr "Debut analyse"
+msgstr "Début analyse"
 
 msgid "dashboard_end"
 msgstr "Fin analyse"
@@ -407,3 +407,8 @@ msgstr "Op. TH"
 
 msgid "dashboard_op_aw"
 msgstr "Op. AW"
+
+# COA (lot 4)
+
+msgid "Report reference"
+msgstr "Référence du rapport"

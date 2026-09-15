@@ -8,6 +8,20 @@
   <!-- Enregistre le dossier locales/ pour la traduction automatique -->
   <i18n:registerTranslations directory="locales" />
 
+  <!-- Nos catalogues en tete de leurs domaines (voir i18n.py). Sans cela
+       senaite.core, charge avant nous, garde ses traductions trompeuses
+       ("Batch" rendu par "Lot"). Deux evenements: le demarrage du
+       serveur, et l'ouverture de la base, qui couvre aussi les scripts
+       lances par bin/instance run. L'operation est idempotente. -->
+  <subscriber
+      for="zope.processlifetime.IProcessStarting"
+      handler=".i18n.prioritize_trimeta_catalogs"
+      />
+  <subscriber
+      for="zope.processlifetime.IDatabaseOpenedWithRoot"
+      handler=".i18n.prioritize_trimeta_catalogs"
+      />
+
   <!-- =============================================================
        Profil d'installation
        ============================================================= -->

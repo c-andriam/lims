@@ -6,11 +6,12 @@ Ajoute les 15 champs de la section RECEPTION demandes par Trimeta Group.
 Utilise archetypes.schemaextender, la methode standard pour etendre un
 schema Archetypes sans toucher au code core de SENAITE.
 
-Designation, Sample Condition, Packaging Condition et Origin sont des
-champs texte libre avec autocompletion dynamique et partagee (voir
-suggestions.py + browser/suggestions_api.py +
-resources/reception_separator.js), plutot que des listes deroulantes
-fixes.
+Designation et Origin sont des champs texte libre avec autocompletion
+dynamique et partagee (voir suggestions.py + browser/suggestions_api.py
++ resources/field_suggestions.js).
+
+Sample Condition et Packaging Condition suivent les listes imposees par
+le cahier des charges; l'emballage accepte "Autre..." en saisie libre.
 
 Reception Temperature et Item Code (ex-Sample Reference) restent des
 listes deroulantes strictes. Received By est une reference dynamique
@@ -36,6 +37,7 @@ from bika.lims.browser.fields import UIDReferenceField
 from bika.lims.browser.widgets import DateTimeWidget
 from senaite.core.browser.fields.datetime import DateTimeField
 from senaite.core.browser.widgets.referencewidget import ReferenceWidget
+from senaite.core.browser.widgets.selectotherwidget import SelectOtherWidget
 from senaite.core.catalog import CONTACT_CATALOG
 
 from senaite.trimeta.samplefields import vocabularies as vocab
@@ -191,23 +193,27 @@ class ReceptionFieldsExtender(object):
             ),
         ),
 
-        # 9. Sample Condition - texte libre avec autocompletion dynamique
+        # 9. Sample Condition - liste fixe: conforme / non conforme
         ExtStringField(
             "SampleCondition",
             required=True,
+            vocabulary=vocab.as_displaylist(vocab.SAMPLE_CONDITION_VOCAB),
             schemata="Reception",
-            widget=StringWidget(
+            widget=SelectionWidget(
                 visible=ADD_VISIBLE,
+                format="select",
                 label=_(u"Sample Condition"),
             ),
         ),
 
-        # 10. Packaging Condition - texte libre avec autocompletion dynamique
+        # 10. Packaging Condition - sous vide, sachet zip, kraft, ou
+        #     "Autre..." en saisie libre (widget natif de senaite.core)
         ExtStringField(
             "PackagingCondition",
             required=True,
+            vocabulary=vocab.as_displaylist(vocab.PACKAGING_CONDITION_VOCAB),
             schemata="Reception",
-            widget=StringWidget(
+            widget=SelectOtherWidget(
                 visible=ADD_VISIBLE,
                 label=_(u"Packaging Condition"),
             ),

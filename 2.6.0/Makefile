@@ -52,7 +52,7 @@ ARGS ?=
 .PHONY: help debug up down restart logs ps pull shell status \
         clean fclean re install backup restore redeploy-addon \
         first-setup redeploy-instance test test-list test-pure check-engine fix-perms doctor require-running test-env impress-info dashboard-info sync \
-        audit-listes
+        audit-listes i18n
 
 check-engine:
 	@if [ -z "$(ENGINE)" ]; then \
@@ -171,6 +171,9 @@ dashboard-info: require-running ## Inventorie l'API de listing (prepare le table
 
 audit-listes: ## Colonnes vides des tableaux (SENAITE_PASSWORD=... requis)
 	@SENAITE_URL=$${SENAITE_URL:-$(SITE_URL)} $(PYTHON) scripts/audit-listes.py $(PAGES)
+
+i18n: ## Compile les traductions de l'add-on (.po -> .mo), puis redeployer
+	@$(PYTHON) scripts/compile-mo.py
 
 test-env: require-running ## Inventorie ce qui permet de lancer les tests
 	@ENGINE=$(ENGINE) SERVICE=$(SERVICE) INSTANCE_DIR=$(INSTANCE_DIR) sh scripts/test-env.sh

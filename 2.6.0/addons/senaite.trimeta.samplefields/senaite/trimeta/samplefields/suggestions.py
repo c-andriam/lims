@@ -31,11 +31,12 @@ STORAGE_KEY = "senaite.trimeta.samplefields.suggestions"
 # These must stay unique per record; surfacing old values as
 # suggestions would risk encouraging accidental duplicate reuse of
 # a unique identifier.
+#
+# Plus de suggestions pour SampleCondition et PackagingCondition: ce sont
+# desormais des listes (cahier des charges).
 SUGGESTION_FIELDS = (
     # Section Reception / Analyse
     "Designation",
-    "SampleCondition",
-    "PackagingCondition",
     "Origin",
     "SupplierCustomerDetail",
     "Contract",

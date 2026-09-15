@@ -1,6 +1,13 @@
 <tal:report
     define="model view/model"
-    i18n:domain="senaite.impress">
+    i18n:domain="senaite.trimeta.coa">
+
+  <!-- Domaine de traduction propre, sans catalogue: le COA reste en
+       anglais, comme le cahier des charges le specifie ("Sample
+       reference", "Report reference", "ORGANOLEPTIC ANALYSIS"...).
+       Sous senaite.impress, le catalogue francais de l'add-on (ecran de
+       publication) traduisait une partie des libelles seulement: le COA
+       melangeait les deux langues. -->
 
   <!-- Gabarit COA Trimeta (lot 4).
 
@@ -75,15 +82,15 @@
             </td>
           </tr>
           <tr>
-            <!-- "Report reference" du cahier des charges. La reference
-                 du rapport lui-meme n'existe pas encore au moment ou ce
-                 gabarit est rendu: senaite.impress produit le PDF
-                 AVANT de creer l'ARReport qui le portera. On affiche
-                 donc la reference que le laboratoire attribue lui-meme
-                 a l'analyse, le Numero de fiche d'analyse. A confirmer,
-                 voir docs/lot4-coa.md. -->
+            <!-- "Report reference" du cahier des charges: le Code
+                 echantillon. Le meme document demande que le COA porte le
+                 nom du Code echantillon: c'est la reference sous laquelle
+                 le rapport circule, et le nom de son PDF. L'identifiant
+                 de l'ARReport n'existe pas encore au rendu (senaite.impress
+                 produit le PDF AVANT de creer l'ARReport). Le Numero de
+                 fiche d'analyse sert de repli si le code manque. -->
             <td class="label" i18n:translate="">Report reference</td>
-            <td tal:content="model/AnalysisSheetNumber|nothing"></td>
+            <td tal:content="python:model.SampleCode or model.AnalysisSheetNumber or ''"></td>
           </tr>
           <tr>
             <td class="label" i18n:translate="">Sample Type</td>
