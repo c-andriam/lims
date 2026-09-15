@@ -251,6 +251,24 @@ Vérifié : sans filtre, type seul, option groupée, tri, pagination, lot.
   même intitulé forment une seule entrée, qui filtre sur tous leurs UID.
 - **Aucune entrée sans intitulé.**
 
+### Accès et confidentialité
+
+Constaté lors d'un test navigateur non connecté (15/09/2026) : la page
+s'affichait à un visiteur anonyme, et la liste **Provenance** lui
+montrait « Sambava ». La permission `zope2.View` est accordée aux
+anonymes à la racine du site, et `uniqueValuesFor` lit l'index brut,
+**sans** le filtre de sécurité du catalogue. Un contact client aurait vu
+de même les provenances des autres clients.
+
+Corrigé :
+
+- la page renvoie les visiteurs anonymes vers l'écran de connexion ;
+- les provenances sont lues sur les résultats d'une recherche, donc
+  limitées aux échantillons que l'utilisateur a le droit de voir.
+
+Vérifié : anonyme → HTTP 302 vers la connexion, aucune provenance dans
+la réponse ; connecté → « Tous | Sambava ».
+
 ### Deux détails qui coûtent cher
 
 **Le cache du navigateur.** `dashboard.js` est servi avec un paramètre
