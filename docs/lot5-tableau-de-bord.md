@@ -244,6 +244,14 @@ l'exécution. Un test balaie désormais le fichier.
    colonne *Keyword*. Un mot-clé faux ne lève aucune erreur : la colonne
    reste vide. La vue journalise donc un avertissement quand un mot-clé
    ne ramène jamais rien.
+
+   **Attention** : les captures du serveur réel jointes au document
+   montrent des services nommés *Vanillin*, *pHB Acid*, *Vanillic Acid*,
+   *PHB Aldehyde*, *Water Activity* et *Moisture*, plus des ratios
+   calculés, et **aucune Gluco-vanilline**. Les mots-clés provisoires
+   (`VANILLINE`, `GLUCOVANILLINE`…) sont donc très probablement faux, et
+   la correspondance « PHB » / « AC PHB » du document reste à préciser
+   avec le laboratoire.
 2. **Valider sur des données réelles.** Le `sample_catalog` de
    l'instance de test est vide (0 objet à la réindexation) : un tableau
    vide ne prouve ni qu'il marche, ni qu'il est cassé.

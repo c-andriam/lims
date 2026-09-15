@@ -265,5 +265,6 @@ Ce qui reste relève du développement :
 
 - **Lot 4** — contenu du COA et nommage des fichiers ;
 - **Lot 5** — tableau de bord avec ses filtres ;
-- **D13** — le bug d'export de données depuis la Work Sheet, dont le
-  symptôme reste à décrire par la personne qui l'a rencontré.
+- **D13** — le bug d'export de données depuis la Work Sheet : reproduit
+  et corrigé, voir `d13-export-work-sheet.md`. Le symptôme reste à
+  confirmer avec la personne qui l'a rencontré.
