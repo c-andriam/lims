@@ -165,6 +165,16 @@ class TestDiscrimination(unittest.TestCase):
         self.assertFalse(
             self.applies(WorksheetAnalysesAdapter, "AnalysisRequest"))
 
+    def test_worksheet_grid_filters_without_portal_type(self):
+        """La grille de saisie d'une Work Sheet filtre sur getWorksheetUID,
+        sans portal_type: seul l'adaptateur Work Sheet doit s'y appliquer."""
+        listing = FakeListing()
+        listing.contentFilter = {"getWorksheetUID": "abc",
+                                 "sort_on": "sortable_title"}
+        self.assertTrue(WorksheetAnalysesAdapter(listing, None).applies())
+        self.assertFalse(SamplesListingAdapter(listing, None).applies())
+        self.assertFalse(ReportsListingAdapter(listing, None).applies())
+
     def test_reports_adapter_scope(self):
         self.assertTrue(self.applies(ReportsListingAdapter, "ARReport"))
         self.assertFalse(
@@ -256,6 +266,19 @@ class TestWorksheetColumn(unittest.TestCase):
         self.assertIn("getId", listing.columns)
         self.assertEqual(list(listing.columns.keys()),
                          ["getId", "SampleCode", "Result"])
+
+    def test_column_follows_position_in_worksheet_grid(self):
+        """Colonnes reelles de bika.lims.browser.worksheet.views.analyses."""
+        listing = FakeListing(
+            columns=[("Pos", {}), ("Service", {}), ("Result", {})],
+            review_states=[{"id": "default",
+                            "columns": ["Pos", "Service", "Result"]}],
+        )
+        listing.contentFilter = {"getWorksheetUID": "abc"}
+        WorksheetAnalysesAdapter(listing, None).before_render()
+        self.assertEqual(list(listing.columns.keys()),
+                         ["Pos", "SampleCode", "Service", "Result"])
+        self.assertIn("SampleCode", listing.review_states[0]["columns"])
 
     def test_column_is_not_sortable(self):
         """Aucun index de code echantillon n'existe sur le catalogue des

@@ -39,8 +39,18 @@ class WorksheetAnalysesAdapter(BaseListingAdapter):
         "ReferenceAnalysis",
     )
 
+    def applies(self):
+        # La grille d'une Work Sheet filtre sur getWorksheetUID, sans
+        # portal_type: le test de la classe de base ne la reconnait pas.
+        content_filter = getattr(self.listing, "contentFilter", None) or {}
+        if "getWorksheetUID" in content_filter:
+            return True
+        return super(WorksheetAnalysesAdapter, self).applies()
+
     def add_columns(self):
-        insert_column_after(self.listing.columns, "getId", SAMPLE_CODE, {
+        # La grille d'une Work Sheet n'a pas de colonne getId, mais "Pos".
+        anchor = "Pos" if "Pos" in self.listing.columns else "getId"
+        insert_column_after(self.listing.columns, anchor, SAMPLE_CODE, {
             "title": _(u"Sample Code"),
             "sortable": False,   # pas d'index sur le catalogue analyses
             "toggle": True,
