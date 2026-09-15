@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from setuptools import find_packages, setup
 
-version = "1.1.0"
+version = "1.2.0"
 
 long_description = (
     "Add-on SENAITE pour Trimeta Group.\n\n"

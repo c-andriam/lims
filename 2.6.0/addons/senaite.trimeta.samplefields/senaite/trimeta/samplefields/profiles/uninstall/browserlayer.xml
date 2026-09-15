@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Retire la couche de navigateur: les vues de senaite.core
+     retrouvent leur comportement natif, notamment le nommage des
+     fichiers COA par Sample ID. -->
+<layers>
+  <layer
+      name="senaite.trimeta.samplefields"
+      remove="True"
+      />
+</layers>
