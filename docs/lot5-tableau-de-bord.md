@@ -225,6 +225,50 @@ double. La règle retenue n'exige aucune connaissance du balisage :
 
 Un garde-fou refuse d'insérer tout bloc portant plus d'un lien.
 
+### Les filtres ne s'appliquaient pas dans le navigateur
+
+Constaté en reproduisant exactement les appels du navigateur. Les champs
+cachés (`additional_hidden_fields`) ne suffisaient pas, contrairement à
+ce qu'annonçait une version antérieure de ce document.
+
+- `senaite.app.listing` charge les lignes, trie et pagine en AJAX. Il
+  construit la vue, **puis** injecte ses données dans le formulaire
+  (clés préfixées `trimeta_dashboard_`) et appelle `update()`.
+- Son script ajoute les paramètres de la page à l'adresse de chaque
+  appel, mais envoie un corps **JSON** : Zope n'analyse alors pas
+  l'adresse.
+- Les filtres, lus une seule fois dans `__init__`, n'étaient donc jamais
+  vus : le tableau restait non filtré.
+
+Correctif : `update()` relit les filtres depuis les trois sources
+(`filters.merged_form`) et reconstruit la requête à chaque passage.
+Vérifié : sans filtre, type seul, option groupée, tri, pagination, lot.
+
+### Listes déroulantes des filtres
+
+- Première option **« Tous »**, et non une ligne vide.
+- **Une entrée par nom** : plusieurs types d'échantillon ou clients de
+  même intitulé forment une seule entrée, qui filtre sur tous leurs UID.
+- **Aucune entrée sans intitulé.**
+
+### Accès et confidentialité
+
+Constaté lors d'un test navigateur non connecté (15/09/2026) : la page
+s'affichait à un visiteur anonyme, et la liste **Provenance** lui
+montrait « Sambava ». La permission `zope2.View` est accordée aux
+anonymes à la racine du site, et `uniqueValuesFor` lit l'index brut,
+**sans** le filtre de sécurité du catalogue. Un contact client aurait vu
+de même les provenances des autres clients.
+
+Corrigé :
+
+- la page renvoie les visiteurs anonymes vers l'écran de connexion ;
+- les provenances sont lues sur les résultats d'une recherche, donc
+  limitées aux échantillons que l'utilisateur a le droit de voir.
+
+Vérifié : anonyme → HTTP 302 vers la connexion, aucune provenance dans
+la réponse ; connecté → « Tous | Sambava ».
+
 ### Deux détails qui coûtent cher
 
 **Le cache du navigateur.** `dashboard.js` est servi avec un paramètre
@@ -244,6 +288,14 @@ l'exécution. Un test balaie désormais le fichier.
    colonne *Keyword*. Un mot-clé faux ne lève aucune erreur : la colonne
    reste vide. La vue journalise donc un avertissement quand un mot-clé
    ne ramène jamais rien.
+
+   **Attention** : les captures du serveur réel jointes au document
+   montrent des services nommés *Vanillin*, *pHB Acid*, *Vanillic Acid*,
+   *PHB Aldehyde*, *Water Activity* et *Moisture*, plus des ratios
+   calculés, et **aucune Gluco-vanilline**. Les mots-clés provisoires
+   (`VANILLINE`, `GLUCOVANILLINE`…) sont donc très probablement faux, et
+   la correspondance « PHB » / « AC PHB » du document reste à préciser
+   avec le laboratoire.
 2. **Valider sur des données réelles.** Le `sample_catalog` de
    l'instance de test est vide (0 objet à la réindexation) : un tableau
    vide ne prouve ni qu'il marche, ni qu'il est cassé.

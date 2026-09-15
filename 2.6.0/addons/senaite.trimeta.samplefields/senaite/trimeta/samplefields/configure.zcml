@@ -138,6 +138,9 @@
   <!-- Gabarit COA (lot 4) -->
   <include package=".coa" />
 
+  <!-- Work Sheet: code echantillon en tete de position, export -->
+  <include package=".worksheet" />
+
   <include package=".browser" />
 
 </configure>

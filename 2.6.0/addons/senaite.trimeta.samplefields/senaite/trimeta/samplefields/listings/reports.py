@@ -20,21 +20,35 @@ from senaite.trimeta.samplefields.listings.base import show_in_all_states
 _ = MessageFactory("senaite.trimeta.samplefields")
 
 SAMPLE_CODE = "SampleCode"
+LOT = "Lot"
+
+# Colonne native "Batch" (lot de travail), traduite "Lot" en francais:
+# elle faisait croire que le Lot de l'echantillon etait vide.
+NATIVE_BATCH = "Batch"
 
 
 @implementer(IListingViewAdapter)
 class ReportsListingAdapter(BaseListingAdapter):
-    """Ajoute le Code echantillon a la liste des rapports."""
+    """Ajoute Code echantillon et Lot a la liste des rapports."""
 
     portal_types = ("ARReport",)
 
     def add_columns(self):
-        insert_column_after(self.listing.columns, "Title", SAMPLE_CODE, {
+        columns = self.listing.columns
+        insert_column_after(columns, "AnalysisRequest", SAMPLE_CODE, {
             "title": _(u"Sample Code"),
             "sortable": False,
             "toggle": True,
         })
-        show_in_all_states(self.listing, SAMPLE_CODE)
+        insert_column_after(columns, SAMPLE_CODE, LOT, {
+            "title": _(u"Lot"),
+            "sortable": False,
+            "toggle": True,
+        })
+        if NATIVE_BATCH in columns:
+            # masquee par defaut, toujours activable dans le menu des colonnes
+            columns[NATIVE_BATCH]["toggle"] = False
+        show_in_all_states(self.listing, SAMPLE_CODE, LOT)
 
     def get_sample_uid(self, report):
         """UID de l'echantillon dont le rapport rend compte."""
@@ -51,3 +65,4 @@ class ReportsListingAdapter(BaseListingAdapter):
     def fill_item(self, obj, item, index):
         sample = self.get_cached_sample(self.get_sample_uid(obj))
         item[SAMPLE_CODE] = self.get_sample_code(sample)
+        item[LOT] = (sample.getClientSampleID() or "") if sample else ""

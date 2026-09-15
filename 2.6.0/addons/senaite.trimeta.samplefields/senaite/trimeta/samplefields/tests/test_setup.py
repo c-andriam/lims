@@ -33,7 +33,43 @@ class TestProfileInstallation(TrimetaTestCase):
         """
         setup_tool = self.portal.portal_setup
         version = setup_tool.getLastVersionForProfile(PROFILE)
-        self.assertEqual(version, ("1001",))
+        self.assertEqual(version, ("1005",))
+
+    def test_site_language_is_french(self):
+        """registry.xml: francais par defaut, langue du navigateur ignoree."""
+        from plone import api as ploneapi
+        get = ploneapi.portal.get_registry_record
+        self.assertEqual(get("plone.default_language"), "fr")
+        self.assertEqual(list(get("plone.available_languages")), ["fr", "en"])
+        self.assertFalse(get("plone.use_request_negotiation"))
+        self.assertTrue(get("plone.use_cookie_negotiation"))
+        self.assertFalse(get("plone.use_combined_language_codes"))
+
+    def test_portal_timezone_is_madagascar(self):
+        """Doit concorder avec TZ du conteneur (compose.yml)."""
+        from plone import api as ploneapi
+        self.assertEqual(
+            ploneapi.portal.get_registry_record("plone.portal_timezone"),
+            "Indian/Antananarivo")
+
+    def test_currency_and_country_are_madagascar(self):
+        from bika.lims import api
+        setup = api.get_setup()
+        self.assertEqual(setup.getField("Currency").get(setup), "MGA")
+        self.assertEqual(setup.getField("DefaultCountry").get(setup), "MG")
+
+    def test_lab_choice_is_kept(self):
+        """Un choix explicite du laboratoire n'est pas ecrase."""
+        from bika.lims import api
+        from senaite.trimeta.samplefields.setuphandlers import set_lab_defaults
+        setup = api.get_setup()
+        field = setup.getField("Currency")
+        field.set(setup, "USD")
+        try:
+            self.assertEqual(set_lab_defaults(), {})
+            self.assertEqual(field.get(setup), "USD")
+        finally:
+            field.set(setup, "MGA")
 
     def test_indexes_are_created(self):
         for catalog_id, indexes, _columns in CATALOGS:

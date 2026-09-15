@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="senaite.trimeta.samplefields">
+
+  <!-- Declare senaite.core.permissions.ViewResults avant les vues. -->
+  <include package="senaite.core.permissions" />
+
+  <!-- Memes noms, "for" et permission que
+       bika/lims/browser/worksheet/configure.zcml; la couche
+       ISenaiteTrimetaLayer, plus specifique, les fait gagner. -->
+  <browser:page
+      for="bika.lims.interfaces.IWorksheet"
+      name="analyses_classic_view"
+      class=".views.TrimetaAnalysesView"
+      permission="senaite.core.permissions.ViewResults"
+      layer="senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
+      />
+
+  <browser:page
+      for="bika.lims.interfaces.IWorksheet"
+      name="analyses_transposed_view"
+      class=".views.TrimetaAnalysesTransposedView"
+      permission="senaite.core.permissions.ViewResults"
+      layer="senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
+      />
+
+</configure>

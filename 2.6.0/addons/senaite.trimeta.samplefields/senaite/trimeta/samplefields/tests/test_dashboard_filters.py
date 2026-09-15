@@ -23,6 +23,9 @@ from senaite.trimeta.samplefields.dashboard.columns import get_metadata_map
 from senaite.trimeta.samplefields.dashboard.filters import ALL_FILTERS
 from senaite.trimeta.samplefields.dashboard.filters import PREFIX
 from senaite.trimeta.samplefields.dashboard.filters import build_query
+from senaite.trimeta.samplefields.dashboard.filters import distinct_values
+from senaite.trimeta.samplefields.dashboard.filters import group_options
+from senaite.trimeta.samplefields.dashboard.filters import merged_form
 from senaite.trimeta.samplefields.dashboard.filters import hidden_fields
 from senaite.trimeta.samplefields.dashboard.filters import is_active
 from senaite.trimeta.samplefields.dashboard.filters import read_filters
@@ -285,11 +288,95 @@ class TestScriptVersion(unittest.TestCase):
                 "caractere de controle %d present dans dashboard.js" % code)
 
 
+class TestMergedForm(unittest.TestCase):
+    """Les filtres doivent arriver jusqu'a la vue par tous les chemins."""
+
+    def test_page_load_reads_the_form(self):
+        form = {PREFIX + "lot": "LOT-1", "other": "x"}
+        self.assertEqual(merged_form(form), {PREFIX + "lot": "LOT-1"})
+
+    def test_ajax_call_reads_the_query_string(self):
+        """POST JSON du navigateur: filtres seulement dans l'adresse."""
+        query = "trimeta_sample_type=u1%2Cu2&trimeta_lot=LOT-1&pagesize=50"
+        self.assertEqual(
+            read_filters(merged_form({}, query, "trimeta_dashboard")),
+            {"sample_type": "u1,u2", "lot": "LOT-1"})
+
+    def test_ajax_injected_keys_are_unprefixed(self):
+        form = {"trimeta_dashboard_trimeta_origin": "Sambava",
+                "trimeta_dashboard_pagesize": 50}
+        self.assertEqual(merged_form(form, "", "trimeta_dashboard"),
+                         {PREFIX + "origin": "Sambava"})
+
+    def test_form_wins_over_the_query_string(self):
+        form = {PREFIX + "lot": "LOT-FORM"}
+        merged = merged_form(form, "trimeta_lot=LOT-URL", "trimeta_dashboard")
+        self.assertEqual(merged[PREFIX + "lot"], "LOT-FORM")
+
+    def test_nothing_gives_no_filter(self):
+        self.assertEqual(read_filters(merged_form(None, None, "trimeta_dashboard")), {})
+
+
+class TestGroupOptions(unittest.TestCase):
+    """Listes deroulantes des filtres Client et Type d'echantillon."""
+
+    def test_unique_titles_are_kept_and_sorted(self):
+        options = [("u2", "Vanille verte"), ("u1", "Extrait REDO")]
+        self.assertEqual(group_options(options),
+                         [("u1", "Extrait REDO"), ("u2", "Vanille verte")])
+
+    def test_duplicates_become_one_entry_with_all_uids(self):
+        options = [("u3", "Vanille verte"), ("u1", "Vanille verte"),
+                   ("u2", "Vanille verte")]
+        self.assertEqual(group_options(options), [("u1,u2,u3", "Vanille verte")])
+
+    def test_grouping_ignores_case_and_spaces(self):
+        options = [("u1", "Eurofins"), ("u2", " eurofins ")]
+        self.assertEqual(group_options(options), [("u1,u2", "Eurofins")])
+
+    def test_untitled_objects_are_not_offered(self):
+        """Pas de ligne blanche dans la liste."""
+        options = [("u1", ""), ("u2", "   "), ("u3", None), ("u4", "Sambava")]
+        self.assertEqual(group_options(options), [("u4", "Sambava")])
+
+    def test_a_grouped_value_filters_on_every_uid(self):
+        value = group_options([("u1", "Vanille verte"), ("u2", "Vanille verte")])[0][0]
+        self.assertEqual(build_query({"sample_type": value}),
+                         {"getTrimetaSampleTypeUID": ["u1", "u2"]})
+
+    def test_text_filters_are_never_split(self):
+        """Un Lot ou une Provenance peut contenir une virgule."""
+        self.assertEqual(build_query({"lot": "LOT-1,2", "origin": "Sava, nord"}),
+                         {"getClientSampleID": "LOT-1,2", "getOrigin": "Sava, nord"})
+
+
+class TestDistinctValues(unittest.TestCase):
+    """Liste deroulante Provenance: valeurs libres lues sur les brains."""
+
+    def test_no_duplicate_and_no_empty_entry(self):
+        self.assertEqual(
+            distinct_values([u"Sambava", None, u"", u"  ", u"Sambava",
+                             u"Antalaha"]),
+            [(u"Antalaha", u"Antalaha"), (u"Sambava", u"Sambava")])
+
+    def test_value_is_kept_as_indexed(self):
+        """La valeur part telle quelle dans la requete catalogue."""
+        self.assertEqual(distinct_values([u"sava "]), [(u"sava ", u"sava ")])
+
+    def test_sort_ignores_case(self):
+        self.assertEqual([v for v, _ in distinct_values([u"b", u"A", u"c"])],
+                         [u"A", u"b", u"c"])
+
+    def test_accepts_a_generator(self):
+        self.assertEqual(distinct_values(v for v in [u"x"]), [(u"x", u"x")])
+
+
 def test_suite():
     suite = unittest.TestSuite()
     loader = unittest.TestLoader()
     for case in (TestReadFilters, TestBuildQuery, TestHiddenFields,
                  TestIsActive, TestColumns, TestColumnHelp,
-                 TestScriptVersion):
+                 TestScriptVersion, TestGroupOptions, TestMergedForm,
+                 TestDistinctValues):
         suite.addTest(loader.loadTestsFromTestCase(case))
     return suite

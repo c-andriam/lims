@@ -45,6 +45,22 @@ REMEMBERED_CONSUMABLES = (
 )
 
 
+class TestVocabularyPlaceholders(unittest.TestCase):
+    """Les listes facultatives s'ouvrent sur une entree libellee."""
+
+    def test_first_entry_is_empty_but_labelled(self):
+        from senaite.trimeta.samplefields.qualitydata import vocabularies as v
+        for vocab in (v.CONFORMITY_VOCAB, v.COUNT_VOCAB, v.TRANSMISSION_VOCAB):
+            value, label = vocab[0]
+            self.assertEqual(value, "")
+            self.assertTrue(label.strip())
+
+    def test_placeholder_appears_once(self):
+        from senaite.trimeta.samplefields.qualitydata import vocabularies as v
+        for vocab in (v.CONFORMITY_VOCAB, v.COUNT_VOCAB, v.TRANSMISSION_VOCAB):
+            self.assertEqual([k for k, _label in vocab].count(""), 1)
+
+
 class TestQualityDataDeclaration(unittest.TestCase):
     """Inspection de la declaration; aucun site Plone necessaire."""
 

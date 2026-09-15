@@ -118,10 +118,11 @@
             <td tal:content="python:view.to_localized_time(view.timestamp)"></td>
           </tr>
           <tr tal:condition="reporter">
-            <!-- Nom seul: pas de lien mailto, sur demande du cahier
-                 des charges ("supprimer l'adresse mail"). -->
+            <!-- Nom seul, sans l'adresse e-mail ("supprimer l'adresse
+                 mail"). Nom complet, sinon identifiant: un compte sans
+                 nom complet laissait la cellule vide. -->
             <td class="label" i18n:translate="">Published by</td>
-            <td tal:content="reporter/fullname|reporter/username"></td>
+            <td tal:content="python:reporter.get('fullname') or reporter.get('username')"></td>
           </tr>
           <tr>
             <td class="label" i18n:translate="">Sample weight</td>
@@ -187,8 +188,45 @@
   <!-- REPORT ATTACHMENTS -->
   <tal:t replace="structure python:view.render_attachments(context, **options)" />
 
-  <!-- REPORT SIGNATURES -->
-  <tal:t replace="structure python:view.render_signatures(context, **options)" />
+  <!-- REPORT SIGNATURES (copie de senaite.impress signatures.pt, sans
+       l'adresse e-mail de "Published by") -->
+  <tal:t define="collection view/collection;
+                 managers python:view.uniquify_items(reduce(lambda a1, a2: a1+a2, map(lambda m: m.managers, collection)))">
+    <div class="row section-signatures no-gutters">
+      <div class="w-100">
+        <h1 i18n:translate="">Responsibles</h1>
+        <table class="table table-sm table-condensed">
+          <tr>
+            <tal:manager repeat="manager managers">
+              <td style="border:none">
+                <div>
+                  <img tal:condition="manager/Signature"
+                       tal:attributes="src string:${manager/absolute_url}/Signature" style="height:75px"/>
+                </div>
+                <div class="font-weight-bold">
+                  <span tal:content="manager/Salutation"></span>
+                  <span tal:condition="manager/Salutation">&nbsp;</span>
+                  <span tal:content="manager/Fullname"></span>
+                </div>
+                <div>
+                  <span tal:content="manager/JobTitle"></span>
+                </div>
+                <div>
+                  <span tal:content="manager/DefaultDepartment/title|nothing"></span>
+                </div>
+              </td>
+            </tal:manager>
+            <tal:reporter define="reporter python:view.current_user" condition="reporter">
+              <td style="border:none">
+                <div class="label" i18n:translate="">Published by</div>
+                <div tal:content="python:reporter.get('fullname') or reporter.get('username')"></div>
+              </td>
+            </tal:reporter>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </tal:t>
 
   <!-- REPORT DISCREETER -->
   <tal:t replace="structure python:view.render_discreeter(context, **options)" />

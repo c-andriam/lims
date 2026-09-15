@@ -20,6 +20,16 @@
       layer="bika.lims.interfaces.IBikaLIMS"
       />
 
+  <!-- Suggestions des champs libres: creation, page de l'echantillon,
+       base_edit -->
+  <browser:viewlet
+      name="senaite.trimeta.samplefields.field_suggestions"
+      manager="plone.app.layout.viewlets.interfaces.IHtmlHead"
+      class=".viewlets.FieldSuggestionsViewlet"
+      permission="zope2.View"
+      layer="bika.lims.interfaces.IBikaLIMS"
+      />
+
   <!-- Formulaires de modification: sous-sections Assurance Qualite -->
   <browser:viewlet
       name="senaite.trimeta.samplefields.quality_sections"

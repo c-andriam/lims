@@ -24,21 +24,28 @@ l'ecran:
 La vue reste donc un `ListingView` ordinaire, avec sa pagination, son
 tri, sa bascule de colonnes et son export.
 
-La pagination et le tri passent par AJAX. Les criteres du formulaire
-sont donc poses en champs caches (`additional_hidden_fields`), sans
-quoi la page 2 d'un resultat filtre afficherait tout le catalogue.
+Le chargement des lignes, la pagination et le tri passent par AJAX.
+senaite.app.listing construit la vue, PUIS injecte ses donnees dans le
+formulaire et appelle `update()`; son script ajoute les parametres de
+la page a l'adresse, que Zope ignore pour un corps JSON. Les filtres
+sont donc relus dans `update()`, depuis toutes ces sources (voir
+filters.merged_form). Lus seulement dans `__init__`, ils etaient ignores
+par le navigateur: le tableau restait non filtre.
 
 Securite
 --------
-Aucun controle d'acces specifique n'est ajoute, et c'est voulu: le
-sample_catalog filtre deja par `allowedRolesAndUsers`. Un contact
+Le sample_catalog filtre deja par `allowedRolesAndUsers`: un contact
 client qui ouvrirait cette page n'y verrait que ses propres
-echantillons.
+echantillons. La permission zope2.View est cependant accordee aux
+visiteurs anonymes sur la racine du site; la page, et sa barre de
+filtres, ne leur sont donc pas servies (renvoi vers la connexion).
 """
 
 import logging
 
+from AccessControl import Unauthorized
 from bika.lims import api
+from plone import api as ploneapi
 from DateTime import DateTime
 from senaite.app.listing import ListingView
 from senaite.core.catalog import ANALYSIS_CATALOG
@@ -101,16 +108,37 @@ class DashboardView(ListingView):
             "columns": list(self.columns.keys()),
         }]
 
-        self.filters = flt.read_filters(request.form)
-        self.additional_hidden_fields = flt.hidden_fields(self.filters)
-        self.apply_filters()
+        self._base_content_filter = dict(self.contentFilter)
+        self.refresh_filters()
 
         # Identifiants de la page en cours, remplis par folderitem() et
         # consommes par folderitems() pour la requete groupee.
         self._page_ids = []
         self._results = {}
 
+    def __call__(self):
+        # Unauthorized declenche le renvoi de Plone vers l'ecran de
+        # connexion, puis le retour ici une fois connecte.
+        if ploneapi.user.is_anonymous():
+            raise Unauthorized("trimeta-dashboard")
+        return super(DashboardView, self).__call__()
+
     # -- filtres --------------------------------------------------------
+
+    def update(self):
+        # avant l'update d'origine, pour ne pas ecraser ce qu'elle ajoute
+        self.refresh_filters()
+        super(DashboardView, self).update()
+
+    def refresh_filters(self):
+        """Relit les filtres et reconstruit la requete depuis sa base."""
+        form = flt.merged_form(self.request.form,
+                               self.request.get("QUERY_STRING", ""),
+                               self.form_id)
+        self.filters = flt.read_filters(form)
+        self.additional_hidden_fields = flt.hidden_fields(self.filters)
+        self.contentFilter = dict(self._base_content_filter)
+        self.apply_filters()
 
     def to_date(self, value, end_of_day=False):
         """Convertit une date de formulaire, ou None si elle est illisible.

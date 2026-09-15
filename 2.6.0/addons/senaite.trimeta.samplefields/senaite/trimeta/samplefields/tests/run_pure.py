@@ -141,7 +141,8 @@ def install_stubs():
             raise LookupError(uid)
 
     bika = make_module("bika")
-    bika.lims = make_module("bika.lims", api=FakeAPI())
+    bika.lims = make_module("bika.lims", api=FakeAPI(),
+                            senaiteMessageFactory=lambda msgid: msgid)
     make_module("bika.lims.interfaces", IAnalysisRequest=Interface)
     make_module("bika.lims.browser")
     make_module("bika.lims.browser.fields", UIDReferenceField=StubField)
@@ -197,7 +198,7 @@ def install_package_shims():
     make_module("senaite.trimeta.samplefields.tests.utils",
                 SampleFactory=object)
 
-    for sub in ("listings", "qualitydata", "dashboard", "coa"):
+    for sub in ("listings", "qualitydata", "dashboard", "coa", "worksheet"):
         module = make_module(
             "senaite.trimeta.samplefields.{}".format(sub))
         module.__path__ = [os.path.join(ROOT, sub)]
@@ -229,11 +230,12 @@ MODULES = [
     (P + "listings.samples", "listings/samples.py"),
     (P + "listings.worksheets", "listings/worksheets.py"),
     (P + "listings.reports", "listings/reports.py"),
+    (P + "listings.instruments", "listings/instruments.py"),
     (P + "dashboard.results", "dashboard/results.py"),
     (P + "dashboard.filters", "dashboard/filters.py"),
     (P + "dashboard.columns", "dashboard/columns.py"),
     (P + "coa.filename", "coa/filename.py"),
-    (P + "catalog", "catalog.py"),
+    (P + "worksheet.export", "worksheet/export.py"),
 ]
 
 # (fichier de test, classes qui n'ont pas besoin d'un site Plone)
@@ -245,13 +247,13 @@ PURE_CASES = [
                           "TestContactTitleResolution",
                           "TestReferenceUid"]),
     ("test_schema.py", ["TestExtenderDeclaration"]),
-    ("test_qualitydata.py", ["TestQualityDataDeclaration"]),
+    ("test_qualitydata.py", ["TestQualityDataDeclaration",
+                             "TestVocabularyPlaceholders"]),
     ("test_listings.py", None),   # tout le fichier est pur
     ("test_dashboard.py", None),  # idem
     ("test_dashboard_filters.py", None),
-    ("test_coa_filename.py", None),
-    ("test_catalog_wiring.py", None),
-    ("test_field_references.py", None),
+    ("test_coa.py", None),
+    ("test_worksheet_export.py", None),
 ]
 
 

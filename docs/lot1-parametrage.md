@@ -117,30 +117,30 @@ et `2.1` doit donner `2.1`.
 
 **Que faire si une seule ou deux répétitions sont saisies ?**
 
-Avec la formule ci-dessus, un champ vide compte comme zéro : saisir
-`2.0` et `2.2` seuls donne `1.4`, pas `2.1`. C'est faux, et rien ne le
-signale.
+Vérifié dans le code de SENAITE (`AbstractAnalysis.calculateResult`), puis
+sur l'instance locale (R1 = 2.0, R2 = 2.2, R3 vide → `NA` ; avec
+R3 = 2.1 → `2.1`) :
+une répétition laissée vide n'est **pas** comptée comme zéro. Elle est
+écartée du calcul, sa case `[R3]` reste sans valeur, et l'analyse
+affiche **`NA`** au lieu d'un nombre. Le résultat ne peut donc pas être
+faux en silence : il est absent, et cela se voit.
 
-Trois options, par ordre de sûreté :
+Une version antérieure de ce document annonçait `1.4` au lieu de `2.1`
+pour deux répétitions saisies : c'était faux.
+
+Deux options :
 
 1. **Imposer les trois répétitions.** Convention de travail, aucune
    configuration supplémentaire. La plus sûre.
 2. **Créer deux calculs** — `Moyenne de 2 répétitions` et `Moyenne de
    3 répétitions` — et choisir le bon service selon le protocole.
    Explicite, sans piège.
-3. **Une formule qui ignore les vides** :
+Une formule qui « ignorerait les vides », comme
+`max(1, ([R1] > 0) + ([R2] > 0) + ([R3] > 0))`, ne sert à rien : la
+répétition vide n'atteint jamais la formule, le résultat reste `NA`.
 
-   ```
-   ([R1] + [R2] + [R3]) / max(1, ([R1] > 0) + ([R2] > 0) + ([R3] > 0))
-   ```
-
-   Élégant, mais le moteur de formules de SENAITE n'accepte qu'un
-   sous-ensemble de Python. **À tester sur l'instance avant de s'en
-   servir** : si le résultat n'apparaît pas, c'est que la construction
-   n'est pas acceptée, et il faut retomber sur l'option 1 ou 2.
-
-Recommandation : commencer par l'option 1, qui ne peut pas produire de
-résultat faux.
+Recommandation : option 1. Si le protocole prévoit parfois deux
+répétitions, option 2.
 
 ---
 
@@ -192,6 +192,18 @@ L'onglet Maintenance de l'instrument liste les interventions, avec leur
 type et leur état. Une tâche non clôturée dont la date de fin est
 dépassée ressort en retard.
 
+### Essai local (15/09/2026)
+
+Instrument « AW Metre 1 » (Novasina, type AW-Metre) créé avec deux
+tâches : « Remplacement du capteur » (Réparation) et « Entretien annuel »
+(Préventif). Les deux apparaissent dans l'onglet Maintenance, avec leurs
+dates d'immobilisation et l'intervenant.
+
+Défaut corrigé au passage : senaite.core 2.6 affiche `getType()[0]`,
+c'est-à-dire la **première lettre** du type (« R », « P »). L'add-on
+remplace ce contenu par le libellé complet et traduit
+(`listings/instruments.py`), sans surcharger la vue.
+
 > Si, à l'usage, le laboratoire a besoin de champs qui n'existent pas
 > ici — numéro de bon d'intervention, prestataire externe, pièces
 > remplacées — cela redevient du développement : une extension de schéma
@@ -228,10 +240,21 @@ Au moment de publier plusieurs échantillons :
 1. Sélectionner les échantillons, puis **Publier** (*Publish*).
 2. Dans le sélecteur **Gabarit** (*Template*), choisir un modèle dont
    le nom **ne contient pas** `Multi` — par exemple
-   `senaite.impress:Default.pt` et non `senaite.impress:MultiDefault.pt`.
-3. Décocher la case **Fusionner** (*merge*), qui regroupe tout en un
-   seul PDF même sans gabarit `Multi`.
-4. Générer.
+   `senaite.trimeta.samplefields:COA-Trimeta.pt` ou
+   `senaite.impress:Default.pt`, et non `senaite.impress:MultiDefault.pt`.
+3. Générer (*Save*).
+
+> **Confirmé dans le code** (`senaite.impress`, `ajax_save_reports` et
+> `PdfReportStorageAdapter.store`) : un gabarit `Multi` rend un seul PDF
+> pour tous les échantillons, et le réglage *Store Multi-Report PDFs
+> Individually*, actif par défaut, rattache ce même PDF à chacun.
+> Il n'existe pas de case « Fusionner » : une version antérieure de ce
+> document en mentionnait une à tort.
+>
+> Le piège venait surtout du **gabarit présélectionné**, qui est
+> `MultiDefault.pt` par défaut. Depuis le lot 4 (étape de mise à jour
+> 1004), l'add-on présélectionne `COA-Trimeta.pt`, sauf si le
+> laboratoire avait déjà choisi un autre gabarit par défaut.
 
 ### Vérification
 
@@ -254,5 +277,6 @@ Ce qui reste relève du développement :
 
 - **Lot 4** — contenu du COA et nommage des fichiers ;
 - **Lot 5** — tableau de bord avec ses filtres ;
-- **D13** — le bug d'export de données depuis la Work Sheet, dont le
-  symptôme reste à décrire par la personne qui l'a rencontré.
+- **D13** — le bug d'export de données depuis la Work Sheet : reproduit
+  et corrigé, voir `d13-export-work-sheet.md`. Le symptôme reste à
+  confirmer avec la personne qui l'a rencontré.

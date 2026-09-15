@@ -166,22 +166,27 @@ class FilterBar(object):
         try:
             brains = api.search({"portal_type": portal_type,
                                  "is_active": True}, catalog_id)
-            options = [(b.UID, to_text(b.Title)) for b in brains]
-            return sorted(options, key=lambda pair: pair[1].lower())
+            return flt.group_options([(b.UID, b.Title) for b in brains])
         except Exception:
             logger.exception("Liste %s indisponible", portal_type)
             return []
 
     def get_origin_options(self):
-        """Provenances reellement saisies, lues dans l'index.
+        """Provenances des echantillons que l'utilisateur a le droit de voir.
 
         Il n'existe pas de liste de reference pour ce champ: les choix
         proposes sont donc les valeurs deja rencontrees.
+
+        Lues sur les brains d'une recherche (colonne getOrigin) et non par
+        `uniqueValuesFor`: ce dernier lit l'index brut, sans le filtre de
+        securite du catalogue. Un visiteur anonyme voyait ainsi les
+        provenances, et un contact client celles des autres clients.
         """
         try:
-            catalog = api.get_tool(SAMPLE_CATALOG)
-            values = catalog.uniqueValuesFor("getOrigin")
-            return [(v, v) for v in sorted([to_text(x) for x in values if x])]
+            brains = api.search({"portal_type": "AnalysisRequest"},
+                                SAMPLE_CATALOG)
+            return flt.distinct_values(
+                getattr(b, "getOrigin", None) for b in brains)
         except Exception:
             logger.exception("Provenances indisponibles")
             return []
@@ -202,7 +207,9 @@ class FilterBar(object):
 
     def select_input(self, name, label, options):
         current = to_text(self.filters.get(name, ""))
-        rendered = [u'<option value=""></option>']
+        # Option "aucun filtre": libellee, sinon elle ressemble a une erreur.
+        rendered = [u'<option value="">{}</option>'.format(
+            escape(t(_(u"All"))))]
         for value, text in options:
             selected = u' selected="selected"' \
                 if to_text(value) == current else u''
