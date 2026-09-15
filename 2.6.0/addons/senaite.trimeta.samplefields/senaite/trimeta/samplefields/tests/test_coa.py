@@ -4,6 +4,7 @@
 import unittest
 
 from senaite.trimeta.samplefields.coa.filename import build_coa_filename
+from senaite.trimeta.samplefields.coa.filename import unique_filename
 
 
 class TestBuildCoaFilename(unittest.TestCase):
@@ -37,5 +38,28 @@ class TestBuildCoaFilename(unittest.TestCase):
                          "ECH.pdf")
 
 
+class TestUniqueFilename(unittest.TestCase):
+
+    def test_free_name_is_kept_and_recorded(self):
+        taken = set()
+        self.assertEqual(unique_filename("ECH-001.pdf", taken), "ECH-001.pdf")
+        self.assertEqual(taken, {"ECH-001.pdf"})
+
+    def test_collisions_get_numbered_suffixes(self):
+        taken = set()
+        names = [unique_filename("ECH-001.pdf", taken) for _ in range(3)]
+        self.assertEqual(names,
+                         ["ECH-001.pdf", "ECH-001-2.pdf", "ECH-001-3.pdf"])
+
+    def test_suffix_skips_names_already_taken(self):
+        taken = {"ECH-001.pdf", "ECH-001-2.pdf"}
+        self.assertEqual(unique_filename("ECH-001.pdf", taken),
+                         "ECH-001-3.pdf")
+
+
 def test_suite():
-    return unittest.TestLoader().loadTestsFromTestCase(TestBuildCoaFilename)
+    loader = unittest.TestLoader()
+    suite = unittest.TestSuite()
+    for case in (TestBuildCoaFilename, TestUniqueFilename):
+        suite.addTests(loader.loadTestsFromTestCase(case))
+    return suite

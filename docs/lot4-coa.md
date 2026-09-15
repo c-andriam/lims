@@ -112,12 +112,25 @@ espace, un `;`, un `/` ou un retour à la ligne saisi dans le code
 casserait le téléchargement, ou permettrait d'injecter un en-tête. Couvert
 par `tests/test_coa.py`.
 
+### Plusieurs rapports d'un même échantillon
+
+Un échantillon republié porte plusieurs rapports, donc plusieurs PDF au
+même nom. Dans le zip de l'action groupée, ils s'écraseraient à
+l'extraction (défaut déjà présent dans `senaite.core` avec l'ID).
+`unique_filename()` numérote les suivants : `ECH-001.pdf`,
+`ECH-001-2.pdf`, `ECH-001-3.pdf`.
+
 ### Vérifié
 
-Sur l'instance de démonstration, `download_pdf` renvoie
-`Content-Disposition: inline; filename=ECH-DEMO-001.pdf` pour VAN-0005.
-Les deux autres points partagent la même fonction mais n'ont pas été
-testés par une vraie requête.
+Par de vraies requêtes sur l'instance de démonstration, pour VAN-0005
+(Code échantillon `ECH-DEMO-001`, trois rapports) :
+
+| Point | Résultat |
+|---|---|
+| `download_pdf` | `inline; filename=ECH-DEMO-001.pdf` |
+| Écran d'envoi par e-mail | pièce jointe `ECH-DEMO-001.pdf` |
+| Action groupée, un rapport | `attachment; filename=ECH-DEMO-001.pdf` |
+| Action groupée, trois rapports | zip contenant `ECH-DEMO-001.pdf`, `-2`, `-3` |
 
 ---
 
@@ -158,7 +171,10 @@ l'ont pas été) :
 
     http://<hôte>:8080/senaite/portal_setup/manage_upgrades
 
-Enfin, pour en faire le gabarit proposé par défaut :
+L'étape 1004 fait aussi de `COA-Trimeta.pt` le gabarit présélectionné,
+sauf si le laboratoire en avait déjà choisi un autre que
+`MultiDefault.pt`. Ce gabarit d'usine était la cause de la demande D11
+(voir `lot1-parametrage.md`). Réglage modifiable dans
 *Configuration › Impress › Default Template*.
 
 ---

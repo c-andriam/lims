@@ -49,6 +49,12 @@ COA_TEMPLATE = u"senaite.trimeta.samplefields:COA-Trimeta.pt"
 # dans le selecteur, pas le notre, tant que ce qui suit n'existait pas.
 IMPRESS_TEMPLATES_RECORD = "senaite.impress.templates"
 
+# Gabarit preselectionne dans l'ecran de publication. La valeur d'usine
+# est un gabarit Multi: publier plusieurs echantillons produit alors un
+# seul PDF, rattache a chacun d'eux (demande D11 du document).
+IMPRESS_DEFAULT_RECORD = "senaite.impress.default_template"
+IMPRESS_FACTORY_DEFAULT = u"senaite.impress:MultiDefault.pt"
+
 
 def post_install(portal_setup):
     """Post-installation du profil `default`."""
@@ -60,6 +66,7 @@ def post_install(portal_setup):
         for catalog_id, indexes in added.items():
             reindex_catalog(catalog_id, indexes)
     register_coa_template()
+    set_coa_as_default_template()
     logger.info("senaite.trimeta.samplefields: post_install termine")
 
 
@@ -89,8 +96,26 @@ def register_coa_template():
                 IMPRESS_TEMPLATES_RECORD)
 
 
+def set_coa_as_default_template():
+    """Preselectionne le gabarit COA Trimeta, s'il n'y a pas eu de choix.
+
+    Ne remplace que la valeur d'usine: un gabarit par defaut choisi par
+    le laboratoire dans Configuration > Impress est conserve.
+    """
+    current = api.get_registry_record(IMPRESS_DEFAULT_RECORD, default=None)
+    if current not in (None, u"", IMPRESS_FACTORY_DEFAULT):
+        logger.info("Gabarit par defaut %s conserve", current)
+        return
+    ploneapi.portal.set_registry_record(IMPRESS_DEFAULT_RECORD, COA_TEMPLATE)
+    logger.info("Gabarit par defaut: %s -> %s", current, COA_TEMPLATE)
+
+
 def unregister_coa_template():
     """Retire le gabarit COA Trimeta de la liste des gabarits actifs."""
+    if api.get_registry_record(IMPRESS_DEFAULT_RECORD,
+                               default=None) == COA_TEMPLATE:
+        ploneapi.portal.set_registry_record(IMPRESS_DEFAULT_RECORD,
+                                            IMPRESS_FACTORY_DEFAULT)
     try:
         templates = list(api.get_registry_record(
             IMPRESS_TEMPLATES_RECORD, default=[]) or [])

@@ -14,6 +14,7 @@ from bika.lims.browser.workflow.client import \
 from DateTime import DateTime
 
 from senaite.trimeta.samplefields.coa.filename import get_report_filename
+from senaite.trimeta.samplefields.coa.filename import unique_filename
 
 
 class TrimetaDownloadView(DownloadView):
@@ -41,6 +42,7 @@ class TrimetaDownloadReportsAdapter(WorkflowActionDownloadReportsAdapter):
         reports = map(api.get_object_by_uid, uids)
 
         pdfs = []
+        taken = set()
 
         for report in reports:
             pdf = self.get_pdf(report)
@@ -50,7 +52,7 @@ class TrimetaDownloadReportsAdapter(WorkflowActionDownloadReportsAdapter):
                     _("Could not load PDF for sample {}"
                       .format(sample_id)), "warning")
                 continue
-            pdf.filename = get_report_filename(report)
+            pdf.filename = unique_filename(get_report_filename(report), taken)
             pdfs.append(pdf)
 
         if len(pdfs) == 1:
