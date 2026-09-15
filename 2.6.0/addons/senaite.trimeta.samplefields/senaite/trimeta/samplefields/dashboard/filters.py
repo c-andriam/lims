@@ -198,6 +198,26 @@ def is_active(filters):
     return bool(filters)
 
 
+def distinct_values(values):
+    """Options d'une liste de valeurs libres: sans doublon, sans vide, triees.
+
+    :param values: valeurs lues sur des brains (texte, None, ...)
+    :returns: [(valeur, valeur)]
+
+    La valeur n'est PAS retouchee (ni espaces, ni casse): c'est elle qui
+    part dans la requete catalogue, et l'index compare a l'identique.
+    """
+    seen = set()
+    result = []
+    for value in values:
+        text = to_text(value)
+        if not text.strip() or text in seen:
+            continue
+        seen.add(text)
+        result.append(text)
+    return [(v, v) for v in sorted(result, key=lambda v: (v.lower(), v))]
+
+
 def group_options(options):
     """Options d'une liste deroulante: une entree par nom, aucune vide.
 

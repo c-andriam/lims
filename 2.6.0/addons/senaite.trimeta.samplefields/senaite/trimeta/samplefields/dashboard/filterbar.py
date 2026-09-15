@@ -172,15 +172,21 @@ class FilterBar(object):
             return []
 
     def get_origin_options(self):
-        """Provenances reellement saisies, lues dans l'index.
+        """Provenances des echantillons que l'utilisateur a le droit de voir.
 
         Il n'existe pas de liste de reference pour ce champ: les choix
         proposes sont donc les valeurs deja rencontrees.
+
+        Lues sur les brains d'une recherche (colonne getOrigin) et non par
+        `uniqueValuesFor`: ce dernier lit l'index brut, sans le filtre de
+        securite du catalogue. Un visiteur anonyme voyait ainsi les
+        provenances, et un contact client celles des autres clients.
         """
         try:
-            catalog = api.get_tool(SAMPLE_CATALOG)
-            values = catalog.uniqueValuesFor("getOrigin")
-            return [(v, v) for v in sorted([to_text(x) for x in values if x])]
+            brains = api.search({"portal_type": "AnalysisRequest"},
+                                SAMPLE_CATALOG)
+            return flt.distinct_values(
+                getattr(b, "getOrigin", None) for b in brains)
         except Exception:
             logger.exception("Provenances indisponibles")
             return []

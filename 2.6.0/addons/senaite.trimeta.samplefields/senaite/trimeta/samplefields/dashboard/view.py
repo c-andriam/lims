@@ -34,15 +34,18 @@ par le navigateur: le tableau restait non filtre.
 
 Securite
 --------
-Aucun controle d'acces specifique n'est ajoute, et c'est voulu: le
-sample_catalog filtre deja par `allowedRolesAndUsers`. Un contact
+Le sample_catalog filtre deja par `allowedRolesAndUsers`: un contact
 client qui ouvrirait cette page n'y verrait que ses propres
-echantillons.
+echantillons. La permission zope2.View est cependant accordee aux
+visiteurs anonymes sur la racine du site; la page, et sa barre de
+filtres, ne leur sont donc pas servies (renvoi vers la connexion).
 """
 
 import logging
 
+from AccessControl import Unauthorized
 from bika.lims import api
+from plone import api as ploneapi
 from DateTime import DateTime
 from senaite.app.listing import ListingView
 from senaite.core.catalog import ANALYSIS_CATALOG
@@ -112,6 +115,13 @@ class DashboardView(ListingView):
         # consommes par folderitems() pour la requete groupee.
         self._page_ids = []
         self._results = {}
+
+    def __call__(self):
+        # Unauthorized declenche le renvoi de Plone vers l'ecran de
+        # connexion, puis le retour ici une fois connecte.
+        if ploneapi.user.is_anonymous():
+            raise Unauthorized("trimeta-dashboard")
+        return super(DashboardView, self).__call__()
 
     # -- filtres --------------------------------------------------------
 

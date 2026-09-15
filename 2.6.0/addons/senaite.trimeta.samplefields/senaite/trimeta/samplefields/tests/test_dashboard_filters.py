@@ -23,6 +23,7 @@ from senaite.trimeta.samplefields.dashboard.columns import get_metadata_map
 from senaite.trimeta.samplefields.dashboard.filters import ALL_FILTERS
 from senaite.trimeta.samplefields.dashboard.filters import PREFIX
 from senaite.trimeta.samplefields.dashboard.filters import build_query
+from senaite.trimeta.samplefields.dashboard.filters import distinct_values
 from senaite.trimeta.samplefields.dashboard.filters import group_options
 from senaite.trimeta.samplefields.dashboard.filters import merged_form
 from senaite.trimeta.samplefields.dashboard.filters import hidden_fields
@@ -349,11 +350,33 @@ class TestGroupOptions(unittest.TestCase):
                          {"getClientSampleID": "LOT-1,2", "getOrigin": "Sava, nord"})
 
 
+class TestDistinctValues(unittest.TestCase):
+    """Liste deroulante Provenance: valeurs libres lues sur les brains."""
+
+    def test_no_duplicate_and_no_empty_entry(self):
+        self.assertEqual(
+            distinct_values([u"Sambava", None, u"", u"  ", u"Sambava",
+                             u"Antalaha"]),
+            [(u"Antalaha", u"Antalaha"), (u"Sambava", u"Sambava")])
+
+    def test_value_is_kept_as_indexed(self):
+        """La valeur part telle quelle dans la requete catalogue."""
+        self.assertEqual(distinct_values([u"sava "]), [(u"sava ", u"sava ")])
+
+    def test_sort_ignores_case(self):
+        self.assertEqual([v for v, _ in distinct_values([u"b", u"A", u"c"])],
+                         [u"A", u"b", u"c"])
+
+    def test_accepts_a_generator(self):
+        self.assertEqual(distinct_values(v for v in [u"x"]), [(u"x", u"x")])
+
+
 def test_suite():
     suite = unittest.TestSuite()
     loader = unittest.TestLoader()
     for case in (TestReadFilters, TestBuildQuery, TestHiddenFields,
                  TestIsActive, TestColumns, TestColumnHelp,
-                 TestScriptVersion, TestGroupOptions, TestMergedForm):
+                 TestScriptVersion, TestGroupOptions, TestMergedForm,
+                 TestDistinctValues):
         suite.addTest(loader.loadTestsFromTestCase(case))
     return suite
