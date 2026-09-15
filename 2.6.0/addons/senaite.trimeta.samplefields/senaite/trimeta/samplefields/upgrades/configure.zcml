@@ -75,20 +75,61 @@
 
   <!-- 1003 -> 1004 : nommage des COA par le Code echantillon
 
-       Active la couche de navigateur ITrimetaLayer, qui porte les
-       surcharges des trois endroits ou senaite.core fabrique le nom
-       d'un fichier COA. Sans cette etape, une instance deja installee
-       garderait le nommage par Sample ID: browserlayer.xml n'est lu
-       qu'a l'installation du profil. Instantanee, aucune
-       reindexation. -->
+       Couche navigateur qui nomme les PDF d'apres le Code echantillon,
+       et enregistrement du gabarit COA Trimeta parmi les gabarits
+       actifs de senaite.impress. -->
   <genericsetup:upgradeStep
-      title="Trimeta 1003 -> 1004 : nommage des COA par le Code echantillon"
-      description="Active la couche de navigateur qui fait nommer les
-                   fichiers COA d'apres le Code echantillon au lieu du
-                   Sample ID."
+      title="Trimeta 1003 -> 1004 : COA, gabarit et nom des PDF"
+      description="Importe la couche navigateur de l'add-on et ajoute
+                   le gabarit COA Trimeta aux gabarits actifs."
       source="1003"
       destination="1004"
       handler=".v1004.upgrade"
+      profile="senaite.trimeta.samplefields:default"
+      />
+
+  <!-- 1004 -> 1005 : langue et fuseau horaire du site
+
+       Francais par defaut, langues proposees francais et anglais,
+       langue du navigateur ignoree, fuseau Indian/Antananarivo
+       (profiles/default/registry.xml). -->
+  <genericsetup:upgradeStep
+      title="Trimeta 1004 -> 1005 : francais et fuseau de Madagascar"
+      description="Importe le registre de l'add-on: langue par defaut,
+                   langues proposees, mode de choix de la langue et
+                   fuseau horaire du portail."
+      source="1004"
+      destination="1005"
+      handler=".v1005.upgrade"
+      profile="senaite.trimeta.samplefields:default"
+      />
+
+  <!-- 1005 -> 1006 : parametres de base
+
+       Virgule decimale des rapports et lundi premier jour de semaine,
+       sans remplacer un choix du laboratoire. -->
+  <genericsetup:upgradeStep
+      title="Trimeta 1005 -> 1006 : virgule decimale et lundi"
+      description="Virgule decimale sur les rapports et lundi comme
+                   premier jour de la semaine, si les valeurs d'usine
+                   sont encore en place."
+      source="1005"
+      destination="1006"
+      handler=".v1006.upgrade"
+      profile="senaite.trimeta.samplefields:default"
+      />
+
+  <!-- 1006 -> 1007 : logo de l'application
+
+       Logo Trimeta Group dans la barre d'outils, sauf si un logo est deja
+       defini dans Configuration > Apparence. -->
+  <genericsetup:upgradeStep
+      title="Trimeta 1006 -> 1007 : logo Trimeta Group"
+      description="Pose le logo Trimeta Group dans la barre d'outils si
+                   aucun logo n'est defini."
+      source="1006"
+      destination="1007"
+      handler=".v1007.upgrade"
       profile="senaite.trimeta.samplefields:default"
       />
 

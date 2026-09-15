@@ -19,8 +19,12 @@ le tri a eu lieu.
 """
 
 import collections
+import re
+import unicodedata
 
 from zope.i18nmessageid import MessageFactory
+
+from senaite.trimeta.samplefields.compat import to_text
 
 _ = MessageFactory("senaite.trimeta.samplefields")
 
@@ -90,6 +94,83 @@ def get_keyword_for(column_id):
         if cid == column_id:
             return keyword
     return None
+
+
+# ---------------------------------------------------------------------
+# Services retrouves par leur intitule
+# ---------------------------------------------------------------------
+#
+# Les mots-cles ci-dessus sont ceux de l'instance de demonstration. Sur un
+# serveur ou le laboratoire en a choisi d'autres, une colonne resterait
+# vide sans le moindre message a l'ecran. Quand le mot-cle configure ne
+# correspond a AUCUN service actif, la colonne se rabat donc sur les
+# services dont l'intitule correspond aux noms du cahier des charges, ou
+# a leurs variantes courantes.
+#
+# Sont compares l'intitule complet et le contenu de ses parentheses, une
+# fois normalises (minuscules, sans accents, ponctuation -> espace).
+# "Taux d'humidite (TH)" est ainsi reconnu par "th". Le texte HORS
+# parentheses n'est jamais compare seul: "Vanilline (moyenne 3 rep.)"
+# n'est pas pris pour la colonne Vanilline.
+TITLE_ALIASES = {
+    "Vanillin": (u"vanilline", u"vanillin"),
+    "GlucoVanillin": (u"gluco-vanilline", u"glucovanilline",
+                      u"gluco-vanillin", u"glucovanillin"),
+    "VanillicAcid": (u"ac vanillique", u"ac. vanillique", u"ac van",
+                     u"acide vanillique", u"vanillic acid"),
+    # "PHB Aldehyde": nom du service sur le serveur reel (captures jointes
+    # au cahier des charges). PHB = p-hydroxybenzaldehyde.
+    "PHB": (u"phb", u"phb aldehyde", u"aldehyde phb",
+            u"p-hydroxybenzaldehyde", u"4-hydroxybenzaldehyde"),
+    "PHBAcid": (u"ac phb", u"ac. phb", u"acide phb", u"phb acid",
+                u"acide p-hydroxybenzoique", u"acide 4-hydroxybenzoique"),
+    "Moisture": (u"th", u"taux d'humidite", u"teneur en eau", u"humidite",
+                 u"moisture"),
+    "WaterActivity": (u"aw", u"activite de l'eau", u"water activity"),
+}
+
+
+def normalize_title(text):
+    """Intitule comparable: minuscules, sans accents ni ponctuation."""
+    text = unicodedata.normalize("NFKD", to_text(text))
+    text = u"".join(c for c in text if not unicodedata.combining(c))
+    return u" ".join(re.sub(u"[^0-9a-z]+", u" ", text.lower()).split())
+
+
+def title_candidates(title):
+    """Formes comparees d'un intitule: complet, et chaque parenthese."""
+    text = to_text(title)
+    candidates = set([normalize_title(text)])
+    for inner in re.findall(u"\\(([^)]*)\\)", text):
+        candidates.add(normalize_title(inner))
+    candidates.discard(u"")
+    return candidates
+
+
+def resolve_column_keywords(services):
+    """Mots-cles a lire pour chaque colonne de resultat.
+
+    :param services: [(mot-cle, intitule)] des services d'analyse ACTIFS
+    :returns: OrderedDict {colonne: [mots-cles]}, dans l'ordre des colonnes
+
+    Le mot-cle configure est garde s'il existe sur le site, ou si la liste
+    des services n'a pas pu etre lue (aucune supposition dans ce cas).
+    Sinon, les services reconnus par leur intitule le remplacent.
+    """
+    services = [(to_text(k).strip(), t) for k, t in services
+                if to_text(k).strip()]
+    known = set(k for k, _title in services)
+    resolved = collections.OrderedDict()
+    for column_id, keyword, _label in DASHBOARD_ANALYSES:
+        if not services or keyword in known:
+            resolved[column_id] = [keyword]
+            continue
+        aliases = set(normalize_title(a)
+                      for a in TITLE_ALIASES.get(column_id, ()))
+        matched = sorted(set(k for k, title in services
+                             if title_candidates(title) & aliases))
+        resolved[column_id] = matched or [keyword]
+    return resolved
 
 
 # ---------------------------------------------------------------------

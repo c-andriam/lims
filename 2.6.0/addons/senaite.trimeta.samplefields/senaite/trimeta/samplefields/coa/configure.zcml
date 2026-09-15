@@ -5,11 +5,13 @@
     xmlns:plone="http://namespaces.plone.org/plone"
     i18n_domain="senaite.trimeta.samplefields">
 
-  <!-- =============================================================
-       Gabarit COA Trimeta (lot 4)
-       =============================================================
-       Ajoute au selecteur "Gabarit" de l'ecran de publication, a cote
-       de Default.pt/MultiDefault.pt.
+  <!-- Declare senaite.core.permissions.* avant les vues ci-dessous: sans
+       cela Zope refuse de demarrer (ComponentLookupError sur
+       IPermission), l'add-on etant charge avant senaite.core. -->
+  <include package="senaite.core.permissions" />
+
+  <!-- Gabarit COA Trimeta: ajoute au selecteur "Gabarit" de l'ecran de
+       publication, a cote de Default.pt/MultiDefault.pt.
 
        Decouvert par le meme mecanisme que senaite.impress utilise pour
        ses propres gabarits: un repertoire de ressources Plone du type
@@ -26,60 +28,44 @@
       name="senaite.trimeta.samplefields"
       />
 
-  <!-- =============================================================
-       Nommage des fichiers COA par le Code echantillon (demande D10)
-       =============================================================
-       senaite.core fabrique ce nom a TROIS endroits, tous a partir du
-       Sample ID. Les trois sont repris ci-dessous.
+  <!-- Nom des PDF: Code echantillon au lieu de l'ID (voir views.py).
 
-       Chaque enregistrement reprend EXACTEMENT le `for`, le `name` et
-       la `permission` de l'amont, et ne change que la couche: la
-       notre derive de IBikaLIMS, elle est donc plus specifique et le
-       registre d'adaptateurs la retient. Le code de senaite.core n'est
-       pas touche, et desinstaller l'add-on retire la couche donc la
-       surcharge.
-
-       Amont: bika/lims/browser/publish/configure.zcml
-              bika/lims/browser/workflow/configure.zcml -->
-
-  <!-- 1. Telechargement unitaire -->
+       Memes noms, memes "for" et memes permissions que dans
+       bika/lims/browser/publish/configure.zcml et
+       bika/lims/browser/workflow/configure.zcml. Seule la couche change:
+       ISenaiteTrimetaLayer etend IBikaLIMS, elle est donc plus
+       specifique et gagne. Tant que browserlayer.xml n'a pas ete importe
+       (profil non installe ou etape 1004 non jouee), les vues de
+       senaite.core restent actives. -->
   <browser:page
       for="*"
       name="download_pdf"
-      class=".download.TrimetaDownloadView"
+      class=".views.TrimetaDownloadView"
       permission="senaite.core.permissions.ManageAnalysisRequests"
-      layer="senaite.trimeta.samplefields.interfaces.ITrimetaLayer"
+      layer="senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
       />
 
-  <!-- 2. Pieces jointes d'un courriel : depuis un Client... -->
   <browser:page
       for="bika.lims.interfaces.IClient"
       name="email"
-      class=".email.TrimetaEmailView"
+      class=".views.TrimetaEmailView"
       permission="senaite.core.permissions.ManageAnalysisRequests"
-      layer="senaite.trimeta.samplefields.interfaces.ITrimetaLayer"
+      layer="senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
       />
 
-  <!-- ... et depuis un echantillon -->
   <browser:page
       for="bika.lims.interfaces.IAnalysisRequest"
       name="email"
-      class=".email.TrimetaEmailView"
+      class=".views.TrimetaEmailView"
       permission="senaite.core.permissions.ManageAnalysisRequests"
-      layer="senaite.trimeta.samplefields.interfaces.ITrimetaLayer"
+      layer="senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
       />
 
-  <!-- 3. Telechargement groupe (archive ZIP).
-
-       Ce n'est pas une browser:page mais un adaptateur nomme, dont le
-       second element du `for` est la REQUETE. Notre couche derivant de
-       IBrowserRequest, la remplacer a cet endroit suffit a rendre
-       l'enregistrement plus specifique que celui de l'amont. -->
   <adapter
       name="workflow_action_download_reports"
       for="bika.lims.interfaces.IClient
-           senaite.trimeta.samplefields.interfaces.ITrimetaLayer"
-      factory=".workflow.TrimetaDownloadReportsAdapter"
+           senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
+      factory=".views.TrimetaDownloadReportsAdapter"
       provides="bika.lims.interfaces.IWorkflowActionAdapter"
       permission="zope.Public"
       />
@@ -87,8 +73,8 @@
   <adapter
       name="workflow_action_download_reports"
       for="bika.lims.interfaces.IAnalysisRequest
-           senaite.trimeta.samplefields.interfaces.ITrimetaLayer"
-      factory=".workflow.TrimetaDownloadReportsAdapter"
+           senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
+      factory=".views.TrimetaDownloadReportsAdapter"
       provides="bika.lims.interfaces.IWorkflowActionAdapter"
       permission="zope.Public"
       />

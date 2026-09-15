@@ -40,4 +40,13 @@
       factory=".reports.ReportsListingAdapter"
       />
 
+  <!-- Historique des pannes et entretiens d'un equipement: libelle
+       complet du type (senaite.core n'en affiche que la 1re lettre) -->
+  <subscriber
+      for="senaite.app.listing.interfaces.IListingView
+           *"
+      provides="senaite.app.listing.interfaces.IListingViewAdapter"
+      factory=".instruments.InstrumentMaintenanceAdapter"
+      />
+
 </configure>

@@ -14,6 +14,7 @@ duplique rien et ne casse rien.
 """
 
 import logging
+import os
 
 import transaction
 from bika.lims import api
@@ -48,6 +49,43 @@ COA_TEMPLATE = u"senaite.trimeta.samplefields:COA-Trimeta.pt"
 # l'instance de demonstration: le gabarit natif Default.pt s'affichait
 # dans le selecteur, pas le notre, tant que ce qui suit n'existait pas.
 IMPRESS_TEMPLATES_RECORD = "senaite.impress.templates"
+
+# Gabarit preselectionne dans l'ecran de publication. La valeur d'usine
+# est un gabarit Multi: publier plusieurs echantillons produit alors un
+# seul PDF, rattache a chacun d'eux (demande D11 du document).
+IMPRESS_DEFAULT_RECORD = "senaite.impress.default_template"
+IMPRESS_FACTORY_DEFAULT = u"senaite.impress:MultiDefault.pt"
+
+# Valeurs par defaut du laboratoire dans Configuration > Setup, onglet
+# Accounting: {champ: (valeur voulue, valeurs d'usine remplacables)}.
+#
+# Seules les valeurs d'usine sont remplacees: un choix fait ensuite par
+# le laboratoire dans l'ecran de configuration est conserve.
+LAB_SETUP_DEFAULTS = {
+    "Currency": ("MGA", ("", "EUR")),       # Ariary malgache (ISO 4217)
+    "DefaultCountry": ("MG", ("",)),        # Madagascar (ISO 3166 alpha-2)
+    # Virgule decimale sur les rapports (COA), usage francais. Affichage
+    # seulement: la saisie des resultats (ResultsDecimalMark) n'est pas
+    # modifiee.
+    "DecimalMark": (",", (".",)),
+}
+
+# Logo de la barre d'outils SENAITE (fond sombre): version blanche du logo
+# Trimeta Group. Source, en PNG d'origine de la meme image:
+#   https://trimetagroup.com/wp-content/uploads/2024/08/
+#   LOGO-GROUPE_BLANC-SANS-SINCE-RECTANGLE-180x92.png(.webp)
+# Embarque dans l'add-on: l'affichage ne depend pas du site du groupe, et
+# PNG plutot que WebP, que la chaine d'images Python 2 ne garantit pas.
+SITE_LOGO_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                              "setup_data", "logo-trimeta-groupe-blanc.png")
+SITE_LOGO_CSS = "height:32px;"
+
+# Premier jour de la semaine des calendriers: lundi (0), usage francais.
+FIRST_WEEKDAY_RECORD = "plone.first_weekday"
+FIRST_WEEKDAY = 0
+# Valeurs d'usine remplacables: non renseigne, ou dimanche (6), que Plone
+# pose lui-meme a la creation du site (constate sur l'instance).
+FIRST_WEEKDAY_FACTORY = (None, 6)
 
 
 def post_install(portal_setup):
@@ -126,8 +164,26 @@ def register_coa_template():
                 IMPRESS_TEMPLATES_RECORD)
 
 
+def set_coa_as_default_template():
+    """Preselectionne le gabarit COA Trimeta, s'il n'y a pas eu de choix.
+
+    Ne remplace que la valeur d'usine: un gabarit par defaut choisi par
+    le laboratoire dans Configuration > Impress est conserve.
+    """
+    current = api.get_registry_record(IMPRESS_DEFAULT_RECORD, default=None)
+    if current not in (None, u"", IMPRESS_FACTORY_DEFAULT):
+        logger.info("Gabarit par defaut %s conserve", current)
+        return
+    ploneapi.portal.set_registry_record(IMPRESS_DEFAULT_RECORD, COA_TEMPLATE)
+    logger.info("Gabarit par defaut: %s -> %s", current, COA_TEMPLATE)
+
+
 def unregister_coa_template():
     """Retire le gabarit COA Trimeta de la liste des gabarits actifs."""
+    if api.get_registry_record(IMPRESS_DEFAULT_RECORD,
+                               default=None) == COA_TEMPLATE:
+        ploneapi.portal.set_registry_record(IMPRESS_DEFAULT_RECORD,
+                                            IMPRESS_FACTORY_DEFAULT)
     try:
         templates = list(api.get_registry_record(
             IMPRESS_TEMPLATES_RECORD, default=[]) or [])
@@ -216,7 +272,6 @@ def setup_catalogs(portal):
         if touched:
             created[catalog_id] = new_indexes
     return created
-
 
 def reindex_catalog(catalog_id, indexes):
     """Reindexe tous les objets d'un catalogue pour les index donnes.

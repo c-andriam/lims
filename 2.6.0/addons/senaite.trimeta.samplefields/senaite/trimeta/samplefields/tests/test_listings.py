@@ -17,9 +17,13 @@ import unittest
 from collections import OrderedDict
 from contextlib import contextmanager
 
+from senaite.core.catalog import SAMPLE_CATALOG
+
 from senaite.trimeta.samplefields.listings.base import BaseListingAdapter
 from senaite.trimeta.samplefields.listings.base import insert_column_after
 from senaite.trimeta.samplefields.listings.base import show_in_all_states
+from senaite.trimeta.samplefields.listings.instruments import (
+    InstrumentMaintenanceAdapter, maintenance_type_value)
 from senaite.trimeta.samplefields.listings.reports import (
     ReportsListingAdapter)
 from senaite.trimeta.samplefields.listings.samples import (
@@ -165,6 +169,16 @@ class TestDiscrimination(unittest.TestCase):
         self.assertFalse(
             self.applies(WorksheetAnalysesAdapter, "AnalysisRequest"))
 
+    def test_worksheet_grid_filters_without_portal_type(self):
+        """La grille de saisie d'une Work Sheet filtre sur getWorksheetUID,
+        sans portal_type: seul l'adaptateur Work Sheet doit s'y appliquer."""
+        listing = FakeListing()
+        listing.contentFilter = {"getWorksheetUID": "abc",
+                                 "sort_on": "sortable_title"}
+        self.assertTrue(WorksheetAnalysesAdapter(listing, None).applies())
+        self.assertFalse(SamplesListingAdapter(listing, None).applies())
+        self.assertFalse(ReportsListingAdapter(listing, None).applies())
+
     def test_reports_adapter_scope(self):
         self.assertTrue(self.applies(ReportsListingAdapter, "ARReport"))
         self.assertFalse(
@@ -174,6 +188,20 @@ class TestDiscrimination(unittest.TestCase):
         """Certains listings ne filtrent pas par type: ne rien supposer
         plutot que d'ajouter une colonne au hasard."""
         listing = FakeListing()
+        self.assertFalse(SamplesListingAdapter(listing, None).applies())
+
+    def test_samples_listing_filters_on_catalog_only(self):
+        """senaite.core SamplesView: sample_catalog, sans portal_type."""
+        listing = FakeListing()
+        listing.catalog = SAMPLE_CATALOG
+        listing.contentFilter = {"sort_on": "created", "isRootAncestor": True}
+        self.assertTrue(SamplesListingAdapter(listing, None).applies())
+        self.assertFalse(WorksheetAnalysesAdapter(listing, None).applies())
+        self.assertFalse(ReportsListingAdapter(listing, None).applies())
+
+    def test_unknown_catalog_without_portal_type_is_skipped(self):
+        listing = FakeListing()
+        listing.catalog = "portal_catalog"
         self.assertFalse(SamplesListingAdapter(listing, None).applies())
 
     def test_portal_type_as_a_list(self):
@@ -257,6 +285,19 @@ class TestWorksheetColumn(unittest.TestCase):
         self.assertEqual(list(listing.columns.keys()),
                          ["getId", "SampleCode", "Result"])
 
+    def test_column_follows_position_in_worksheet_grid(self):
+        """Colonnes reelles de bika.lims.browser.worksheet.views.analyses."""
+        listing = FakeListing(
+            columns=[("Pos", {}), ("Service", {}), ("Result", {})],
+            review_states=[{"id": "default",
+                            "columns": ["Pos", "Service", "Result"]}],
+        )
+        listing.contentFilter = {"getWorksheetUID": "abc"}
+        WorksheetAnalysesAdapter(listing, None).before_render()
+        self.assertEqual(list(listing.columns.keys()),
+                         ["Pos", "SampleCode", "Service", "Result"])
+        self.assertIn("SampleCode", listing.review_states[0]["columns"])
+
     def test_column_is_not_sortable(self):
         """Aucun index de code echantillon n'existe sur le catalogue des
         analyses: annoncer un tri serait mentir a l'utilisateur."""
@@ -264,6 +305,127 @@ class TestWorksheetColumn(unittest.TestCase):
                               columns=[("getId", {})])
         WorksheetAnalysesAdapter(listing, None).before_render()
         self.assertFalse(listing.columns["SampleCode"]["sortable"])
+
+
+class FakeField(object):
+    def __init__(self, value):
+        self.value = value
+
+    def get(self, instance):
+        return self.value
+
+
+class FakeSample(object):
+    def __init__(self, code, lot):
+        self.code = code
+        self.lot = lot
+
+    def getField(self, name):
+        return FakeField(self.code) if name == "SampleCode" else None
+
+    def getClientSampleID(self):
+        return self.lot
+
+
+class TestReportsColumns(unittest.TestCase):
+    """Colonnes reelles de bika.lims.browser.publish.reports_listing."""
+
+    def make_listing(self):
+        return FakeListing(
+            portal_type="ARReport",
+            columns=[("Info", {}), ("AnalysisRequest", {}),
+                     ("Batch", {"title": "Batch"}), ("State", {})],
+            review_states=[{"id": "default",
+                            "columns": ["Info", "AnalysisRequest", "Batch",
+                                        "State"]}],
+        )
+
+    def test_columns_follow_the_primary_sample(self):
+        listing = self.make_listing()
+        ReportsListingAdapter(listing, None).before_render()
+        self.assertEqual(list(listing.columns.keys()),
+                         ["Info", "AnalysisRequest", "SampleCode", "Lot",
+                          "Batch", "State"])
+        self.assertIn("Lot", listing.review_states[0]["columns"])
+
+    def test_native_batch_column_is_hidden_by_default(self):
+        """Traduite "Lot", elle affichait le lot de travail, toujours vide."""
+        listing = self.make_listing()
+        ReportsListingAdapter(listing, None).before_render()
+        self.assertIs(listing.columns["Batch"]["toggle"], False)
+
+    def test_lot_and_code_come_from_the_sample(self):
+        listing = self.make_listing()
+        adapter = ReportsListingAdapter(listing, None)
+        adapter.before_render()
+        adapter.get_cached_sample = lambda uid: FakeSample("ECH-1", "LOT-1")
+        item = adapter.folder_item(FakeBrain(getAnalysisRequestUID="u1"), {}, 0)
+        self.assertEqual(item["SampleCode"], "ECH-1")
+        self.assertEqual(item["Lot"], "LOT-1")
+
+    def test_unknown_sample_gives_empty_cells(self):
+        listing = self.make_listing()
+        adapter = ReportsListingAdapter(listing, None)
+        adapter.before_render()
+        adapter.get_cached_sample = lambda uid: None
+        item = adapter.folder_item(FakeBrain(getAnalysisRequestUID="u1"), {}, 0)
+        self.assertEqual(item["Lot"], "")
+
+
+class FakeTask(object):
+    def __init__(self, value):
+        self.value = value
+
+    def getType(self):
+        return self.value
+
+
+class FakeInstrument(object):
+    """Contexte du listing: traduit un msgid comme le ferait Plone."""
+
+    LABELS = {"Repair": u"Réparation", "Preventive": u"Préventif"}
+
+    def translate(self, msgid):
+        return self.LABELS.get(msgid, msgid)
+
+
+class TestInstrumentMaintenanceType(unittest.TestCase):
+    """senaite.core affichait obj.getType()[0], soit "R" ou "P"."""
+
+    def make_adapter(self, context=None):
+        listing = FakeListing(portal_type="InstrumentMaintenanceTask",
+                              columns=[("Title", {}), ("getType", {})])
+        listing.context = context
+        return InstrumentMaintenanceAdapter(listing, context)
+
+    def test_applies_only_to_maintenance_tasks(self):
+        self.assertTrue(self.make_adapter().applies())
+        other = FakeListing(portal_type="InstrumentCalibration")
+        self.assertFalse(InstrumentMaintenanceAdapter(other, None).applies())
+
+    def test_full_translated_label(self):
+        adapter = self.make_adapter(FakeInstrument())
+        item = adapter.folder_item(FakeTask("Repair"), {"getType": "R"}, 0)
+        self.assertEqual(item["getType"], u"Réparation")
+
+    def test_legacy_list_value(self):
+        adapter = self.make_adapter(FakeInstrument())
+        item = adapter.folder_item(FakeTask(["Preventive"]), {}, 0)
+        self.assertEqual(item["getType"], u"Préventif")
+
+    def test_without_translation_keeps_the_whole_word(self):
+        item = self.make_adapter().folder_item(FakeTask("Repair"), {}, 0)
+        self.assertEqual(item["getType"], "Repair")
+
+    def test_empty_type_gives_empty_cell(self):
+        item = self.make_adapter(FakeInstrument()).folder_item(
+            FakeTask(None), {"getType": "N"}, 0)
+        self.assertEqual(item["getType"], "")
+
+    def test_value_normalisation(self):
+        self.assertEqual(maintenance_type_value(" Repair "), "Repair")
+        self.assertEqual(maintenance_type_value([]), "")
+        self.assertEqual(maintenance_type_value(None), "")
 
 
 class TestFailureIsolation(unittest.TestCase):
@@ -307,6 +469,7 @@ def test_suite():
     loader = unittest.TestLoader()
     for case in (TestInsertColumnAfter, TestShowInAllStates,
                  TestDiscrimination, TestSamplesColumns,
-                 TestWorksheetColumn, TestFailureIsolation):
+                 TestWorksheetColumn, TestReportsColumns,
+                 TestInstrumentMaintenanceType, TestFailureIsolation):
         suite.addTest(loader.loadTestsFromTestCase(case))
     return suite

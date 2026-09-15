@@ -1,0 +1,155 @@
+# Libellés du domaine « plone » restés en anglais sur les écrans SENAITE.
+# Placé en tête des catalogues au démarrage (voir i18n.py).
+msgid ""
+msgstr ""
+"Project-Id-Version: senaite.trimeta.samplefields 1.0.0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: fr\n"
+"Language-Team: Trimeta Group\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Domain: plone\n"
+
+msgid "Toggle sidebar visibility"
+msgstr "Afficher ou masquer le menu latéral"
+
+msgid "label_description"
+msgstr "Description"
+
+msgid "label_edit"
+msgstr "Modifier"
+
+msgid "label_format"
+msgstr "Format"
+
+msgid "label_search"
+msgstr "Rechercher"
+
+msgid "label_search_large"
+msgstr "Tout afficher"
+
+msgid "label_showall"
+msgstr "Tout afficher"
+
+msgid "label_file"
+msgstr "Fichier"
+
+msgid "title_view_revision"
+msgstr "Voir"
+
+msgid "label_powered_by_plone"
+msgstr "Plone"
+
+msgid "Edit"
+msgstr "Modifier"
+
+msgid "View"
+msgstr "Voir"
+
+msgid "Search"
+msgstr "Rechercher"
+
+msgid "File"
+msgstr "Fichier"
+
+msgid "Copyright"
+msgstr "Copyright"
+
+msgid "This site was built using the Plone Open Source CMS/WCM."
+msgstr "Ce site repose sur Plone, CMS libre."
+
+msgid "SENAITE is powered by"
+msgstr "SENAITE repose sur"
+
+# Onglets et tuiles de la configuration: les intitulés de schémas et de
+# types passent par le domaine « plone », pas par senaite.core.
+
+msgid "Setup"
+msgstr "Configuration"
+
+msgid "Accounting"
+msgstr "Comptabilité"
+
+msgid "Analyses"
+msgstr "Analyses"
+
+msgid "Appearance"
+msgstr "Apparence"
+
+msgid "Notifications"
+msgstr "Notifications"
+
+msgid "Security"
+msgstr "Sécurité"
+
+msgid "Results Reports"
+msgstr "Rapports de résultats"
+
+msgid "Results reports"
+msgstr "Rapports de résultats"
+
+msgid "Sticker"
+msgstr "Étiquette"
+
+msgid "Small Sticker"
+msgstr "Petite étiquette"
+
+msgid "Large Sticker"
+msgstr "Grande étiquette"
+
+msgid "Analysis Services"
+msgstr "Services d'analyse"
+
+msgid "Batches"
+msgstr "Séries"
+
+msgid "Calculations"
+msgstr "Calculs"
+
+msgid "Instruments"
+msgstr "Équipements"
+
+msgid "Lab Contacts"
+msgstr "Contacts du laboratoire"
+
+msgid "Methods"
+msgstr "Méthodes"
+
+msgid "Reference Definitions"
+msgstr "Définitions de référence"
+
+msgid "Samples"
+msgstr "Échantillons"
+
+msgid "Sample"
+msgstr "Échantillon"
+
+msgid "Worksheets"
+msgstr "Feuilles de travail"
+
+msgid "Hazardous"
+msgstr "Dangereux"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Required"
+msgstr "Obligatoire"
+
+# Barre de l'éditeur de texte (interprétation des résultats)
+
+msgid "Apply"
+msgstr "Appliquer"
+
+msgid "Insert"
+msgstr "Insérer"
+
+msgid "Undo"
+msgstr "Annuler"
+
+msgid "Redo"
+msgstr "Rétablir"
+
+msgid "Tools"
+msgstr "Outils"

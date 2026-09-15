@@ -171,6 +171,19 @@ dans :
 
 Un service absent donnera simplement une colonne vide, sans erreur.
 
+**Repli sur l'intitulé.** Quand le mot-clé configuré ne correspond à
+aucun service actif du site, la colonne se rabat sur les services dont
+l'intitulé correspond aux noms du cahier des charges ou à leurs
+variantes (`TITLE_ALIASES` dans `dashboard/columns.py`) : « Vanilline »
+ou « Vanillin », « Ac. vanillique » ou « Vanillic Acid », « AC PHB » ou
+« pHB Acid », « PHB » ou « PHB Aldehyde », « Taux d'humidité (TH) » ou
+« Moisture », « Activité de l'eau (AW) » ou « Water Activity ». Sont
+comparés l'intitulé complet et le contenu de ses parenthèses, sans
+accents ni ponctuation ; le texte hors parenthèses n'est jamais comparé
+seul, pour que « Vanilline (moyenne 3 rep.) » ne soit pas pris pour la
+Vanilline. Les services du serveur réel, vus sur les captures jointes au
+document, sont ainsi reconnus sans connaître leurs mots-clés.
+
 ---
 
 ## Où on en est
@@ -225,6 +238,50 @@ double. La règle retenue n'exige aucune connaissance du balisage :
 
 Un garde-fou refuse d'insérer tout bloc portant plus d'un lien.
 
+### Les filtres ne s'appliquaient pas dans le navigateur
+
+Constaté en reproduisant exactement les appels du navigateur. Les champs
+cachés (`additional_hidden_fields`) ne suffisaient pas, contrairement à
+ce qu'annonçait une version antérieure de ce document.
+
+- `senaite.app.listing` charge les lignes, trie et pagine en AJAX. Il
+  construit la vue, **puis** injecte ses données dans le formulaire
+  (clés préfixées `trimeta_dashboard_`) et appelle `update()`.
+- Son script ajoute les paramètres de la page à l'adresse de chaque
+  appel, mais envoie un corps **JSON** : Zope n'analyse alors pas
+  l'adresse.
+- Les filtres, lus une seule fois dans `__init__`, n'étaient donc jamais
+  vus : le tableau restait non filtré.
+
+Correctif : `update()` relit les filtres depuis les trois sources
+(`filters.merged_form`) et reconstruit la requête à chaque passage.
+Vérifié : sans filtre, type seul, option groupée, tri, pagination, lot.
+
+### Listes déroulantes des filtres
+
+- Première option **« Tous »**, et non une ligne vide.
+- **Une entrée par nom** : plusieurs types d'échantillon ou clients de
+  même intitulé forment une seule entrée, qui filtre sur tous leurs UID.
+- **Aucune entrée sans intitulé.**
+
+### Accès et confidentialité
+
+Constaté lors d'un test navigateur non connecté (15/09/2026) : la page
+s'affichait à un visiteur anonyme, et la liste **Provenance** lui
+montrait « Sambava ». La permission `zope2.View` est accordée aux
+anonymes à la racine du site, et `uniqueValuesFor` lit l'index brut,
+**sans** le filtre de sécurité du catalogue. Un contact client aurait vu
+de même les provenances des autres clients.
+
+Corrigé :
+
+- la page renvoie les visiteurs anonymes vers l'écran de connexion ;
+- les provenances sont lues sur les résultats d'une recherche, donc
+  limitées aux échantillons que l'utilisateur a le droit de voir.
+
+Vérifié : anonyme → HTTP 302 vers la connexion, aucune provenance dans
+la réponse ; connecté → « Tous | Sambava ».
+
 ### Deux détails qui coûtent cher
 
 **Le cache du navigateur.** `dashboard.js` est servi avec un paramètre
@@ -239,11 +296,16 @@ l'exécution. Un test balaie désormais le fichier.
 
 ### Reste à faire
 
-1. **Confirmer les sept mots-clés** dans `dashboard/columns.py`
-   (constante `DASHBOARD_ANALYSES`), lus dans Configuration › Analyses,
-   colonne *Keyword*. Un mot-clé faux ne lève aucune erreur : la colonne
-   reste vide. La vue journalise donc un avertissement quand un mot-clé
-   ne ramène jamais rien.
+1. **Mots-clés : plus bloquant.** Les captures du serveur réel montrent
+   des services nommés *Vanillin*, *pHB Acid*, *Vanillic Acid*,
+   *PHB Aldehyde*, *Water Activity* et *Moisture*, plus des ratios
+   calculés, et **aucune Gluco-vanilline**. Le repli sur l'intitulé
+   (ci-dessus) les reconnaît : les colonnes se remplissent sans
+   connaître les mots-clés. La colonne Gluco-vanilline restera vide tant
+   que ce service n'existe pas. Correspondance retenue, conforme à la
+   chimie de la vanille : « PHB » = p-hydroxybenzaldéhyde (*PHB
+   Aldehyde*), « AC PHB » = acide p-hydroxybenzoïque (*pHB Acid*). À
+   vérifier d'un coup d'œil sur le premier tableau de bord réel.
 2. **Valider sur des données réelles.** Le `sample_catalog` de
    l'instance de test est vide (0 objet à la réindexation) : un tableau
    vide ne prouve ni qu'il marche, ni qu'il est cassé.

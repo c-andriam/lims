@@ -24,25 +24,33 @@ l'ecran:
 La vue reste donc un `ListingView` ordinaire, avec sa pagination, son
 tri, sa bascule de colonnes et son export.
 
-La pagination et le tri passent par AJAX. Les criteres du formulaire
-sont donc poses en champs caches (`additional_hidden_fields`), sans
-quoi la page 2 d'un resultat filtre afficherait tout le catalogue.
+Le chargement des lignes, la pagination et le tri passent par AJAX.
+senaite.app.listing construit la vue, PUIS injecte ses donnees dans le
+formulaire et appelle `update()`; son script ajoute les parametres de
+la page a l'adresse, que Zope ignore pour un corps JSON. Les filtres
+sont donc relus dans `update()`, depuis toutes ces sources (voir
+filters.merged_form). Lus seulement dans `__init__`, ils etaient ignores
+par le navigateur: le tableau restait non filtre.
 
 Securite
 --------
-Aucun controle d'acces specifique n'est ajoute, et c'est voulu: le
-sample_catalog filtre deja par `allowedRolesAndUsers`. Un contact
+Le sample_catalog filtre deja par `allowedRolesAndUsers`: un contact
 client qui ouvrirait cette page n'y verrait que ses propres
-echantillons.
+echantillons. La permission zope2.View est cependant accordee aux
+visiteurs anonymes sur la racine du site; la page, et sa barre de
+filtres, ne leur sont donc pas servies (renvoi vers la connexion).
 """
 
 import logging
 
+from AccessControl import Unauthorized
 from bika.lims import api
+from plone import api as ploneapi
 from DateTime import DateTime
 from senaite.app.listing import ListingView
 from senaite.core.catalog import ANALYSIS_CATALOG
 from senaite.core.catalog import SAMPLE_CATALOG
+from senaite.core.catalog import SETUP_CATALOG
 from senaite.core.i18n import translate as t
 from zope.i18nmessageid import MessageFactory
 
@@ -50,6 +58,7 @@ from senaite.trimeta.samplefields.compat import to_text
 from senaite.trimeta.samplefields.dashboard import columns as cols
 from senaite.trimeta.samplefields.dashboard import filters as flt
 from senaite.trimeta.samplefields.dashboard.results import fetch_results
+from senaite.trimeta.samplefields.dashboard.results import pick_result
 from senaite.trimeta.samplefields.dashboard.results import sample_ids_in_range
 
 _ = MessageFactory("senaite.trimeta.samplefields")
@@ -101,16 +110,41 @@ class DashboardView(ListingView):
             "columns": list(self.columns.keys()),
         }]
 
-        self.filters = flt.read_filters(request.form)
-        self.additional_hidden_fields = flt.hidden_fields(self.filters)
-        self.apply_filters()
+        # Mots-cles lus par colonne de resultat, resolus a la premiere
+        # utilisation (le filtre Vanilline en a besoin des __init__).
+        self._column_keywords = None
+
+        self._base_content_filter = dict(self.contentFilter)
+        self.refresh_filters()
 
         # Identifiants de la page en cours, remplis par folderitem() et
         # consommes par folderitems() pour la requete groupee.
         self._page_ids = []
         self._results = {}
 
+    def __call__(self):
+        # Unauthorized declenche le renvoi de Plone vers l'ecran de
+        # connexion, puis le retour ici une fois connecte.
+        if ploneapi.user.is_anonymous():
+            raise Unauthorized("trimeta-dashboard")
+        return super(DashboardView, self).__call__()
+
     # -- filtres --------------------------------------------------------
+
+    def update(self):
+        # avant l'update d'origine, pour ne pas ecraser ce qu'elle ajoute
+        self.refresh_filters()
+        super(DashboardView, self).update()
+
+    def refresh_filters(self):
+        """Relit les filtres et reconstruit la requete depuis sa base."""
+        form = flt.merged_form(self.request.form,
+                               self.request.get("QUERY_STRING", ""),
+                               self.form_id)
+        self.filters = flt.read_filters(form)
+        self.additional_hidden_fields = flt.hidden_fields(self.filters)
+        self.contentFilter = dict(self._base_content_filter)
+        self.apply_filters()
 
     def to_date(self, value, end_of_day=False):
         """Convertit une date de formulaire, ou None si elle est illisible.
@@ -155,9 +189,10 @@ class DashboardView(ListingView):
         if not minimum and not maximum:
             return
 
-        keyword = cols.get_keyword_for(cols.VANILLIN_COLUMN)
+        keywords = (self.get_column_keywords().get(cols.VANILLIN_COLUMN)
+                    or [cols.get_keyword_for(cols.VANILLIN_COLUMN)])
         matching = sample_ids_in_range(
-            api.get_tool(ANALYSIS_CATALOG), keyword, minimum, maximum)
+            api.get_tool(ANALYSIS_CATALOG), keywords, minimum, maximum)
 
         if matching is None:
             return
@@ -171,16 +206,18 @@ class DashboardView(ListingView):
         items = super(DashboardView, self).folderitems()
 
         try:
-            keywords = cols.get_keywords()
+            column_keywords = self.get_column_keywords()
+            keywords = sorted(set(
+                k for kws in column_keywords.values() for k in kws))
             self._results = fetch_results(
                 api.get_tool(ANALYSIS_CATALOG), self._page_ids, keywords)
 
             for item in items:
                 per_sample = self._results.get(item.get("_trimeta_id"), {})
-                for column_id, keyword, _label in cols.DASHBOARD_ANALYSES:
-                    item[column_id] = per_sample.get(keyword, "")
+                for column_id, kws in column_keywords.items():
+                    item[column_id] = pick_result(per_sample, kws)
 
-            self.warn_about_empty_columns()
+            self.warn_about_empty_columns(keywords)
         except Exception:
             # Des colonnes de resultats vides restent lisibles; une
             # page d'erreur, non.
@@ -222,7 +259,26 @@ class DashboardView(ListingView):
                 return to_text(value.strftime("%Y-%m-%d"))
         return to_text(value)
 
-    def warn_about_empty_columns(self):
+    def get_column_keywords(self):
+        """{colonne de resultat: [mots-cles]}, resolus une fois par vue.
+
+        Services actifs lus dans le setup_catalog (mot-cle et intitule,
+        colonnes de metadonnees). En cas d'echec, les mots-cles configures
+        sont gardes tels quels: voir cols.resolve_column_keywords.
+        """
+        if self._column_keywords is None:
+            try:
+                brains = api.search({"portal_type": "AnalysisService",
+                                     "is_active": True}, SETUP_CATALOG)
+                services = [(getattr(b, "getKeyword", ""),
+                             getattr(b, "Title", "")) for b in brains]
+            except Exception:
+                logger.exception("Services d'analyse illisibles")
+                services = []
+            self._column_keywords = cols.resolve_column_keywords(services)
+        return self._column_keywords
+
+    def warn_about_empty_columns(self, keywords):
         """Journalise les mots-cles qui ne ramenent jamais rien.
 
         Une faute de frappe dans DASHBOARD_ANALYSES ne provoque aucune
@@ -234,7 +290,7 @@ class DashboardView(ListingView):
         seen = set()
         for per_sample in self._results.values():
             seen.update(per_sample.keys())
-        missing = [k for k in cols.get_keywords() if k not in seen]
+        missing = [k for k in keywords if k not in seen]
         if missing:
             logger.info(
                 "Tableau de bord: aucun resultat pour les mots-cles %s. "

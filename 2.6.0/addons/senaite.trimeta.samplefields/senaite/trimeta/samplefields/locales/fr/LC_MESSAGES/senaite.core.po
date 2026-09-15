@@ -1,0 +1,610 @@
+# Complément et corrections de la traduction française de senaite.core 2.6.
+#
+# Le catalogue français livré avec senaite.core n'est traduit qu'à moitié
+# (1 117 entrées vides sur 2 225). Ce fichier couvre les libellés relevés
+# à l'écran sur les pages utilisées par le laboratoire, et corrige
+# quelques traductions trompeuses. Il est placé EN TÊTE des catalogues au
+# démarrage (voir i18n.py): ses traductions l'emportent.
+#
+# Terminologie retenue:
+# - Batch: « Série » (et non « Lot », réservé au lot du client);
+# - Date Sampled: « Date de prélèvement »;
+# - Instruments: « Équipements », comme dans le cahier des charges.
+msgid ""
+msgstr ""
+"Project-Id-Version: senaite.trimeta.samplefields 1.0.0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: fr\n"
+"Language-Team: Trimeta Group\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Domain: senaite.core\n"
+
+# --- Formats de date (vides dans senaite.core: dates affichées en ISO) ---
+
+msgid "date_format_long"
+msgstr "${d}/${m}/${Y} ${H}:${M}"
+
+msgid "date_format_short"
+msgstr "${d}/${m}/${Y}"
+
+msgid "date_format_short_datepicker"
+msgstr "dd/mm/yy"
+
+msgid "time_format"
+msgstr "${H}:${M}"
+
+# --- Navigation et écrans ---
+
+msgid "Samples"
+msgstr "Échantillons"
+
+msgid "Sample"
+msgstr "Échantillon"
+
+msgid "label_registry_samples"
+msgstr "Échantillons"
+
+msgid "label_senaitesetup_fieldset_samples"
+msgstr "Échantillons"
+
+msgid "Worksheets"
+msgstr "Feuilles de travail"
+
+msgid "Batch"
+msgstr "Série"
+
+msgid "Batches"
+msgstr "Séries"
+
+msgid "Methods"
+msgstr "Méthodes"
+
+msgid "listing_services_column_methods"
+msgstr "Méthodes"
+
+msgid "Instruments"
+msgstr "Équipements"
+
+msgid "Calculations"
+msgstr "Calculs"
+
+msgid "Lab Contacts"
+msgstr "Contacts du laboratoire"
+
+msgid "Analysis Services"
+msgstr "Services d'analyse"
+
+msgid "title_worksheettemplate_services"
+msgstr "Services d'analyse"
+
+msgid "Reference Definitions"
+msgstr "Définitions de référence"
+
+msgid "Setup"
+msgstr "Configuration"
+
+msgid "Accounting"
+msgstr "Comptabilité"
+
+msgid "Appearance"
+msgstr "Apparence"
+
+msgid "Security"
+msgstr "Sécurité"
+
+msgid "Notifications"
+msgstr "Notifications"
+
+msgid "Results Reports"
+msgstr "Rapports de résultats"
+
+msgid "Results reports"
+msgstr "Rapports de résultats"
+
+msgid "Sticker"
+msgstr "Étiquette"
+
+msgid "Small Sticker"
+msgstr "Petite étiquette"
+
+msgid "Large Sticker"
+msgstr "Grande étiquette"
+
+msgid "Stickers preview"
+msgstr "Aperçu des étiquettes"
+
+msgid "Enable global Audit Log"
+msgstr "Activer le journal d'audit global"
+
+msgid "Manage Access"
+msgstr "Gérer les accès"
+
+msgid "Documents"
+msgstr "Documents"
+
+msgid "QC Results"
+msgstr "Résultats CQ"
+
+msgid "General"
+msgstr "Général"
+
+msgid "Tools"
+msgstr "Outils"
+
+msgid "Press Ctrl+Space to trigger the Spotlight search"
+msgstr "Ctrl+Espace pour lancer la recherche rapide"
+
+msgid "label_powered_by_plone"
+msgstr "Plone"
+
+msgid "SENAITE is powered by"
+msgstr "SENAITE repose sur"
+
+# --- Actions ---
+
+msgid "Save"
+msgstr "Enregistrer"
+
+msgid "label_save"
+msgstr "Enregistrer"
+
+msgid "Save and Copy"
+msgstr "Enregistrer et copier"
+
+msgid "Edit"
+msgstr "Modifier"
+
+msgid "View"
+msgstr "Voir"
+
+msgid "Search"
+msgstr "Rechercher"
+
+msgid "Apply"
+msgstr "Appliquer"
+
+msgid "Insert"
+msgstr "Insérer"
+
+msgid "Undo"
+msgstr "Annuler"
+
+msgid "Redo"
+msgstr "Rétablir"
+
+msgid "Recalculate"
+msgstr "Recalculer"
+
+msgid "Show all"
+msgstr "Tout afficher"
+
+msgid "Show more"
+msgstr "Afficher plus"
+
+msgid "Use Template"
+msgstr "Utiliser le modèle"
+
+msgid "Create new worksheet"
+msgstr "Créer une feuille de travail"
+
+msgid "Print Worksheet"
+msgstr "Imprimer la feuille de travail"
+
+msgid "Filter analyses by name..."
+msgstr "Filtrer les analyses par nom…"
+
+msgid "Other..."
+msgstr "Autre…"
+
+# --- Listes et états ---
+
+msgid "Progress"
+msgstr "Progression"
+
+msgid "Review State"
+msgstr "État"
+
+msgid "Required"
+msgstr "Obligatoire"
+
+msgid "Email sent"
+msgstr "Courriel envoyé"
+
+msgid "Sent to"
+msgstr "Envoyé à"
+
+msgid "Source"
+msgstr "Source"
+
+msgid "Submitter"
+msgstr "Saisi par"
+
+msgid "Taxes"
+msgstr "Taxes"
+
+msgid "Unsassigned"
+msgstr "Non assignés"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Position"
+msgstr "Position"
+
+msgid "title_layout_record_pos"
+msgstr "Position"
+
+msgid "listing_services_column_title"
+msgstr "Service"
+
+msgid "listing_suppliercontacts_title"
+msgstr "Contacts"
+
+# --- Formulaire et en-tête de l'échantillon ---
+
+msgid "Date Sampled"
+msgstr "Date de prélèvement"
+
+msgid "label_sample_datesampled"
+msgstr "Date de prélèvement"
+
+msgid "description_sample_datesampled"
+msgstr "Date à laquelle l'échantillon a été prélevé"
+
+msgid "Sample Type"
+msgstr "Type d'échantillon"
+
+msgid "label_sample_sampletype"
+msgstr "Type d'échantillon"
+
+msgid "label_analysisspec_sampletype"
+msgstr "Type d'échantillon"
+
+msgid "label_artemplate_sampletype"
+msgstr "Type d'échantillon"
+
+msgid "label_sampletemplate_sampletype"
+msgstr "Type d'échantillon"
+
+msgid "label_sampletemplate_partition_sampletype"
+msgstr "Type d'échantillon"
+
+msgid "listing_sampletypes_column_title"
+msgstr "Type d'échantillon"
+
+msgid "description_sample_sampletype"
+msgstr "Sélectionner le type de cet échantillon"
+
+msgid "Sample Point"
+msgstr "Point de prélèvement"
+
+msgid "label_sample_samplepoint"
+msgstr "Point de prélèvement"
+
+msgid "label_artemplate_samplepoint"
+msgstr "Point de prélèvement"
+
+msgid "label_sampletemplate_samplepoint"
+msgstr "Point de prélèvement"
+
+msgid "listing_samplepoints_column_title"
+msgstr "Point de prélèvement"
+
+msgid "description_sample_samplepoint"
+msgstr "Lieu où l'échantillon a été prélevé"
+
+msgid "Storage Location"
+msgstr "Lieu de stockage"
+
+msgid "label_sample_storagelocation"
+msgstr "Lieu de stockage"
+
+msgid "listing_storagelocations_column_title"
+msgstr "Lieu de stockage"
+
+msgid "description_sample_storagelocation"
+msgstr "Lieu où l'échantillon est conservé"
+
+msgid "Sampling Deviation"
+msgstr "Écart de prélèvement"
+
+msgid "label_sample_samplingdeviation"
+msgstr "Écart de prélèvement"
+
+msgid "listing_samplingdeviations_column_title"
+msgstr "Écart de prélèvement"
+
+msgid "description_sample_samplingdeviation"
+msgstr "Écart entre l'échantillon et son mode de prélèvement"
+
+msgid "Container"
+msgstr "Contenant"
+
+msgid "label_sample_container"
+msgstr "Contenant"
+
+msgid "label_sampletemplate_partition_container"
+msgstr "Contenant"
+
+msgid "listing_sampleconatiners_column_title"
+msgstr "Contenant"
+
+msgid "description_sample_container"
+msgstr "Sélectionner un contenant pour cet échantillon"
+
+msgid "Preservation"
+msgstr "Conservation"
+
+msgid "label_sample_preservation"
+msgstr "Conservation"
+
+msgid "label_container_preservation"
+msgstr "Conservation"
+
+msgid "label_sampletemplate_partition_preservation"
+msgstr "Conservation"
+
+msgid "description_sample_preservation"
+msgstr "Sélectionner la conservation requise pour cet échantillon"
+
+msgid "Primary Sample"
+msgstr "Échantillon primaire"
+
+msgid "label_sample_primary"
+msgstr "Échantillon primaire"
+
+msgid "label_arreport_sample"
+msgstr "Échantillon primaire"
+
+msgid "description_sample_primary"
+msgstr "Sélectionner un échantillon pour créer un échantillon secondaire"
+
+msgid "Analysis Profiles"
+msgstr "Profils d'analyse"
+
+msgid "label_sample_profiles"
+msgstr "Profils d'analyse"
+
+msgid "listing_analysisprofiles_title"
+msgstr "Profils d'analyse"
+
+msgid "description_sample_profiles"
+msgstr "Sélectionner un profil d'analyse pour cet échantillon"
+
+msgid "Analysis Specification"
+msgstr "Spécification d'analyse"
+
+msgid "label_sample_specification"
+msgstr "Spécification d'analyse"
+
+msgid "description_sample_specification"
+msgstr "Sélectionner une spécification d'analyse pour cet échantillon"
+
+msgid "label_sample_publicationspecification"
+msgstr "Spécification de publication"
+
+msgid "description_sample_publicationspecification"
+msgstr "Spécification d'analyse à utiliser dans le rapport de publication"
+
+msgid "Sample Template"
+msgstr "Modèle d'échantillon"
+
+msgid "label_sample_template"
+msgstr "Modèle d'échantillon"
+
+msgid "listing_sampletemplates_column_title"
+msgstr "Modèle d'échantillon"
+
+msgid "description_sample_template"
+msgstr "Sélectionner un modèle d'analyse pour cet échantillon"
+
+msgid "label_sample_batch"
+msgstr "Série"
+
+msgid "description_sample_batch"
+msgstr "Rattacher l'échantillon à une série"
+
+msgid "label_sample_subgroup"
+msgstr "Sous-groupe de série"
+
+msgid "description_sample_subgroup"
+msgstr "Sous-groupe de série de cette demande"
+
+msgid "label_sample_cccontact"
+msgstr "Contacts en copie"
+
+msgid "description_sample_cccontact"
+msgstr "Contacts en copie des notifications par courriel"
+
+msgid "label_sample_client"
+msgstr "Client"
+
+msgid "label_batch_client"
+msgstr "Client"
+
+msgid "description_sample_client"
+msgstr "Sélectionner le client de cet échantillon"
+
+msgid "label_sample_contact"
+msgstr "Contact"
+
+msgid "label_user_contact"
+msgstr "Contact"
+
+msgid "description_sample_contact"
+msgstr "Sélectionner le contact principal de cet échantillon"
+
+msgid "Invoice"
+msgstr "Facture"
+
+msgid "label_sample_invoice"
+msgstr "Facture"
+
+msgid "description_sample_invoice"
+msgstr "Facture générée pour cet échantillon"
+
+msgid "Hazardous"
+msgstr "Dangereux"
+
+msgid "label_referencedefinition_hazardous"
+msgstr "Dangereux"
+
+msgid "listing_sampletypes_column_hazardous"
+msgstr "Dangereux"
+
+msgid "title_sampletype_hazardous"
+msgstr "Dangereux"
+
+msgid "label_analysisrequest_numsamples"
+msgstr "Nombre d'échantillons"
+
+msgid "description_analysisrequest_numsamples"
+msgstr "Nombre d'échantillons à créer avec ces informations"
+
+msgid "Should the analyses be excluded from the invoice?"
+msgstr "Exclure les analyses de la facture ?"
+
+msgid "The client side order number for this request"
+msgstr "Numéro de commande du client pour cette demande"
+
+msgid "The environmental condition during sampling"
+msgstr "Conditions environnementales lors du prélèvement"
+
+msgid "fieldset_sampletemplate_analyses"
+msgstr "Analyses"
+
+msgid "label_fieldset_worksheettemplate_analyses"
+msgstr "Analyses"
+
+msgid "label_senaitesetup_fieldset_analyses"
+msgstr "Analyses"
+
+# --- Colonnes « Description » des listes de configuration ---
+
+msgid "label_sampletype_description"
+msgstr "Description"
+
+msgid "listing_analysiscategories_column_description"
+msgstr "Description"
+
+msgid "listing_analysisprofiles_column_description"
+msgstr "Description"
+
+msgid "listing_attachmenttypes_column_description"
+msgstr "Description"
+
+msgid "listing_containertypes_column_description"
+msgstr "Description"
+
+msgid "listing_dynamic_analysisspecs_column_description"
+msgstr "Description"
+
+msgid "listing_instrumentlocations_column_description"
+msgstr "Description"
+
+msgid "listing_instrumenttypes_column_description"
+msgstr "Description"
+
+msgid "listing_interpretationtemplates_column_description"
+msgstr "Description"
+
+msgid "listing_manufacturers_column_description"
+msgstr "Description"
+
+msgid "listing_sampleconatiners_column_description"
+msgstr "Description"
+
+msgid "listing_sampleconditions_column_description"
+msgstr "Description"
+
+msgid "listing_samplematrices_column_description"
+msgstr "Description"
+
+msgid "listing_samplepoints_column_description"
+msgstr "Description"
+
+msgid "listing_samplepreservations_column_description"
+msgstr "Description"
+
+msgid "listing_sampletemplates_column_description"
+msgstr "Description"
+
+msgid "listing_sampletypes_column_description"
+msgstr "Description"
+
+msgid "listing_samplingdeviations_column_description"
+msgstr "Description"
+
+msgid "listing_storagelocations_column_description"
+msgstr "Description"
+
+msgid "listing_subgroups_column_description"
+msgstr "Description"
+
+msgid "listing_worksheettemplates_column_description"
+msgstr "Description"
+
+msgid "title_analysiscategory_description"
+msgstr "Description"
+
+msgid "title_analysisprofile_description"
+msgstr "Description"
+
+msgid "title_attachmenttype_description"
+msgstr "Description"
+
+msgid "title_containertype_description"
+msgstr "Description"
+
+msgid "title_department_description"
+msgstr "Description"
+
+msgid "title_instrumentlocation_description"
+msgstr "Description"
+
+msgid "title_instrumenttype_description"
+msgstr "Description"
+
+msgid "title_interpretationtemplate_description"
+msgstr "Description"
+
+msgid "title_label_description"
+msgstr "Description"
+
+msgid "title_labproduct_description"
+msgstr "Description"
+
+msgid "title_manufacturer_description"
+msgstr "Description"
+
+msgid "title_samplecondition_description"
+msgstr "Description"
+
+msgid "title_samplecontainer_description"
+msgstr "Description"
+
+msgid "title_samplematrix_description"
+msgstr "Description"
+
+msgid "title_samplepoint_description"
+msgstr "Description"
+
+msgid "title_samplepreservation_description"
+msgstr "Description"
+
+msgid "title_sampletemplate_description"
+msgstr "Description"
+
+msgid "title_samplingdeviation_description"
+msgstr "Description"
+
+msgid "title_storagelocation_description"
+msgstr "Description"
+
+msgid "title_subgroup_description"
+msgstr "Description"
+
+msgid "title_worksheettemplate_description"
+msgstr "Description"

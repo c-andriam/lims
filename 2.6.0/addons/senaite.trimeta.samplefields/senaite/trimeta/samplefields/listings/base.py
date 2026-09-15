@@ -21,10 +21,19 @@ au pire disparaitre une colonne, jamais tomber le site.
 import logging
 
 from bika.lims import api
+from senaite.core.catalog import SAMPLE_CATALOG
 
 from senaite.trimeta.samplefields.compat import string_types
 
 logger = logging.getLogger("senaite.trimeta.samplefields")
+
+# Catalogues a type unique: leurs listings ne filtrent pas sur portal_type.
+# La liste des Echantillons de senaite.core interroge le sample_catalog
+# sans portal_type; sans cette table, ses colonnes n'etaient jamais
+# ajoutees.
+CATALOG_TYPES = {
+    SAMPLE_CATALOG: ("AnalysisRequest",),
+}
 
 
 def insert_column_after(columns, after, key, definition):
@@ -97,7 +106,7 @@ class BaseListingAdapter(object):
         content_filter = getattr(self.listing, "contentFilter", None) or {}
         portal_type = content_filter.get("portal_type")
         if not portal_type:
-            return ()
+            return CATALOG_TYPES.get(getattr(self.listing, "catalog", None), ())
         # string_types couvre str ET unicode: sur Python 2, un
         # portal_type unicode echouerait le test et tuple() le
         # decouperait en caracteres. La colonne disparaitrait alors

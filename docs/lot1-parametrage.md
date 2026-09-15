@@ -245,6 +245,18 @@ L'onglet Maintenance de l'instrument liste les interventions, avec leur
 type et leur état. Une tâche non clôturée dont la date de fin est
 dépassée ressort en retard.
 
+### Essai local (15/09/2026)
+
+Instrument « AW Metre 1 » (Novasina, type AW-Metre) créé avec deux
+tâches : « Remplacement du capteur » (Réparation) et « Entretien annuel »
+(Préventif). Les deux apparaissent dans l'onglet Maintenance, avec leurs
+dates d'immobilisation et l'intervenant.
+
+Défaut corrigé au passage : senaite.core 2.6 affiche `getType()[0]`,
+c'est-à-dire la **première lettre** du type (« R », « P »). L'add-on
+remplace ce contenu par le libellé complet et traduit
+(`listings/instruments.py`), sans surcharger la vue.
+
 > Si, à l'usage, le laboratoire a besoin de champs qui n'existent pas
 > ici — numéro de bon d'intervention, prestataire externe, pièces
 > remplacées — cela redevient du développement : une extension de schéma
@@ -281,10 +293,21 @@ Au moment de publier plusieurs échantillons :
 1. Sélectionner les échantillons, puis **Publier** (*Publish*).
 2. Dans le sélecteur **Gabarit** (*Template*), choisir un modèle dont
    le nom **ne contient pas** `Multi` — par exemple
-   `senaite.impress:Default.pt` et non `senaite.impress:MultiDefault.pt`.
-3. Décocher la case **Fusionner** (*merge*), qui regroupe tout en un
-   seul PDF même sans gabarit `Multi`.
-4. Générer.
+   `senaite.trimeta.samplefields:COA-Trimeta.pt` ou
+   `senaite.impress:Default.pt`, et non `senaite.impress:MultiDefault.pt`.
+3. Générer (*Save*).
+
+> **Confirmé dans le code** (`senaite.impress`, `ajax_save_reports` et
+> `PdfReportStorageAdapter.store`) : un gabarit `Multi` rend un seul PDF
+> pour tous les échantillons, et le réglage *Store Multi-Report PDFs
+> Individually*, actif par défaut, rattache ce même PDF à chacun.
+> Il n'existe pas de case « Fusionner » : une version antérieure de ce
+> document en mentionnait une à tort.
+>
+> Le piège venait surtout du **gabarit présélectionné**, qui est
+> `MultiDefault.pt` par défaut. Depuis le lot 4 (étape de mise à jour
+> 1004), l'add-on présélectionne `COA-Trimeta.pt`, sauf si le
+> laboratoire avait déjà choisi un autre gabarit par défaut.
 
 ### Vérification
 
@@ -307,5 +330,6 @@ Ce qui reste relève du développement :
 
 - **Lot 4** — contenu du COA et nommage des fichiers ;
 - **Lot 5** — tableau de bord avec ses filtres ;
-- **D13** — le bug d'export de données depuis la Work Sheet, dont le
-  symptôme reste à décrire par la personne qui l'a rencontré.
+- **D13** — le bug d'export de données depuis la Work Sheet : reproduit
+  et corrigé, voir `d13-export-work-sheet.md`. Le symptôme reste à
+  confirmer avec la personne qui l'a rencontré.

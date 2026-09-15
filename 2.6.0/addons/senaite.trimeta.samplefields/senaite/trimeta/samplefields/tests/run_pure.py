@@ -141,7 +141,8 @@ def install_stubs():
             raise LookupError(uid)
 
     bika = make_module("bika")
-    bika.lims = make_module("bika.lims", api=FakeAPI())
+    bika.lims = make_module("bika.lims", api=FakeAPI(),
+                            senaiteMessageFactory=lambda msgid: msgid)
     make_module("bika.lims.interfaces", IAnalysisRequest=Interface)
     make_module("bika.lims.browser")
     make_module("bika.lims.browser.fields", UIDReferenceField=StubField)
@@ -174,6 +175,8 @@ def install_stubs():
     make_module("senaite.core.browser.widgets")
     make_module("senaite.core.browser.widgets.referencewidget",
                 ReferenceWidget=StubWidget)
+    make_module("senaite.core.browser.widgets.selectotherwidget",
+                SelectOtherWidget=StubWidget)
 
     make_module("plone")
     make_module("plone.indexer", indexer=indexer)
@@ -197,7 +200,7 @@ def install_package_shims():
     make_module("senaite.trimeta.samplefields.tests.utils",
                 SampleFactory=object)
 
-    for sub in ("listings", "qualitydata", "dashboard", "coa"):
+    for sub in ("listings", "qualitydata", "dashboard", "coa", "worksheet"):
         module = make_module(
             "senaite.trimeta.samplefields.{}".format(sub))
         module.__path__ = [os.path.join(ROOT, sub)]
@@ -229,6 +232,7 @@ MODULES = [
     (P + "listings.samples", "listings/samples.py"),
     (P + "listings.worksheets", "listings/worksheets.py"),
     (P + "listings.reports", "listings/reports.py"),
+    (P + "listings.instruments", "listings/instruments.py"),
     (P + "dashboard.results", "dashboard/results.py"),
     (P + "dashboard.filters", "dashboard/filters.py"),
     (P + "dashboard.columns", "dashboard/columns.py"),
@@ -246,7 +250,8 @@ PURE_CASES = [
                           "TestContactTitleResolution",
                           "TestReferenceUid"]),
     ("test_schema.py", ["TestExtenderDeclaration"]),
-    ("test_qualitydata.py", ["TestQualityDataDeclaration"]),
+    ("test_qualitydata.py", ["TestQualityDataDeclaration",
+                             "TestVocabularyPlaceholders"]),
     ("test_listings.py", None),   # tout le fichier est pur
     ("test_dashboard.py", None),  # idem
     ("test_dashboard_filters.py", None),

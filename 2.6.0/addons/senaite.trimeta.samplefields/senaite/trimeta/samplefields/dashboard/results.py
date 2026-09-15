@@ -30,8 +30,10 @@ source de valeurs fausses en silence.
 Pourquoi le mot-cle et pas l'intitule
 -------------------------------------
 Un service peut etre renomme dans l'interface; son mot-cle (Keyword)
-est la cle stable. Un mot-cle qui ne correspond a aucun service donne
-une colonne vide, jamais une erreur.
+est la cle stable. Un mot-cle qui ne correspond a aucun service actif
+est remplace par ceux des services reconnus a leur intitule (voir
+columns.resolve_column_keywords); a defaut, la colonne reste vide,
+jamais en erreur.
 
 Le cas des resultats censures
 -----------------------------
@@ -150,6 +152,20 @@ def group_by_sample(brains, keywords=None):
     for (sample_id, keyword), (result, _date) in best.items():
         grouped.setdefault(sample_id, {})[keyword] = result
     return grouped
+
+
+def pick_result(per_sample, keywords):
+    """Premier resultat renseigne parmi les mots-cles d'une colonne.
+
+    :param per_sample: {mot-cle: resultat} d'un echantillon
+    :param keywords: mots-cles de la colonne, par ordre de preference
+    """
+    per_sample = per_sample or {}
+    for keyword in keywords or ():
+        value = per_sample.get(keyword)
+        if value:
+            return value
+    return ""
 
 
 def fetch_results(catalog, sample_ids, keywords):
