@@ -75,6 +75,17 @@
             </td>
           </tr>
           <tr>
+            <!-- "Report reference" du cahier des charges. La reference
+                 du rapport lui-meme n'existe pas encore au moment ou ce
+                 gabarit est rendu: senaite.impress produit le PDF
+                 AVANT de creer l'ARReport qui le portera. On affiche
+                 donc la reference que le laboratoire attribue lui-meme
+                 a l'analyse, le Numero de fiche d'analyse. A confirmer,
+                 voir docs/lot4-coa.md. -->
+            <td class="label" i18n:translate="">Report reference</td>
+            <td tal:content="model/AnalysisSheetNumber|nothing"></td>
+          </tr>
+          <tr>
             <td class="label" i18n:translate="">Sample Type</td>
             <td tal:content="model/SampleType/title|nothing"></td>
           </tr>
