@@ -166,8 +166,7 @@ class FilterBar(object):
         try:
             brains = api.search({"portal_type": portal_type,
                                  "is_active": True}, catalog_id)
-            options = [(b.UID, to_text(b.Title)) for b in brains]
-            return sorted(options, key=lambda pair: pair[1].lower())
+            return flt.group_options([(b.UID, b.Title) for b in brains])
         except Exception:
             logger.exception("Liste %s indisponible", portal_type)
             return []
@@ -202,7 +201,9 @@ class FilterBar(object):
 
     def select_input(self, name, label, options):
         current = to_text(self.filters.get(name, ""))
-        rendered = [u'<option value=""></option>']
+        # Option "aucun filtre": libellee, sinon elle ressemble a une erreur.
+        rendered = [u'<option value="">{}</option>'.format(
+            escape(t(_(u"All"))))]
         for value, text in options:
             selected = u' selected="selected"' \
                 if to_text(value) == current else u''

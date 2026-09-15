@@ -245,7 +245,8 @@ PURE_CASES = [
                           "TestContactTitleResolution",
                           "TestReferenceUid"]),
     ("test_schema.py", ["TestExtenderDeclaration"]),
-    ("test_qualitydata.py", ["TestQualityDataDeclaration"]),
+    ("test_qualitydata.py", ["TestQualityDataDeclaration",
+                             "TestVocabularyPlaceholders"]),
     ("test_listings.py", None),   # tout le fichier est pur
     ("test_dashboard.py", None),  # idem
     ("test_dashboard_filters.py", None),

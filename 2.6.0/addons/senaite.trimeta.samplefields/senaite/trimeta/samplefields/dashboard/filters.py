@@ -20,6 +20,11 @@ Tout ce module est de la logique pure -- aucune dependance a Zope --
 donc entierement couvert par `make test-pure`.
 """
 
+try:                                   # Python 2
+    from urlparse import parse_qsl
+except ImportError:                    # Python 3
+    from urllib.parse import parse_qsl
+
 from senaite.trimeta.samplefields.compat import to_text
 
 # Prefixe des parametres, pour ne pas entrer en collision avec ceux de
@@ -47,11 +52,55 @@ DATE_FILTERS = ("date_from", "date_to")
 # results.sample_ids_in_range.
 RANGE_FILTERS = ("van_min", "van_max")
 
+# Filtres dont la valeur est une liste d'UID (voir group_options). Jamais
+# les champs texte: un Lot ou une Provenance peut contenir une virgule.
+MULTI_VALUE_FILTERS = ("client", "sample_type")
+MULTI_VALUE_SEPARATOR = ","
+
 ALL_FILTERS = (
     tuple([name for name, _index in SIMPLE_FILTERS])
     + DATE_FILTERS
     + RANGE_FILTERS
 )
+
+
+def merged_form(form, query_string="", form_id=""):
+    """Parametres de filtre, d'ou qu'ils viennent.
+
+    :param form: request.form
+    :param query_string: QUERY_STRING brut de la requete
+    :param form_id: identifiant du formulaire du listing
+
+    Trois sources, du moins au plus prioritaire:
+
+    1. l'adresse: pour ses appels AJAX, le script de senaite.app.listing
+       ajoute les parametres de la page (`location.search`) a l'URL mais
+       envoie un corps JSON, et Zope n'analyse alors pas l'adresse;
+    2. les cles prefixees `<form_id>_`, forme sous laquelle
+       senaite.app.listing injecte les donnees AJAX dans le formulaire;
+    3. le formulaire classique (chargement de la page).
+    """
+    form = form or {}
+    # form_id commence lui aussi par "trimeta_": ses cles ne doivent pas
+    # etre prises pour des filtres non prefixes.
+    form_prefix = u"{}_".format(form_id) if form_id else None
+
+    def is_filter_key(key):
+        return key.startswith(PREFIX) and not (
+            form_prefix and key.startswith(form_prefix))
+
+    merged = {}
+    for key, value in parse_qsl(query_string or "", keep_blank_values=False):
+        if is_filter_key(key):
+            merged[key] = value
+    if form_prefix:
+        for key, value in form.items():
+            if key.startswith(form_prefix) and is_filter_key(key[len(form_prefix):]):
+                merged[key[len(form_prefix):]] = value
+    for key, value in form.items():
+        if is_filter_key(key):
+            merged[key] = value
+    return merged
 
 
 def read_filters(form):
@@ -114,8 +163,12 @@ def build_query(filters, to_date=None):
 
     for name, index in SIMPLE_FILTERS:
         value = filters.get(name)
-        if value:
-            query[index] = value
+        if not value:
+            continue
+        if name in MULTI_VALUE_FILTERS and MULTI_VALUE_SEPARATOR in value:
+            value = [v.strip() for v in value.split(MULTI_VALUE_SEPARATOR)
+                     if v.strip()]
+        query[index] = value
 
     if to_date is not None:
         date_query = date_range_query(
@@ -143,3 +196,28 @@ def hidden_fields(filters):
 def is_active(filters):
     """Un filtre est-il pose ? Sert a afficher le bouton de remise a zero."""
     return bool(filters)
+
+
+def group_options(options):
+    """Options d'une liste deroulante: une entree par nom, aucune vide.
+
+    :param options: [(uid, intitule)]
+    :returns: [(uids separes par des virgules, intitule)], tries
+
+    Plusieurs objets de meme nom (types d'echantillon crees en double)
+    donnent une seule entree, qui filtre sur tous leurs UID. Un objet
+    sans intitule n'est pas proposable: il est ecarte.
+    """
+    groups = {}
+    for uid, label in options:
+        label = to_text(label).strip()
+        if not label or not uid:
+            continue
+        key = label.lower()
+        if key not in groups:
+            groups[key] = (label, [])
+        groups[key][1].append(to_text(uid))
+    return sorted(
+        [(MULTI_VALUE_SEPARATOR.join(sorted(uids)), label)
+         for label, uids in groups.values()],
+        key=lambda pair: pair[1].lower())

@@ -16,16 +16,20 @@ from zope.i18nmessageid import MessageFactory
 
 _ = MessageFactory("senaite.trimeta.samplefields")
 
+# Premiere entree des listes: les champs sont facultatifs, il faut pouvoir
+# ne rien choisir, mais une ligne blanche ressemble a une erreur.
+NOT_SPECIFIED = ("", u"— Non renseigné —")
+
 # (1) Conformite
 CONFORMITY_VOCAB = (
-    ("", u""),
+    NOT_SPECIFIED,
     ("OK", u"OK"),
     ("NOK", u"NOK"),
 )
 
 # (2) Nombre d'analyses / d'extractions
 COUNT_VOCAB = (
-    ("", u""),
+    NOT_SPECIFIED,
     ("1", u"1"),
     ("2", u"2"),
     ("3", u"3"),
@@ -33,7 +37,7 @@ COUNT_VOCAB = (
 
 # (5) Mode de transmission des resultats
 TRANSMISSION_VOCAB = (
-    ("", u""),
+    NOT_SPECIFIED,
     ("mail", u"Mail"),
     ("paper", u"Papier"),
     ("coa", u"COA"),
