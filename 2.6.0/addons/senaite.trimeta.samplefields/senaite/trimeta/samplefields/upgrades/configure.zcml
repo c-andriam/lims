@@ -54,7 +54,26 @@
       profile="senaite.trimeta.samplefields:default"
       />
 
-  <!-- 1003 -> 1004 : COA (lot 4)
+  <!-- 1004 -> 1005 : la configuration passe du mode d'emploi au code
+
+       Le laboratoire n'a pas a connaitre les reglages avances de
+       SENAITE pour que le logiciel se comporte correctement. Cette
+       etape pose le gabarit de publication unitaire par defaut (D11),
+       cree les calculs de moyenne sur repetitions et les rattache aux
+       services (D9), et accorde le role Analyst aux comptes existants
+       (D7). Idempotente: aucun reglage deja pose n'est ecrase. -->
+  <genericsetup:upgradeStep
+      title="Trimeta 1004 -> 1005 : configuration livree en code"
+      description="Gabarit COA unitaire par defaut, calculs de moyenne
+                   sur repetitions rattaches aux services, role
+                   Analyst sur les comptes existants."
+      source="1004"
+      destination="1005"
+      handler=".v1005.upgrade"
+      profile="senaite.trimeta.samplefields:default"
+      />
+
+  <!-- 1003 -> 1004 : nommage des COA par le Code echantillon
 
        Couche navigateur qui nomme les PDF d'apres le Code echantillon,
        et enregistrement du gabarit COA Trimeta parmi les gabarits

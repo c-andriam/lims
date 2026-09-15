@@ -98,86 +98,44 @@ def post_install(portal_setup):
         for catalog_id, indexes in added.items():
             reindex_catalog(catalog_id, indexes)
     register_coa_template()
-    set_coa_as_default_template()
-    set_lab_defaults()
-    set_first_weekday()
-    set_site_logo()
+    apply_defaults(portal)
     logger.info("senaite.trimeta.samplefields: post_install termine")
 
 
-def set_site_logo():
-    """Logo Trimeta dans la barre d'outils, si aucun logo n'est defini.
+def apply_defaults(portal):
+    """Pose la configuration que l'add-on livre en code (voir defaults.py).
 
-    Le logo est stocke par SENAITE dans le Setup (champ site_logo), au
-    format "filenameb64:...;datab64:..." du widget de fichier Plone. Un
-    logo deja choisi dans Configuration > Apparence est conserve.
-
-    :returns: True si le logo a ete pose
+    Chaque volet est isole: un echec sur l'un ne doit pas empecher les
+    autres. Une installation reussie avec un reglage manquant se
+    rattrape en rejouant l'etape; une installation interrompue a
+    mi-chemin laisse un site dans un etat que personne ne sait decrire.
     """
-    from plone.formwidget.namedfile.converter import b64encode_file
+    from senaite.trimeta.samplefields import defaults
 
-    setup = api.get_senaite_setup()
-    if setup is None:
-        logger.warning("Setup SENAITE introuvable: logo non pose")
-        return False
-    if setup.getSiteLogo():
-        logger.info("Logo du site conserve (deja defini)")
-        return False
-    with open(SITE_LOGO_FILE, "rb") as logo_file:
-        data = logo_file.read()
-    setup.setSiteLogo(b64encode_file(os.path.basename(SITE_LOGO_FILE), data))
-    if not setup.getSiteLogoCSS():
-        setup.setSiteLogoCSS(SITE_LOGO_CSS)
-    logger.info("Logo Trimeta pose dans la barre d'outils")
-    return True
-
-
-def set_first_weekday():
-    """Lundi comme premier jour de semaine, a la place de l'usine."""
+    # D11 -- gabarit de publication unitaire par defaut.
     try:
-        current = ploneapi.portal.get_registry_record(FIRST_WEEKDAY_RECORD)
+        defaults.set_default_coa_template()
     except Exception:
-        logger.warning("Registre %s introuvable", FIRST_WEEKDAY_RECORD)
-        return
-    if current not in FIRST_WEEKDAY_FACTORY:
-        logger.info("%s=%r conserve", FIRST_WEEKDAY_RECORD, current)
-        return
-    ploneapi.portal.set_registry_record(FIRST_WEEKDAY_RECORD, FIRST_WEEKDAY)
-    logger.info("%s -> %r", FIRST_WEEKDAY_RECORD, FIRST_WEEKDAY)
+        logger.exception("Gabarit COA par defaut: echec")
 
+    # D9 -- calculs de moyenne sur repetitions.
+    try:
+        defaults.setup_repetitions(portal)
+    except Exception:
+        logger.exception("Calculs de repetitions: echec")
 
-def set_lab_defaults():
-    """Devise et pays du laboratoire dans le Setup SENAITE.
+    # D7 -- role Analyst sur les comptes deja crees.
+    try:
+        defaults.grant_analyst_role(portal)
+    except Exception:
+        logger.exception("Role Analyst: echec")
 
-    Idempotent. Une valeur absente du vocabulaire du champ (version de
-    SENAITE differente) n'est pas ecrite: elle est journalisee, plutot
-    que d'enregistrer une valeur que l'ecran ne saurait pas afficher.
-
-    :returns: {champ: (ancienne valeur, nouvelle valeur)} des changements
-    """
-    setup = api.get_setup()
-    changes = {}
-    for name, (wanted, factory_values) in sorted(LAB_SETUP_DEFAULTS.items()):
-        field = setup.getField(name)
-        if field is None:
-            logger.warning("Setup: champ %s introuvable", name)
-            continue
-        current = field.get(setup) or ""
-        if current == wanted:
-            continue
-        if current not in factory_values:
-            logger.info("Setup: %s=%r conserve (choix du laboratoire)",
-                        name, current)
-            continue
-        allowed = field.Vocabulary(setup).keys()
-        if wanted not in allowed:
-            logger.warning("Setup: %r absent du vocabulaire de %s",
-                           wanted, name)
-            continue
-        field.set(setup, wanted)
-        changes[name] = (current, wanted)
-        logger.info("Setup: %s %r -> %r", name, current, wanted)
-    return changes
+    # D6 -- onglet Maintenance sur la fiche equipement. senaite.core le
+    # livre masque; la vue existe et fonctionne.
+    try:
+        defaults.show_instrument_maintenance_tab()
+    except Exception:
+        logger.exception("Onglet Maintenance: echec")
 
 
 def register_coa_template():
@@ -248,6 +206,16 @@ def post_uninstall(portal_setup):
     """
     logger.info("senaite.trimeta.samplefields: post_uninstall")
     unregister_coa_template()
+
+    # L'onglet Maintenance retrouve l'etat ou senaite.core le livre:
+    # masque. Les taches de maintenance deja saisies sont conservees,
+    # seule l'entree de barre disparait.
+    from senaite.trimeta.samplefields import defaults
+    try:
+        defaults.hide_instrument_maintenance_tab()
+    except Exception:
+        logger.exception("Remasquage de l'onglet Maintenance: echec")
+
     for catalog_id, indexes, columns in CATALOGS:
         catalog = capi.get_catalog(catalog_id)
         for index_id, _index_type, _attrs in indexes:

@@ -237,8 +237,8 @@ MODULES = [
     (P + "dashboard.filters", "dashboard/filters.py"),
     (P + "dashboard.columns", "dashboard/columns.py"),
     (P + "coa.filename", "coa/filename.py"),
-    (P + "worksheet.export", "worksheet/export.py"),
-    (P + "i18n", "i18n.py"),
+    (P + "catalog", "catalog.py"),
+    (P + "defaults", "defaults.py"),
 ]
 
 # (fichier de test, classes qui n'ont pas besoin d'un site Plone)
@@ -255,10 +255,10 @@ PURE_CASES = [
     ("test_listings.py", None),   # tout le fichier est pur
     ("test_dashboard.py", None),  # idem
     ("test_dashboard_filters.py", None),
-    ("test_coa.py", None),
-    ("test_worksheet_export.py", None),
-    ("test_i18n.py", None),
-    ("test_branding.py", None),
+    ("test_coa_filename.py", None),
+    ("test_catalog_wiring.py", None),
+    ("test_field_references.py", None),
+    ("test_defaults.py", None),
 ]
 
 
