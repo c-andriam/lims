@@ -1,15 +1,28 @@
 # Lot 1 — quatre demandes réglées par paramétrage
 
-Ces quatre points du document *AMÉLIORATIONS SENAITE LIMS* ne demandent
-aucun développement : la fonctionnalité existe déjà dans SENAITE, elle
-n'est simplement pas configurée.
+Ces quatre points du document *AMÉLIORATIONS SENAITE LIMS* ne
+demandaient à l'origine aucun développement : la fonctionnalité existe
+déjà dans SENAITE, elle n'était simplement pas configurée.
 
-| Réf | Demande | Où |
-|---|---|---|
-| D7 | Analyste assigné à chaque analyse | Contacts du laboratoire |
-| D9 | Répétitions et moyenne automatique | Calculs + Analyses |
-| D6 | Historique des pannes et des entretiens | Instruments |
-| D11 | Export de plusieurs COA au contenu identique | Écran de publication |
+> **Deux d'entre eux sont depuis passés dans le code.** Documenter une
+> manipulation que personne au laboratoire ne sait faire déplace le
+> problème sans le résoudre, et un réglage posé à la main se perd à la
+> première réinstallation. **D9** et **D11** sont désormais posés par
+> le profil d'installation (`defaults.py`, étape de mise à jour
+> 1004 → 1005) : il n'y a plus rien à faire à la main. Les
+> manipulations restent décrites ci-dessous, parce qu'il faut pouvoir
+> vérifier ce que le code a posé, et le corriger au cas par cas.
+>
+> **D7** l'est en partie : le rôle `Analyst` est attribué
+> automatiquement aux comptes existants, mais **créer** un compte exige
+> un mot de passe — cela reste manuel. **D6** reste une convention.
+
+| Réf | Demande | Où | État |
+|---|---|---|---|
+| D7 | Analyste assigné à chaque analyse | Contacts du laboratoire | rôle automatique, compte manuel |
+| D9 | Répétitions et moyenne automatique | Calculs + Analyses | **posé par le code** |
+| D6 | Historique des pannes et des entretiens | Instruments | convention à tenir |
+| D11 | Export de plusieurs COA au contenu identique | Écran de publication | **posé par le code** |
 
 Les noms de menus sont donnés en français puis en anglais entre
 parenthèses : l'interface bascule selon la langue du compte.
@@ -113,34 +126,46 @@ Sur une Work Sheet, la ligne de l'analyse affiche maintenant trois cases
 `R1`, `R2`, `R3` au lieu d'une seule case Résultat. Saisir `2.0`, `2.2`
 et `2.1` doit donner `2.1`.
 
-### Le point à trancher avec le laboratoire
+### Une répétition oubliée est visible — correction
 
-**Que faire si une seule ou deux répétitions sont saisies ?**
+> **Cette section disait le contraire, et c'était faux.** Une version
+> antérieure affirmait qu'un champ vide compte comme zéro, et que
+> saisir `2.0` et `2.2` seuls donnerait `1.4` sans que rien ne le
+> signale. Elle en tirait une recommandation : imposer les trois
+> répétitions par convention de travail. Vérification faite sur le
+> code de `senaite.core` v2.6.0, ce n'est pas ce qui se passe.
 
-Avec la formule ci-dessus, un champ vide compte comme zéro : saisir
-`2.0` et `2.2` seuls donne `1.4`, pas `2.1`. C'est faux, et rien ne le
-signale.
+Dans `AbstractAnalysis.calculateResult` :
 
-Trois options, par ordre de sûreté :
+```python
+# skip unset values
+interim_value = i.get("value", "")
+if interim_value == "":
+    continue
+```
 
-1. **Imposer les trois répétitions.** Convention de travail, aucune
-   configuration supplémentaire. La plus sûre.
-2. **Créer deux calculs** — `Moyenne de 2 répétitions` et `Moyenne de
-   3 répétitions` — et choisir le bon service selon le protocole.
-   Explicite, sans piège.
-3. **Une formule qui ignore les vides** :
+Un champ vide **n'entre pas** dans le tableau de substitution. Son
+marqueur `[R2]` survit donc dans la formule, y devient `%(R2)f`, et le
+formatage lève un `KeyError` — rattrapé quelques lignes plus bas :
 
-   ```
-   ([R1] + [R2] + [R3]) / max(1, ([R1] > 0) + ([R2] > 0) + ([R3] > 0))
-   ```
+```python
+except (KeyError, TypeError, ImportError) as e:
+    self.setResult("NA")
+```
 
-   Élégant, mais le moteur de formules de SENAITE n'accepte qu'un
-   sous-ensemble de Python. **À tester sur l'instance avant de s'en
-   servir** : si le résultat n'apparaît pas, c'est que la construction
-   n'est pas acceptée, et il faut retomber sur l'option 1 ou 2.
+**Une répétition manquante donne le résultat `NA`**, affiché à l'écran
+comme sur le rapport. Pas une moyenne faussée par un zéro fantôme.
 
-Recommandation : commencer par l'option 1, qui ne peut pas produire de
-résultat faux.
+La conséquence est heureuse : la formule simple est **sûre**. Elle ne
+peut pas produire un nombre plausible et faux — le seul risque qui
+aurait justifié d'imposer quoi que ce soit aux opérateurs. Le logiciel
+fait respecter la règle à leur place.
+
+Le vrai piège est ailleurs, et il est désormais verrouillé par un
+test : **ne jamais mettre `0` en valeur par défaut** sur les cases de
+répétition. Trois cases pré-remplies dont deux seulement sont corrigées
+donneraient, elles, une moyenne calculée sur un zéro — plausible,
+fausse, et silencieuse. Voir `test_no_default_value_on_repetitions`.
 
 ---
 

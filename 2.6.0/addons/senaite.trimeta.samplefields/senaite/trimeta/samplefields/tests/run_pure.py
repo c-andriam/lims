@@ -234,6 +234,7 @@ MODULES = [
     (P + "dashboard.columns", "dashboard/columns.py"),
     (P + "coa.filename", "coa/filename.py"),
     (P + "catalog", "catalog.py"),
+    (P + "defaults", "defaults.py"),
 ]
 
 # (fichier de test, classes qui n'ont pas besoin d'un site Plone)
@@ -252,6 +253,7 @@ PURE_CASES = [
     ("test_coa_filename.py", None),
     ("test_catalog_wiring.py", None),
     ("test_field_references.py", None),
+    ("test_defaults.py", None),
 ]
 
 

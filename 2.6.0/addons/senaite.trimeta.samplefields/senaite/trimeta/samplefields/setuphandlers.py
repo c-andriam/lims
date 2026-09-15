@@ -60,7 +60,37 @@ def post_install(portal_setup):
         for catalog_id, indexes in added.items():
             reindex_catalog(catalog_id, indexes)
     register_coa_template()
+    apply_defaults(portal)
     logger.info("senaite.trimeta.samplefields: post_install termine")
+
+
+def apply_defaults(portal):
+    """Pose la configuration que l'add-on livre en code (voir defaults.py).
+
+    Chaque volet est isole: un echec sur l'un ne doit pas empecher les
+    autres. Une installation reussie avec un reglage manquant se
+    rattrape en rejouant l'etape; une installation interrompue a
+    mi-chemin laisse un site dans un etat que personne ne sait decrire.
+    """
+    from senaite.trimeta.samplefields import defaults
+
+    # D11 -- gabarit de publication unitaire par defaut.
+    try:
+        defaults.set_default_coa_template()
+    except Exception:
+        logger.exception("Gabarit COA par defaut: echec")
+
+    # D9 -- calculs de moyenne sur repetitions.
+    try:
+        defaults.setup_repetitions(portal)
+    except Exception:
+        logger.exception("Calculs de repetitions: echec")
+
+    # D7 -- role Analyst sur les comptes deja crees.
+    try:
+        defaults.grant_analyst_role(portal)
+    except Exception:
+        logger.exception("Role Analyst: echec")
 
 
 def register_coa_template():
