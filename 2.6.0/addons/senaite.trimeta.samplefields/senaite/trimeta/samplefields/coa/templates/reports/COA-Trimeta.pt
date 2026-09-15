@@ -1,0 +1,188 @@
+<tal:report
+    define="model view/model"
+    i18n:domain="senaite.impress">
+
+  <!-- Gabarit COA Trimeta (lot 4).
+
+       Copie de la structure de senaite.impress:Default.pt: memes
+       sections REPORT CONTROLS/JS/CSS/HEADER/INFO/ALERTS, rendues via
+       les memes methodes de vue (view.render_*), pour ne pas s'ecarter
+       du comportement natif (barcode, alertes, pieces jointes,
+       signatures...).
+
+       Deux differences, demandees par le cahier des charges:
+
+       1. Le tableau "Summary" natif est remplace par un tableau
+          equivalent, complete des champs Trimeta (poids a la
+          reception, debut/fin d'analyse, validateur final) et sans le
+          lien mailto sur "Published by".
+       2. Deux tableaux sont ajoutes a la suite: "Sample information"
+          (temperature, designation, lot, client) et "Organoleptic
+          analysis" (texture, couleur, arome).
+
+       Les champs lus ci-dessous (model/ReceptionWeight,
+       model/AnalysisStart, model/Texture, ...) viennent du
+       schemaextender de ce meme add-on: voir extender.py et
+       qualitydata/extender.py. SuperModel les expose par leur NOM DE
+       CHAMP (pas l'accesseur get*): c'est le meme mecanisme que
+       model/ClientSampleID ou model/DateReceived ci-dessous, deja
+       utilises par le gabarit natif. -->
+
+  <!-- REPORT CONTROLS -->
+  <tal:t replace="structure python:view.render_controls(context, **options)" />
+
+  <!-- REPORT JS -->
+  <tal:t replace="structure python:view.render_js(context, **options)" />
+
+  <!-- REPORT CSS -->
+  <tal:t replace="structure python:view.render_css(context, **options)" />
+
+  <!-- REPORT HEADER -->
+  <tal:t replace="structure python:view.render_header(context, **options)" />
+
+  <!-- REPORT INFO -->
+  <tal:t replace="structure python:view.render_info(context, **options)" />
+
+  <!-- REPORT ALERTS -->
+  <tal:t replace="structure python:view.render_alerts(context, **options)" />
+
+  <!-- REPORT SUMMARY (version Trimeta, cf. note en tete de fichier) -->
+  <tal:t define="client model/Client;
+                 reporter python:view.current_user;">
+    <div class="row section-summary no-gutters">
+      <div class="w-100">
+
+        <!-- Barcode -->
+        <div class="text-center float-right barcode-container">
+          <div class="barcode"
+               data-code="code128"
+               data-showHRI="true"
+               data-barHeight="15"
+               data-addQuietZone="true"
+               tal:attributes="data-id model/getId">
+          </div>
+        </div>
+
+        <h1 i18n:translate="">Summary</h1>
+
+        <table class="table table-sm table-condensed">
+          <tr>
+            <td style="width:20%" class="label" i18n:translate="">Sample ID</td>
+            <td>
+              <a tal:content="model/getId"
+                 tal:attributes="href model/absolute_url;">
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="label" i18n:translate="">Sample Type</td>
+            <td tal:content="model/SampleType/title|nothing"></td>
+          </tr>
+          <tr>
+            <td class="label" i18n:translate="">Specification</td>
+            <td tal:content="model/Specification/contextual_title|nothing"></td>
+          </tr>
+          <tr>
+            <td class="label" i18n:translate="">Date Received</td>
+            <td tal:content="python:view.to_localized_time(model.DateReceived)"></td>
+          </tr>
+          <tr>
+            <td class="label" i18n:translate="">Beginning of analysis</td>
+            <td tal:content="python:view.to_localized_time(model.AnalysisStart)"></td>
+          </tr>
+          <tr>
+            <td class="label" i18n:translate="">End of analysis</td>
+            <td tal:content="python:view.to_localized_time(model.AnalysisEnd)"></td>
+          </tr>
+          <tr>
+            <td class="label" i18n:translate="">Date Validated</td>
+            <td tal:content="python:view.to_localized_time(model.getDateVerified())"></td>
+          </tr>
+          <tr>
+            <td class="label" i18n:translate="">Validated by</td>
+            <td tal:content="model/FinalValidator/Fullname|nothing"></td>
+          </tr>
+          <tr>
+            <td class="label" i18n:translate="">Date Published</td>
+            <td tal:content="python:view.to_localized_time(view.timestamp)"></td>
+          </tr>
+          <tr tal:condition="reporter">
+            <!-- Nom seul: pas de lien mailto, sur demande du cahier
+                 des charges ("supprimer l'adresse mail"). -->
+            <td class="label" i18n:translate="">Published by</td>
+            <td tal:content="reporter/fullname|reporter/username"></td>
+          </tr>
+          <tr>
+            <td class="label" i18n:translate="">Sample weight</td>
+            <td tal:content="model/ReceptionWeight|nothing"></td>
+          </tr>
+        </table>
+
+        <!-- SAMPLE INFORMATION -->
+        <h2 i18n:translate="">Sample information</h2>
+        <table class="table table-sm table-condensed">
+          <tr>
+            <td style="width:20%" class="label" i18n:translate="">Reception temperature</td>
+            <td tal:content="model/ReceptionTemperature|nothing"></td>
+          </tr>
+          <tr>
+            <td class="label" i18n:translate="">Designation</td>
+            <td tal:content="model/Designation|nothing"></td>
+          </tr>
+          <tr>
+            <td class="label" i18n:translate="">Lot</td>
+            <td tal:content="model/ClientSampleID|nothing"></td>
+          </tr>
+          <tr>
+            <td class="label" i18n:translate="">Client</td>
+            <td>
+              <a tal:condition="client"
+                 tal:attributes="href client/absolute_url"
+                 tal:content="client/Name"></a>
+            </td>
+          </tr>
+        </table>
+
+        <!-- ORGANOLEPTIC ANALYSIS -->
+        <h2 i18n:translate="">Organoleptic analysis</h2>
+        <table class="table table-sm table-condensed">
+          <tr>
+            <td style="width:20%" class="label" i18n:translate="">Texture</td>
+            <td tal:content="model/Texture|nothing"></td>
+          </tr>
+          <tr>
+            <td class="label" i18n:translate="">Color</td>
+            <td tal:content="model/Color|nothing"></td>
+          </tr>
+          <tr>
+            <td class="label" i18n:translate="">Aroma</td>
+            <td tal:content="model/Aroma|nothing"></td>
+          </tr>
+        </table>
+
+      </div>
+    </div>
+  </tal:t>
+
+  <!-- REPORT RESULTS -->
+  <tal:t replace="structure python:view.render_results(context, **options)" />
+
+  <!-- RESULTS INTERPRETATION -->
+  <tal:t replace="structure python:view.render_interpretations(context, **options)" />
+
+  <!-- SAMPLE REMARKS -->
+  <tal:t replace="structure python:view.render_remarks(context, **options)" />
+
+  <!-- REPORT ATTACHMENTS -->
+  <tal:t replace="structure python:view.render_attachments(context, **options)" />
+
+  <!-- REPORT SIGNATURES -->
+  <tal:t replace="structure python:view.render_signatures(context, **options)" />
+
+  <!-- REPORT DISCREETER -->
+  <tal:t replace="structure python:view.render_discreeter(context, **options)" />
+
+  <!-- REPORT FOOTER -->
+  <tal:t replace="structure python:view.render_footer(context, **options)" />
+
+</tal:report>
