@@ -225,6 +225,32 @@ double. La règle retenue n'exige aucune connaissance du balisage :
 
 Un garde-fou refuse d'insérer tout bloc portant plus d'un lien.
 
+### Les filtres ne s'appliquaient pas dans le navigateur
+
+Constaté en reproduisant exactement les appels du navigateur. Les champs
+cachés (`additional_hidden_fields`) ne suffisaient pas, contrairement à
+ce qu'annonçait une version antérieure de ce document.
+
+- `senaite.app.listing` charge les lignes, trie et pagine en AJAX. Il
+  construit la vue, **puis** injecte ses données dans le formulaire
+  (clés préfixées `trimeta_dashboard_`) et appelle `update()`.
+- Son script ajoute les paramètres de la page à l'adresse de chaque
+  appel, mais envoie un corps **JSON** : Zope n'analyse alors pas
+  l'adresse.
+- Les filtres, lus une seule fois dans `__init__`, n'étaient donc jamais
+  vus : le tableau restait non filtré.
+
+Correctif : `update()` relit les filtres depuis les trois sources
+(`filters.merged_form`) et reconstruit la requête à chaque passage.
+Vérifié : sans filtre, type seul, option groupée, tri, pagination, lot.
+
+### Listes déroulantes des filtres
+
+- Première option **« Tous »**, et non une ligne vide.
+- **Une entrée par nom** : plusieurs types d'échantillon ou clients de
+  même intitulé forment une seule entrée, qui filtre sur tous leurs UID.
+- **Aucune entrée sans intitulé.**
+
 ### Deux détails qui coûtent cher
 
 **Le cache du navigateur.** `dashboard.js` est servi avec un paramètre
