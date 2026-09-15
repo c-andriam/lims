@@ -33,7 +33,26 @@ class TestProfileInstallation(TrimetaTestCase):
         """
         setup_tool = self.portal.portal_setup
         version = setup_tool.getLastVersionForProfile(PROFILE)
-        self.assertEqual(version, ("1005",))
+        self.assertEqual(version, ("1007",))
+
+    def test_toolbar_shows_the_trimeta_logo(self):
+        from bika.lims import api
+        from plone.formwidget.namedfile.converter import b64decode_file
+        setup = api.get_senaite_setup()
+        filename, data = b64decode_file(setup.getSiteLogo())
+        self.assertEqual(filename, u"logo-trimeta-groupe-blanc.png")
+        self.assertTrue(data.startswith(b"\x89PNG"))
+        self.assertEqual(setup.getSiteLogoCSS(), "height:32px;")
+
+    def test_reports_use_decimal_comma(self):
+        from bika.lims import api
+        setup = api.get_setup()
+        self.assertEqual(setup.getField("DecimalMark").get(setup), ",")
+
+    def test_week_starts_on_monday(self):
+        from plone import api as ploneapi
+        self.assertEqual(
+            ploneapi.portal.get_registry_record("plone.first_weekday"), 0)
 
     def test_site_language_is_french(self):
         """registry.xml: francais par defaut, langue du navigateur ignoree."""

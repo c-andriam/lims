@@ -85,4 +85,33 @@
       profile="senaite.trimeta.samplefields:default"
       />
 
+  <!-- 1005 -> 1006 : parametres de base
+
+       Virgule decimale des rapports et lundi premier jour de semaine,
+       sans remplacer un choix du laboratoire. -->
+  <genericsetup:upgradeStep
+      title="Trimeta 1005 -> 1006 : virgule decimale et lundi"
+      description="Virgule decimale sur les rapports et lundi comme
+                   premier jour de la semaine, si les valeurs d'usine
+                   sont encore en place."
+      source="1005"
+      destination="1006"
+      handler=".v1006.upgrade"
+      profile="senaite.trimeta.samplefields:default"
+      />
+
+  <!-- 1006 -> 1007 : logo de l'application
+
+       Logo Trimeta Group dans la barre d'outils, sauf si un logo est deja
+       defini dans Configuration > Apparence. -->
+  <genericsetup:upgradeStep
+      title="Trimeta 1006 -> 1007 : logo Trimeta Group"
+      description="Pose le logo Trimeta Group dans la barre d'outils si
+                   aucun logo n'est defini."
+      source="1006"
+      destination="1007"
+      handler=".v1007.upgrade"
+      profile="senaite.trimeta.samplefields:default"
+      />
+
 </configure>
