@@ -48,9 +48,32 @@ class TestCodeArticleVocabulary(unittest.TestCase):
         self.assertEqual(keys[-1], "AUTRES")
 
 
+class TestReceptionListsFromSpecification(unittest.TestCase):
+    """Condition et emballage: listes imposees par le cahier des charges."""
+
+    def test_condition_choices(self):
+        keys = [k for k, _label in vocab.SAMPLE_CONDITION_VOCAB]
+        self.assertEqual(keys, ["", "Conforme", "Non conforme"])
+
+    def test_condition_needs_an_explicit_choice(self):
+        """Sans entree vide, "Conforme" serait preselectionne d'office."""
+        self.assertEqual(vocab.SAMPLE_CONDITION_VOCAB[0][0], "")
+
+    def test_packaging_choices(self):
+        keys = [k for k, _label in vocab.PACKAGING_CONDITION_VOCAB]
+        self.assertEqual(keys, ["Sous vide", "Sachet zip", "Kraft"])
+
+    def test_values_already_entered_stay_valid(self):
+        """Valeurs saisies en texte libre avant le passage en liste."""
+        self.assertIn("Conforme", dict(vocab.SAMPLE_CONDITION_VOCAB))
+        for value in ("Sous vide", "Sachet zip"):
+            self.assertIn(value, dict(vocab.PACKAGING_CONDITION_VOCAB))
+
+
 def test_suite():
     suite = unittest.TestSuite()
     loader = unittest.TestLoader()
     suite.addTest(loader.loadTestsFromTestCase(TestTemperatureVocabulary))
     suite.addTest(loader.loadTestsFromTestCase(TestCodeArticleVocabulary))
+    suite.addTest(loader.loadTestsFromTestCase(TestReceptionListsFromSpecification))
     return suite

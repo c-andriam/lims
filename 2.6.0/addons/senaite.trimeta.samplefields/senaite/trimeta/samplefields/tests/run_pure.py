@@ -175,6 +175,8 @@ def install_stubs():
     make_module("senaite.core.browser.widgets")
     make_module("senaite.core.browser.widgets.referencewidget",
                 ReferenceWidget=StubWidget)
+    make_module("senaite.core.browser.widgets.selectotherwidget",
+                SelectOtherWidget=StubWidget)
 
     make_module("plone")
     make_module("plone.indexer", indexer=indexer)
@@ -236,6 +238,7 @@ MODULES = [
     (P + "dashboard.columns", "dashboard/columns.py"),
     (P + "coa.filename", "coa/filename.py"),
     (P + "worksheet.export", "worksheet/export.py"),
+    (P + "i18n", "i18n.py"),
 ]
 
 # (fichier de test, classes qui n'ont pas besoin d'un site Plone)
@@ -254,6 +257,8 @@ PURE_CASES = [
     ("test_dashboard_filters.py", None),
     ("test_coa.py", None),
     ("test_worksheet_export.py", None),
+    ("test_i18n.py", None),
+    ("test_branding.py", None),
 ]
 
 
