@@ -177,6 +177,19 @@ sauf si le laboratoire en avait déjà choisi un autre que
 (voir `lot1-parametrage.md`). Réglage modifiable dans
 *Configuration › Impress › Default Template*.
 
+## Langue du COA
+
+Le COA reste **en anglais**, avec les libellés du cahier des charges
+(« Sample reference », « Report reference », « ORGANOLEPTIC
+ANALYSIS »…), alors que l'interface est en français. Le gabarit utilise
+son propre domaine de traduction (`senaite.trimeta.coa`), sans catalogue.
+Sous `senaite.impress`, il empruntait les traductions françaises de
+l'écran de publication et mélangeait les deux langues (« Type
+d'échantillon » au milieu de libellés anglais).
+
+Pour un COA en français, il suffirait de fournir un catalogue
+`senaite.trimeta.coa` en français.
+
 ---
 
 ## Reste à trancher
@@ -184,5 +197,11 @@ sauf si le laboratoire en avait déjà choisi un autre que
 1. **« Supprimer l'adresse mail »** a été compris comme le lien mailto
    de *Published by*. L'e-mail du contact client, dans le bloc d'en-tête
    natif, est toujours affiché : à confirmer avec le laboratoire.
-2. **« Report reference »** n'est pas sur le COA : aucun champ SENAITE
-   n'y correspond clairement. À préciser avec le laboratoire.
+2. **« Report reference »** — *tranché à partir du document*. Le même
+   cahier des charges demande que le COA porte le nom du **Code
+   échantillon** (nom du PDF) : c'est la référence sous laquelle le
+   rapport circule. Le COA l'affiche donc sous « Référence du rapport »,
+   avec repli sur le Numéro de fiche d'analyse si le code manque.
+   L'identifiant de l'objet rapport de SENAITE ne peut pas servir : il
+   n'existe pas encore quand le PDF est produit. À valider à la première
+   relecture d'un COA par le laboratoire.
