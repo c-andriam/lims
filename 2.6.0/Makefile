@@ -181,7 +181,14 @@ test-pure: ## Tests de logique pure, sans container (instantane)
 	  echo "container avec 'make test'."; \
 	  exit 1; \
 	fi
-	@$(PYTHON) $(ADDON_DIR)/senaite/trimeta/samplefields/tests/run_pure.py
+	@# PYTHONDONTWRITEBYTECODE: run_pure.py charge les modules PAR
+	@# CHEMIN (importlib.util.spec_from_file_location). Un
+	@# __pycache__ laisse par une execution precedente est alors
+	@# relu tel quel, et la suite teste l'ANCIEN code -- on croit
+	@# un correctif inoperant alors qu'il n'a jamais ete execute.
+	@# Le container se protege deja ainsi (voir compose.yml); il
+	@# manquait la meme protection cote hote.
+	@PYTHONDONTWRITEBYTECODE=1 $(PYTHON) $(ADDON_DIR)/senaite/trimeta/samplefields/tests/run_pure.py
 
 require-running: check-engine
 	@ENGINE=$(ENGINE) SERVICE=$(SERVICE) PORT=$(PORT) sh scripts/require-running.sh

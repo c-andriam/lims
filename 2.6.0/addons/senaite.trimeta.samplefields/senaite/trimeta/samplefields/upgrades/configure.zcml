@@ -54,4 +54,23 @@
       profile="senaite.trimeta.samplefields:default"
       />
 
+  <!-- 1003 -> 1004 : nommage des COA par le Code echantillon
+
+       Active la couche de navigateur ITrimetaLayer, qui porte les
+       surcharges des trois endroits ou senaite.core fabrique le nom
+       d'un fichier COA. Sans cette etape, une instance deja installee
+       garderait le nommage par Sample ID: browserlayer.xml n'est lu
+       qu'a l'installation du profil. Instantanee, aucune
+       reindexation. -->
+  <genericsetup:upgradeStep
+      title="Trimeta 1003 -> 1004 : nommage des COA par le Code echantillon"
+      description="Active la couche de navigateur qui fait nommer les
+                   fichiers COA d'apres le Code echantillon au lieu du
+                   Sample ID."
+      source="1003"
+      destination="1004"
+      handler=".v1004.upgrade"
+      profile="senaite.trimeta.samplefields:default"
+      />
+
 </configure>

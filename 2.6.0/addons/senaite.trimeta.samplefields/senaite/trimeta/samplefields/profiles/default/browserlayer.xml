@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Active la couche de navigateur de l'add-on.
+
+     Elle porte les surcharges de vues de senaite.core: aujourd'hui le
+     nommage des fichiers COA (demande D10), voir interfaces.py et coa/.
+
+     Activee ici, retiree par profiles/uninstall/browserlayer.xml:
+     desinstaller l'add-on redonne le comportement natif. -->
+<layers>
+  <layer
+      name="senaite.trimeta.samplefields"
+      interface="senaite.trimeta.samplefields.interfaces.ITrimetaLayer"
+      />
+</layers>
