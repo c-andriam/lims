@@ -15,6 +15,7 @@ from bika.lims.interfaces import IRoutineAnalysis
 
 from senaite.trimeta.samplefields.indexers import get_field_value
 from senaite.trimeta.samplefields.worksheet.export import fill_export_values
+from senaite.trimeta.samplefields.worksheet.export import format_due_date
 from senaite.trimeta.samplefields.worksheet.export import slot_title
 
 logger = logging.getLogger("senaite.trimeta.samplefields")
@@ -43,6 +44,21 @@ class SampleCodeSlotHeaderMixin(object):
             # copie: la methode parente est memoisee
             data = dict(data, item_title=title)
         return data
+
+    def folderitem(self, obj, item, index):
+        item = super(SampleCodeSlotHeaderMixin, self).folderitem(
+            obj, item, index)
+        # senaite.core (worksheet/views/analyses.py) ecrase l'echeance par
+        # ulocalized_time(analyse) au lieu de getDueDate(): colonne toujours
+        # vide dans la Work Sheet, remplie dans la liste de l'echantillon.
+        try:
+            due_date = api.get_object(obj).getDueDate()
+            item["DueDate"] = format_due_date(
+                due_date, lambda d: self.ulocalized_time(d, long_format=0))
+        except Exception:
+            logger.exception("Echeance de l'analyse %s illisible",
+                             item.get("uid"))
+        return item
 
 
 class TrimetaAnalysesView(SampleCodeSlotHeaderMixin, AnalysesView):

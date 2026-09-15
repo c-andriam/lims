@@ -4,6 +4,7 @@
 import unittest
 
 from senaite.trimeta.samplefields.worksheet.export import fill_export_values
+from senaite.trimeta.samplefields.worksheet.export import format_due_date
 from senaite.trimeta.samplefields.worksheet.export import slot_title
 
 
@@ -64,9 +65,23 @@ class TestSlotTitle(unittest.TestCase):
             self.assertEqual(slot_title(code, "VAN-0006"), "VAN-0006")
 
 
+class TestFormatDueDate(unittest.TestCase):
+
+    def test_due_date_is_localized(self):
+        self.assertEqual(format_due_date("2026-09-20", lambda d: "20/09/2026"),
+                         "20/09/2026")
+
+    def test_no_due_date_gives_empty_cell(self):
+        for value in (None, ""):
+            self.assertEqual(format_due_date(value, lambda d: "jamais"), "")
+
+    def test_localizer_returning_none_gives_empty_cell(self):
+        self.assertEqual(format_due_date("2026-09-20", lambda d: None), "")
+
+
 def test_suite():
     loader = unittest.TestLoader()
     suite = unittest.TestSuite()
-    for case in (TestFillExportValues, TestSlotTitle):
+    for case in (TestFillExportValues, TestSlotTitle, TestFormatDueDate):
         suite.addTests(loader.loadTestsFromTestCase(case))
     return suite

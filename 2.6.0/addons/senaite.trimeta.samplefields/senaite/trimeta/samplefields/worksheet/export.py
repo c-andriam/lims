@@ -2,6 +2,13 @@
 """Logique pure de la Work Sheet, testable sans Zope."""
 
 
+def format_due_date(due_date, localize):
+    """Echeance localisee, ou chaine vide si l'analyse n'en a pas."""
+    if not due_date:
+        return u""
+    return localize(due_date) or u""
+
+
 def slot_title(sample_code, sample_id):
     """`CODE (ID)` en tete de position, ou l'ID seul sans code."""
     if not sample_code:
