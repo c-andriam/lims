@@ -38,8 +38,10 @@ if [ -z "$ENGINE" ]; then
     exit 1
 fi
 
-echo "Compilation de l'add-on dans le container..."
-"$ENGINE" exec -i "$SERVICE" bash -c "cd $INSTANCE_DIR && buildout -c custom.cfg"
+PARTS="${PARTS:-instance}"
+
+echo "Compilation de l'add-on dans le container (partie: $PARTS)..."
+"$ENGINE" exec -i "$SERVICE" bash -c "cd $INSTANCE_DIR && buildout -c custom.cfg install $PARTS"
 STATUS=$?
 
 # --- Toujours, quel que soit le sort de buildout.

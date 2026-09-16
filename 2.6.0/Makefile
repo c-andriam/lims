@@ -120,15 +120,8 @@ redeploy-addon: require-running ## Recharge l'add-on apres modification dans add
 	@echo "  $(SITE_URL)/portal_setup/manage_upgrades"
 	@echo "  -> jouer les etapes de mise a jour de $(ADDON)"
 
-redeploy-instance: require-running ## Comme redeploy-addon, sans reconstruire le site
-	@# 'buildout install instance' ne joue que la partie qui prend
-	@# l'add-on en compte, en sautant 'plonesite' -- lourde en
-	@# memoire et sans rapport avec l'add-on. A utiliser quand
-	@# redeploy-addon se fait tuer (code 137) sur un serveur juste
-	@# en memoire.
-	$(ENGINE) exec -i $(SERVICE) bash -c \
-		"cd $(INSTANCE_DIR) && buildout -c custom.cfg install instance"
-	@ENGINE=$(ENGINE) TARGET=addons QUIET=1 sh scripts/fix-perms.sh
+redeploy-instance: require-running ## Alias de redeploy-addon (joue 'buildout install instance')
+	@ENGINE=$(ENGINE) SERVICE=$(SERVICE) INSTANCE_DIR=$(INSTANCE_DIR) PARTS=instance sh scripts/redeploy.sh
 	$(MAKE) restart
 
 first-setup: ## Premiere installation complete sur une nouvelle machine
