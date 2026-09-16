@@ -316,9 +316,13 @@ class FakeField(object):
 
 
 class FakeSample(object):
-    def __init__(self, code, lot):
+    def __init__(self, code, lot, sample_id="VAN-0001"):
         self.code = code
         self.lot = lot
+        self.sample_id = sample_id
+
+    def getId(self):
+        return self.sample_id
 
     def getField(self, name):
         return FakeField(self.code) if name == "SampleCode" else None
@@ -334,10 +338,11 @@ class TestReportsColumns(unittest.TestCase):
         return FakeListing(
             portal_type="ARReport",
             columns=[("Info", {}), ("AnalysisRequest", {}),
-                     ("Batch", {"title": "Batch"}), ("State", {})],
+                     ("Batch", {"title": "Batch"}), ("State", {}),
+                     ("PDF", {})],
             review_states=[{"id": "default",
                             "columns": ["Info", "AnalysisRequest", "Batch",
-                                        "State"]}],
+                                        "State", "PDF"]}],
         )
 
     def test_columns_follow_the_primary_sample(self):
@@ -345,7 +350,7 @@ class TestReportsColumns(unittest.TestCase):
         ReportsListingAdapter(listing, None).before_render()
         self.assertEqual(list(listing.columns.keys()),
                          ["Info", "AnalysisRequest", "SampleCode", "Lot",
-                          "Batch", "State"])
+                          "Batch", "State", "PDF"])
         self.assertIn("Lot", listing.review_states[0]["columns"])
 
     def test_native_batch_column_is_hidden_by_default(self):
@@ -428,6 +433,50 @@ class TestInstrumentMaintenanceType(unittest.TestCase):
         self.assertEqual(maintenance_type_value(None), "")
 
 
+class TestReportsExport(unittest.TestCase):
+    """Export CSV de la liste des rapports.
+
+    L'export de senaite.app.listing ne prend que les colonnes AFFICHEES,
+    et lit `item[cle]`, jamais le HTML de `item["replace"]`.
+    """
+
+    def make_adapter(self):
+        listing = TestReportsColumns.make_listing(self)
+        adapter = ReportsListingAdapter(listing, None)
+        adapter.before_render()
+        adapter.get_cached_sample = lambda uid: FakeSample(
+            "ECH-1", "LOT-1", "VAN-0005")
+        return listing, adapter
+
+    def test_info_column_is_hidden_by_default(self):
+        """Sa valeur est du HTML: l'export la recopiait en 1re colonne."""
+        listing, _adapter = self.make_adapter()
+        self.assertIs(listing.columns["Info"]["toggle"], False)
+
+    def test_primary_sample_and_pdf_are_exported(self):
+        _listing, adapter = self.make_adapter()
+        item = {"url": "http://lims/rapport-1",
+                "replace": {"PDF": "<a href='#'>PDF</a>"}}
+        adapter.folder_item(FakeBrain(getAnalysisRequestUID="u1"), item, 0)
+        self.assertEqual(item["AnalysisRequest"], "VAN-0005")
+        self.assertEqual(item["PDF"], "http://lims/rapport-1/download_pdf")
+
+    def test_report_without_file_gets_no_address(self):
+        """Pas de lien de telechargement: on n'invente pas d'adresse."""
+        _listing, adapter = self.make_adapter()
+        item = {"url": "http://lims/rapport-1", "replace": {}}
+        adapter.folder_item(FakeBrain(getAnalysisRequestUID="u1"), item, 0)
+        self.assertEqual(item["PDF"], "")
+
+    def test_existing_values_are_kept(self):
+        _listing, adapter = self.make_adapter()
+        item = {"url": "http://lims/rapport-1", "AnalysisRequest": "VAN-9999",
+                "PDF": "deja rempli", "replace": {}}
+        adapter.folder_item(FakeBrain(getAnalysisRequestUID="u1"), item, 0)
+        self.assertEqual(item["AnalysisRequest"], "VAN-9999")
+        self.assertEqual(item["PDF"], "deja rempli")
+
+
 class TestFailureIsolation(unittest.TestCase):
     """Un adaptateur cassé ne doit jamais empêcher un listing de
     s'afficher: mieux vaut une colonne vide qu'un écran d'erreur."""
@@ -469,7 +518,7 @@ def test_suite():
     loader = unittest.TestLoader()
     for case in (TestInsertColumnAfter, TestShowInAllStates,
                  TestDiscrimination, TestSamplesColumns,
-                 TestWorksheetColumn, TestReportsColumns,
+                 TestWorksheetColumn, TestReportsColumns, TestReportsExport,
                  TestInstrumentMaintenanceType, TestFailureIsolation):
         suite.addTest(loader.loadTestsFromTestCase(case))
     return suite

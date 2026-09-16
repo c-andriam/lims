@@ -190,6 +190,44 @@ d'échantillon » au milieu de libellés anglais).
 Pour un COA en français, il suffirait de fournir un catalogue
 `senaite.trimeta.coa` en français.
 
+## Export de la liste des rapports d'analyses
+
+### Le constat
+
+Le bouton **Exportation** produisait un fichier inexploitable :
+
+- première colonne remplie de balises HTML
+  (`<a href=\"analysisreport_info?...\">`) ;
+- colonnes **Échantillon primaire** et **Télécharger le PDF** vides.
+
+### La cause
+
+L'export de `senaite.app.listing` se fait dans le navigateur. Il ne
+retient que les colonnes **affichées**, et lit la **valeur** de chaque
+cellule, jamais la version HTML (`replace`) utilisée à l'écran.
+
+- La colonne *Info* a pour valeur le HTML de l'icône : il partait tel
+  quel dans le fichier.
+- senaite.core ne renseigne, pour l'échantillon primaire et le lien PDF,
+  que la version HTML : l'export ne trouvait donc rien.
+
+### Ce qui a été fait
+
+- *Info* est **masquée par défaut** : elle sort du fichier et reste
+  activable dans le menu des colonnes (« ··· »). Il n'existe pas
+  d'indicateur « ne pas exporter » par colonne.
+- **Échantillon primaire** exporte l'identifiant de l'échantillon,
+  **Télécharger le PDF** l'adresse de téléchargement. Un rapport sans
+  fichier laisse la cellule vide : aucune adresse n'est inventée.
+- L'affichage ne change pas : à l'écran, `replace` reste prioritaire.
+
+### Vérification (16/09/2026)
+
+Fichier réellement téléchargé depuis le navigateur : 10 colonnes, aucune
+balise HTML, aucune colonne *Info*. *Échantillon primaire* donne
+`VAN-0005`, *Télécharger le PDF* l'adresse du fichier. Seule *Envoyé à*
+reste vide, faute d'envoi par courriel sur ces rapports.
+
 ---
 
 ## Reste à trancher
