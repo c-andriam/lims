@@ -44,7 +44,45 @@
   <!-- REPORT CSS -->
   <tal:t replace="structure python:view.render_css(context, **options)" />
 
-  <!-- REPORT HEADER -->
+  <!-- MISE EN PAGE DU COA
+
+       La feuille de style ci-dessus pose "div.row { page-break-inside:
+       avoid }" pour TOUTES les sections. Nos tableaux sont longs: une
+       section qui ne tenait pas dans la place restante basculait entiere
+       a la page suivante, laissant un grand blanc au milieu du rapport.
+
+       Regle posee APRES, et plus specifique, donc prioritaire: nos
+       sections peuvent se couper et remplissent la page. Les titres
+       restent solidaires de ce qui les suit (page-break-after: avoid de
+       la feuille de style), et une ligne de tableau n'est jamais coupee
+       en deux. Seules les sections du COA sont concernees. -->
+  <style type="text/css">
+   .report div.row.section-summary,
+   .report div.row.section-sample-information,
+   .report div.row.section-organoleptic,
+   .report div.row.section-results,
+   .report div.row.section-resultsinterpretation,
+   .report div.row.section-remarks,
+   .report div.row.section-signatures,
+   .report div.row.section-discreeter {
+     page-break-inside: auto;
+   }
+   /* Une ligne de tableau n'est jamais coupee en deux */
+   .report div.row tr {
+     page-break-inside: avoid;
+   }
+   /* Un titre ne reste jamais seul en bas de page */
+   .report div.row h1,
+   .report div.row h2 {
+     page-break-after: avoid;
+   }
+  </style>
+
+  <!-- REPORT HEADER
+
+       Appel standard: le logo du laboratoire vient de la vue de rapport
+       de l'add-on (coa/reportview.py), qui remplace l'en-tete pour TOUS
+       les gabarits, y compris ceux de senaite.impress. -->
   <tal:t replace="structure python:view.render_header(context, **options)" />
 
   <!-- REPORT INFO -->
@@ -137,7 +175,18 @@
           </tr>
         </table>
 
-        <!-- SAMPLE INFORMATION -->
+      </div>
+    </div>
+
+    <!-- SAMPLE INFORMATION
+
+         Section a part, et non a la suite du Summary dans le meme bloc:
+         la feuille de style des rapports pose "div.row { page-break-inside:
+         avoid }". Un bloc unique portant les trois tableaux ne tenait plus
+         dans la place restante et basculait entier a la page suivante, en
+         laissant la premiere page presque vide. -->
+    <div class="row section-sample-information no-gutters">
+      <div class="w-100">
         <h2 i18n:translate="">Sample information</h2>
         <table class="table table-sm table-condensed">
           <tr>
@@ -161,8 +210,12 @@
             </td>
           </tr>
         </table>
+      </div>
+    </div>
 
-        <!-- ORGANOLEPTIC ANALYSIS -->
+    <!-- ORGANOLEPTIC ANALYSIS -->
+    <div class="row section-organoleptic no-gutters">
+      <div class="w-100">
         <h2 i18n:translate="">Organoleptic analysis</h2>
         <table class="table table-sm table-condensed">
           <tr>
@@ -178,7 +231,6 @@
             <td tal:content="model/Aroma|nothing"></td>
           </tr>
         </table>
-
       </div>
     </div>
   </tal:t>

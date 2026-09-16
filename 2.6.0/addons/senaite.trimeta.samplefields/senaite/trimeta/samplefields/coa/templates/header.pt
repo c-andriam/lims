@@ -1,0 +1,34 @@
+<tal:t i18n:domain="senaite.impress">
+
+  <!-- En-tete de rapport Trimeta, rendu pour TOUS les gabarits.
+
+       Copie de senaite/impress/analysisrequest/templates/header.pt:
+       memes classes, meme structure, seule l'image change. La feuille de
+       style du rapport s'applique donc sans retouche.
+
+       Hauteur 34px pour une image recadree sur son encre; les 30px de la
+       feuille de style visaient le logotype allonge de SENAITE. -->
+
+  <div class="row section-header no-gutters">
+    <div class="w-100 mb-2">
+      <table class="w-100 mb-0 noborder">
+        <colgroup>
+          <col style="width:50%"/>
+          <col style="width:50%;"/>
+        </colgroup>
+        <tr>
+          <td class="align-middle text-left">
+            <h1 i18n:translate="">Analysis Report</h1>
+          </td>
+          <td class="align-middle text-right">
+            <img class="logo"
+                 style="height:34px;"
+                 alt="TRIMETA AGROFOOD LABO"
+                 tal:attributes="src python:view.get_resource_url('logo-trimeta-agrofood.png', prefix='senaite.trimeta.samplefields.static')"/>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+</tal:t>

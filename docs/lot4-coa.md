@@ -190,6 +190,67 @@ d'échantillon » au milieu de libellés anglais).
 Pour un COA en français, il suffirait de fournir un catalogue
 `senaite.trimeta.coa` en français.
 
+## Logo du laboratoire sur le COA
+
+Le PDF portait le logo **SENAITE**, en haut à droite de la première
+page. senaite.impress l'écrit en dur dans son en-tête
+(`analysisrequest/templates/header.pt`, image `senaite.svg`) : aucun
+réglage ne permet de le remplacer, et la fiche Laboratoire n'a de champ
+logo que pour l'accréditation.
+
+**L'en-tête est remplacé pour tous les gabarits**, pas seulement pour le
+COA Trimeta : sinon, un utilisateur qui choisit un gabarit SENAITE dans
+l'écran de publication retrouverait le logo SENAITE dans le PDF.
+
+senaite.impress prévoit ce cas. Avant de produire un rapport, il cherche
+une vue qui adapte aussi le contexte, et ne prend la sienne qu'à défaut —
+son code dit que c'est là pour permettre à un add-on de la redéfinir.
+L'add-on enregistre donc ses propres vues de rapport
+(`coa/reportview.py`), qui ne changent qu'une chose : l'en-tête
+(`coa/templates/header.pt`), copie de celui de SENAITE avec la même
+structure et les mêmes classes, où seule l'image change. La feuille de
+style du rapport s'applique sans modification, et le gabarit COA reprend
+l'appel standard, sans duplication.
+
+Le logo est livré avec l'add-on
+(`browser/resources/logo-trimeta-agrofood.png`, source
+`https://trimetagroup.com/wp-content/uploads/2024/08/taf-logo1.png`).
+
+- **Servi par l'application**, pas par le site du groupe : produire un
+  PDF ne dépend d'aucun accès Internet.
+- **Hauteur 45 px** au lieu des 30 px de la feuille de style, prévus pour
+  le logotype allongé de SENAITE : ce logo-ci est presque carré.
+- Ne pas confondre avec le logo de la **barre d'outils**, qui est la
+  version blanche du logo du groupe (voir
+  [parametres-par-defaut.md](parametres-par-defaut.md)).
+
+## Mise en page : plus de page blanche
+
+Le COA sortait sur **3 pages**, la première presque vide et la dernière
+ne portant que les mentions légales.
+
+**La cause.** La feuille de style des rapports pose
+`div.row { page-break-inside: avoid }` : chaque section est insécable.
+Nos tableaux sont longs ; une section qui ne tenait pas dans la place
+restante basculait entière à la page suivante.
+
+**Ce qui a été fait.**
+
+- Le Summary, les informations d'échantillon et l'analyse organoleptique
+  sont **trois sections distinctes**, au lieu d'un bloc unique.
+- Le gabarit COA pose, après la feuille de style et plus spécifiquement
+  qu'elle, une règle qui **autorise la coupure** de ses sections, y
+  compris celles de senaite.impress (résultats, responsables, mentions
+  légales). Seul le COA est concerné : les autres gabarits gardent le
+  comportement d'origine.
+- Deux garde-fous conservés : une ligne de tableau n'est jamais coupée en
+  deux, et un titre ne reste jamais seul en bas de page.
+
+**Résultat** (vérifié sur trois rapports republiés) : 2 pages au lieu de
+3, première page remplie, les tableaux se poursuivant d'une page à
+l'autre. Un blanc peut subsister en bas d'une page lorsqu'un titre de
+section ne tiendrait pas avec au moins une ligne : c'est voulu.
+
 ## Export de la liste des rapports d'analyses
 
 ### Le constat

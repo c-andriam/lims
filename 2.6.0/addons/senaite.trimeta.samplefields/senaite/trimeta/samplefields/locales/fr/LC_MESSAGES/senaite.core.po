@@ -192,6 +192,15 @@ msgstr "Créer une feuille de travail"
 msgid "Print Worksheet"
 msgstr "Imprimer la feuille de travail"
 
+# senaite.core traduit "Print" par "Imprimession", mot qui n'existe pas:
+# le bouton d'impression des etiquettes et l'apercu l'affichaient partout.
+msgid "Print"
+msgstr "Imprimer"
+
+# "Encore non-imprime" dans la liste des echantillons.
+msgid "Not printed yet"
+msgstr "Pas encore imprimé"
+
 msgid "Filter analyses by name..."
 msgstr "Filtrer les analyses par nom…"
 

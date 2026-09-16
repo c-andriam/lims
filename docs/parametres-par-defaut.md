@@ -131,6 +131,20 @@ s'affichaient au format ISO (2026-09-12 14:03).
 
 Dates : jj/mm/aaaa, et jj/mm/aaaa hh:mm pour le format long.
 
+### Fautes de senaite.core corrigées
+
+Le catalogue français livré avec SENAITE contient des fautes, que nos
+catalogues remplacent :
+
+| Libellé | senaite.core | Corrigé |
+|---|---|---|
+| Print | Imprimession | Imprimer |
+| Not printed yet | Encore non-imprimé | Pas encore imprimé |
+| Analysis Profiles | Profiles d'analyse | Profils d'analyse |
+
+Si un autre mot semble mal orthographié, il suffit de l'ajouter au `.po`
+du domaine concerné, puis `make i18n` et redéployer.
+
 ### Vérification (15/09/2026)
 
 Nouveau relevé sur les 15 écrans après redémarrage : 4 libellés sans
