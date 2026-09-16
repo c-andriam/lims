@@ -37,6 +37,7 @@ clean_bytecode() {
     count="$(find "$TARGET" -name '*.pyc' 2>/dev/null | wc -l | tr -d ' ')"
     if [ "$count" -gt 0 ]; then
         find "$TARGET" -name '*.pyc' -delete 2>/dev/null || true
+        find "$TARGET" -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true
         echo "$count fichier(s) .pyc supprime(s)."
     fi
 }
@@ -49,6 +50,9 @@ fi
 
 MY_UID="$(id -u)"
 MY_GID="$(id -g)"
+
+# Nettoie toujours les bytecode/pycache perimes avant verification
+clean_bytecode
 
 FOREIGN="$(find "$TARGET" ! -user "$MY_UID" 2>/dev/null | wc -l | tr -d ' ')"
 
