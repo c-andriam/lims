@@ -110,6 +110,7 @@ redeploy-addon: require-running ## Recharge l'add-on apres modification dans add
 	@# justement dans ce cas que la reparation manquait.
 	@ENGINE=$(ENGINE) SERVICE=$(SERVICE) INSTANCE_DIR=$(INSTANCE_DIR) sh scripts/redeploy.sh
 	$(MAKE) restart
+	@ENGINE=$(ENGINE) TARGET=addons QUIET=1 sh scripts/fix-perms.sh
 	@echo ""
 	@echo "Add-on redeploye. Verifie les logs avec: make logs"
 	@echo ""
