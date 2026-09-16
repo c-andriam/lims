@@ -41,7 +41,7 @@ fi
 PARTS="${PARTS:-instance}"
 
 echo "Compilation de l'add-on dans le container (partie: $PARTS)..."
-"$ENGINE" exec -i "$SERVICE" bash -c "cd $INSTANCE_DIR && buildout -c custom.cfg install $PARTS"
+"$ENGINE" exec -i "$SERVICE" bash -c "cd $INSTANCE_DIR && buildout -c custom.cfg buildout:parts=$PARTS"
 STATUS=$?
 
 # --- Toujours, quel que soit le sort de buildout.
