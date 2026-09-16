@@ -113,7 +113,6 @@ def _is_better(candidate, current):
         # fraicheur: on garde le dernier vu, ce qui suit l'ordre de tri
         # rendu par le catalogue.
         return True
-
     try:
         return new_date >= old_date
     except TypeError:
