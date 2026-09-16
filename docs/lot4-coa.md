@@ -190,6 +190,28 @@ d'échantillon » au milieu de libellés anglais).
 Pour un COA en français, il suffirait de fournir un catalogue
 `senaite.trimeta.coa` en français.
 
+## Logo du laboratoire sur le COA
+
+Le PDF portait le logo **SENAITE**, en haut à droite de la première
+page. senaite.impress l'écrit en dur dans son en-tête
+(`analysisrequest/templates/header.pt`, image `senaite.svg`) : aucun
+réglage ne permet de le remplacer, et la fiche Laboratoire n'a de champ
+logo que pour l'accréditation.
+
+Le gabarit COA dessine donc son propre en-tête, avec la structure et les
+classes de celui de SENAITE — la feuille de style du rapport s'applique
+sans modification. Seule l'image change : le logo du laboratoire, livré
+avec l'add-on (`browser/resources/logo-trimeta-agrofood.png`, 170 × 150
+px, source `https://trimetagroup.com/wp-content/uploads/2024/08/taf-logo1.png`).
+
+- **Servi par l'application**, pas par le site du groupe : produire un
+  PDF ne dépend d'aucun accès Internet.
+- **Hauteur 45 px** au lieu des 30 px de la feuille de style, prévus pour
+  le logotype allongé de SENAITE : ce logo-ci est presque carré.
+- Ne pas confondre avec le logo de la **barre d'outils**, qui est la
+  version blanche du logo du groupe (voir
+  [parametres-par-defaut.md](parametres-par-defaut.md)).
+
 ## Export de la liste des rapports d'analyses
 
 ### Le constat
