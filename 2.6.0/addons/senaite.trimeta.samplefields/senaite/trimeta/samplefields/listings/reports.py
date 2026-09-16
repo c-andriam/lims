@@ -22,6 +22,11 @@ _ = MessageFactory("senaite.trimeta.samplefields")
 SAMPLE_CODE = "SampleCode"
 LOT = "Lot"
 
+# Colonnes natives retouchees pour l'export CSV.
+INFO = "Info"
+PRIMARY_SAMPLE = "AnalysisRequest"
+PDF = "PDF"
+
 # Colonne native "Batch" (lot de travail), traduite "Lot" en francais:
 # elle faisait croire que le Lot de l'echantillon etait vide.
 NATIVE_BATCH = "Batch"
@@ -48,6 +53,13 @@ class ReportsListingAdapter(BaseListingAdapter):
         if NATIVE_BATCH in columns:
             # masquee par defaut, toujours activable dans le menu des colonnes
             columns[NATIVE_BATCH]["toggle"] = False
+        if INFO in columns:
+            # La valeur de cette colonne EST du HTML (icone d'information):
+            # l'export CSV la recopiait telle quelle, en premiere colonne.
+            # L'export ne retient que les colonnes AFFICHEES: masquee par
+            # defaut, elle sort du fichier et reste activable dans le menu
+            # des colonnes.
+            columns[INFO]["toggle"] = False
         show_in_all_states(self.listing, SAMPLE_CODE, LOT)
 
     def get_sample_uid(self, report):
@@ -62,7 +74,27 @@ class ReportsListingAdapter(BaseListingAdapter):
             return None
         return api.get_uid(sample) if sample else None
 
+    def fill_export_values(self, item, sample):
+        """Valeurs texte des colonnes qui n'existent qu'en HTML.
+
+        senaite.core ne renseigne que `item["replace"]` pour l'echantillon
+        primaire et le lien PDF. A l'ecran on voit un lien; l'export CSV,
+        lui, lit `item[cle]` et ramenait donc des colonnes vides.
+
+        L'affichage ne change pas: `replace` reste prioritaire. Aucune
+        adresse n'est inventee -- sans lien de telechargement (rapport sans
+        fichier), la cellule reste vide.
+        """
+        replace = item.get("replace") or {}
+        if not item.get(PRIMARY_SAMPLE) and sample is not None:
+            item[PRIMARY_SAMPLE] = sample.getId()
+        if not item.get(PDF):
+            url = item.get("url")
+            item[PDF] = "{}/download_pdf".format(url) \
+                if url and replace.get(PDF) else ""
+
     def fill_item(self, obj, item, index):
         sample = self.get_cached_sample(self.get_sample_uid(obj))
         item[SAMPLE_CODE] = self.get_sample_code(sample)
         item[LOT] = (sample.getClientSampleID() or "") if sample else ""
+        self.fill_export_values(item, sample)
