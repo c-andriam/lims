@@ -224,6 +224,33 @@ Le logo est livré avec l'add-on
   version blanche du logo du groupe (voir
   [parametres-par-defaut.md](parametres-par-defaut.md)).
 
+## Mise en page : plus de page blanche
+
+Le COA sortait sur **3 pages**, la première presque vide et la dernière
+ne portant que les mentions légales.
+
+**La cause.** La feuille de style des rapports pose
+`div.row { page-break-inside: avoid }` : chaque section est insécable.
+Nos tableaux sont longs ; une section qui ne tenait pas dans la place
+restante basculait entière à la page suivante.
+
+**Ce qui a été fait.**
+
+- Le Summary, les informations d'échantillon et l'analyse organoleptique
+  sont **trois sections distinctes**, au lieu d'un bloc unique.
+- Le gabarit COA pose, après la feuille de style et plus spécifiquement
+  qu'elle, une règle qui **autorise la coupure** de ses sections, y
+  compris celles de senaite.impress (résultats, responsables, mentions
+  légales). Seul le COA est concerné : les autres gabarits gardent le
+  comportement d'origine.
+- Deux garde-fous conservés : une ligne de tableau n'est jamais coupée en
+  deux, et un titre ne reste jamais seul en bas de page.
+
+**Résultat** (vérifié sur trois rapports republiés) : 2 pages au lieu de
+3, première page remplie, les tableaux se poursuivant d'une page à
+l'autre. Un blanc peut subsister en bas d'une page lorsqu'un titre de
+section ne tiendrait pas avec au moins une ligne : c'est voulu.
+
 ## Export de la liste des rapports d'analyses
 
 ### Le constat
