@@ -135,7 +135,9 @@ class ReceptionFieldsExtender(object):
         ExtFixedPointField(
             "ReceptionWeight",
             required=True,
-            precision=3,
+            # Deux decimales partout: 500.00, et non 500.000. Les autres
+            # champs numeriques de la section etaient deja a deux.
+            precision=2,
             schemata="Reception",
             widget=DecimalWidget(
                 visible=ADD_VISIBLE,
@@ -171,7 +173,7 @@ class ReceptionFieldsExtender(object):
         ExtFixedPointField(
             "TechSampleWeight",
             required=True,
-            precision=3,
+            precision=2,
             schemata="Reception",
             widget=DecimalWidget(
                 visible=ADD_VISIBLE,

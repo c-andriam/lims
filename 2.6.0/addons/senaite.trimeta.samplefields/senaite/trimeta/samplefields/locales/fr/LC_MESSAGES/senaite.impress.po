@@ -28,3 +28,90 @@ msgstr "Point de prélèvement"
 
 msgid "Sample Type"
 msgstr "Type d'échantillon"
+
+# --- Contenu du PDF (rapport d'analyses) ---
+
+msgid "Analysis Report"
+msgstr "Rapport d'analyses"
+
+msgid "Provisional report"
+msgstr "Rapport provisoire"
+
+msgid "Results"
+msgstr "Résultats"
+
+msgid "Results for ${id}"
+msgstr "Résultats pour ${id}"
+
+msgid "Result"
+msgstr "Résultat"
+
+msgid "Unit"
+msgstr "Unité"
+
+msgid "Range"
+msgstr "Intervalle"
+
+msgid "Responsibles"
+msgstr "Responsables"
+
+msgid "Published by"
+msgstr "Publié par"
+
+msgid "Supervisor"
+msgstr "Responsable du laboratoire"
+
+msgid "Remarks for ${id}"
+msgstr "Remarques pour ${id}"
+
+msgid "Results Interpretation for ${id}"
+msgstr "Interprétation des résultats pour ${id}"
+
+msgid "Attachments for ${id}"
+msgstr "Pièces jointes pour ${id}"
+
+msgid "Attachment for"
+msgstr "Pièce jointe pour"
+
+msgid "Filename:"
+msgstr "Nom du fichier :"
+
+# --- Mentions de bas de page ---
+
+msgid "Result out of client specified range."
+msgstr "Résultat hors de l'intervalle spécifié par le client."
+
+msgid "Not invoiced"
+msgstr "Non facturé"
+
+msgid "Analysis results relate only to the samples tested."
+msgstr "Les résultats ne concernent que les échantillons analysés."
+
+msgid "This document shall not be reproduced except in full, without the written approval of ${name_lab}"
+msgstr "Ce document ne peut être reproduit que dans son intégralité, sans l'accord écrit de ${name_lab}"
+
+msgid "Methods included in the ${accreditation_body} schedule of Accreditation for this Laboratory. Analysis remarks are not accredited"
+msgstr "Méthodes couvertes par l'accréditation ${accreditation_body} de ce laboratoire. Les remarques d'analyse ne sont pas accréditées"
+
+msgid "Test results are at a ${lab_confidence}% confidence level"
+msgstr "Les résultats sont donnés avec un niveau de confiance de ${lab_confidence} %"
+
+msgid "Phone"
+msgstr "Téléphone"
+
+msgid "Fax"
+msgstr "Fax"
+
+msgid "Page"
+msgstr "Page"
+
+msgid "of"
+msgstr "sur"
+
+# --- Alertes ---
+
+msgid "This Analysis Request has been invalidated due to erroneously published results"
+msgstr "Cette demande d'analyses a été invalidée: des résultats erronés ont été publiés"
+
+msgid "This Analysis request has been replaced by"
+msgstr "Cette demande d'analyses a été remplacée par"
