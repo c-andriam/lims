@@ -70,6 +70,27 @@ class TestReportLogo(unittest.TestCase):
         """Pas de duplication: le COA appelle l'en-tete de la vue."""
         self.assertIn("render_header", self.read(COA_TEMPLATE, mode="r"))
 
+    def test_one_section_per_row(self):
+        """Une seule section par bloc "row", sinon la page se vide.
+
+        La feuille de style des rapports pose "div.row { page-break-inside:
+        avoid }": un bloc portant plusieurs tableaux ne tient plus dans la
+        place restante et bascule entier a la page suivante. Constate: un
+        COA sur 3 pages, la premiere presque vide.
+        """
+        template = self.read(COA_TEMPLATE, mode="r")
+        # Les blocs ne se referment pas par une balise reperable ("</div>"
+        # sert a tout): on decoupe sur les OUVERTURES de <div class="row">,
+        # et chaque tranche est le contenu d'un bloc.
+        blocks = re.split('<div class="row', template)[1:]
+        self.assertGreaterEqual(len(blocks), 3, "sections du COA non separees")
+        for block in blocks:
+            titles = re.findall("<h[12][ >]", block)
+            self.assertLessEqual(
+                len(titles), 1,
+                "un bloc row du COA porte %d titres: il sera insecable"
+                % len(titles))
+
     def test_no_double_hyphen_inside_comments(self):
         """"--" dans un commentaire XML: le gabarit ne compile plus.
 

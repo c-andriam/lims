@@ -141,7 +141,18 @@
           </tr>
         </table>
 
-        <!-- SAMPLE INFORMATION -->
+      </div>
+    </div>
+
+    <!-- SAMPLE INFORMATION
+
+         Section a part, et non a la suite du Summary dans le meme bloc:
+         la feuille de style des rapports pose "div.row { page-break-inside:
+         avoid }". Un bloc unique portant les trois tableaux ne tenait plus
+         dans la place restante et basculait entier a la page suivante, en
+         laissant la premiere page presque vide. -->
+    <div class="row section-sample-information no-gutters">
+      <div class="w-100">
         <h2 i18n:translate="">Sample information</h2>
         <table class="table table-sm table-condensed">
           <tr>
@@ -165,8 +176,12 @@
             </td>
           </tr>
         </table>
+      </div>
+    </div>
 
-        <!-- ORGANOLEPTIC ANALYSIS -->
+    <!-- ORGANOLEPTIC ANALYSIS -->
+    <div class="row section-organoleptic no-gutters">
+      <div class="w-100">
         <h2 i18n:translate="">Organoleptic analysis</h2>
         <table class="table table-sm table-condensed">
           <tr>
@@ -182,7 +197,6 @@
             <td tal:content="model/Aroma|nothing"></td>
           </tr>
         </table>
-
       </div>
     </div>
   </tal:t>
