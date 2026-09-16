@@ -198,11 +198,23 @@ page. senaite.impress l'écrit en dur dans son en-tête
 réglage ne permet de le remplacer, et la fiche Laboratoire n'a de champ
 logo que pour l'accréditation.
 
-Le gabarit COA dessine donc son propre en-tête, avec la structure et les
-classes de celui de SENAITE — la feuille de style du rapport s'applique
-sans modification. Seule l'image change : le logo du laboratoire, livré
-avec l'add-on (`browser/resources/logo-trimeta-agrofood.png`, 170 × 150
-px, source `https://trimetagroup.com/wp-content/uploads/2024/08/taf-logo1.png`).
+**L'en-tête est remplacé pour tous les gabarits**, pas seulement pour le
+COA Trimeta : sinon, un utilisateur qui choisit un gabarit SENAITE dans
+l'écran de publication retrouverait le logo SENAITE dans le PDF.
+
+senaite.impress prévoit ce cas. Avant de produire un rapport, il cherche
+une vue qui adapte aussi le contexte, et ne prend la sienne qu'à défaut —
+son code dit que c'est là pour permettre à un add-on de la redéfinir.
+L'add-on enregistre donc ses propres vues de rapport
+(`coa/reportview.py`), qui ne changent qu'une chose : l'en-tête
+(`coa/templates/header.pt`), copie de celui de SENAITE avec la même
+structure et les mêmes classes, où seule l'image change. La feuille de
+style du rapport s'applique sans modification, et le gabarit COA reprend
+l'appel standard, sans duplication.
+
+Le logo est livré avec l'add-on
+(`browser/resources/logo-trimeta-agrofood.png`, source
+`https://trimetagroup.com/wp-content/uploads/2024/08/taf-logo1.png`).
 
 - **Servi par l'application**, pas par le site du groupe : produire un
   PDF ne dépend d'aucun accès Internet.

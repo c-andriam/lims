@@ -44,44 +44,12 @@
   <!-- REPORT CSS -->
   <tal:t replace="structure python:view.render_css(context, **options)" />
 
-  <!-- REPORT HEADER (version Trimeta)
+  <!-- REPORT HEADER
 
-       senaite.impress fige le logo SENAITE dans son propre en-tete
-       (analysisrequest/templates/header.pt, image senaite.svg): aucun
-       reglage ne permet de le remplacer. On reprend donc sa structure et
-       ses classes a l'identique (la feuille de style du rapport, rendue
-       plus haut par view.render_css, s'applique telle quelle) en
-       changeant la seule image.
-
-       Le logo est servi par le dossier de ressources de l'add-on: il
-       part avec le code, sans dependre d'un site externe au moment de
-       produire le PDF.
-
-       Hauteur 34px, pour une image recadree sur son encre. L'original
-       du site portait 53px de vide en haut et 54px en bas sur 150px:
-       mise a l'echelle, la boite occupait la hauteur demandee, le logo
-       non, et il ressortait illisible. -->
-  <div class="row section-header no-gutters">
-    <div class="w-100 mb-2">
-      <table class="w-100 mb-0 noborder">
-        <colgroup>
-          <col style="width:50%"/>
-          <col style="width:50%;"/>
-        </colgroup>
-        <tr>
-          <td class="align-middle text-left">
-            <h1 i18n:translate="">Analysis Report</h1>
-          </td>
-          <td class="align-middle text-right">
-            <img class="logo"
-                 style="height:34px;"
-                 alt="TRIMETA AGROFOOD LABO"
-                 tal:attributes="src python:view.get_resource_url('logo-trimeta-agrofood.png', prefix='senaite.trimeta.samplefields.static')"/>
-          </td>
-        </tr>
-      </table>
-    </div>
-  </div>
+       Appel standard: le logo du laboratoire vient de la vue de rapport
+       de l'add-on (coa/reportview.py), qui remplace l'en-tete pour TOUS
+       les gabarits, y compris ceux de senaite.impress. -->
+  <tal:t replace="structure python:view.render_header(context, **options)" />
 
   <!-- REPORT INFO -->
   <tal:t replace="structure python:view.render_info(context, **options)" />

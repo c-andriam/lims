@@ -16,6 +16,7 @@ REPORT_LOGO = os.path.join(PACKAGE, "browser", "resources",
                            "logo-trimeta-agrofood.png")
 COA_TEMPLATE = os.path.join(PACKAGE, "coa", "templates", "reports",
                             "COA-Trimeta.pt")
+HEADER_TEMPLATE = os.path.join(PACKAGE, "coa", "templates", "header.pt")
 
 
 class TestSiteLogoFile(unittest.TestCase):
@@ -58,14 +59,16 @@ class TestReportLogo(unittest.TestCase):
         header = self.read(REPORT_LOGO, size=24)
         self.assertEqual(struct.unpack(">II", header[16:24]), (126, 43))
 
-    def test_coa_uses_the_lab_logo(self):
-        template = self.read(COA_TEMPLATE, mode="r")
-        self.assertIn("logo-trimeta-agrofood.png", template)
-        self.assertIn("senaite.trimeta.samplefields.static", template)
+    def test_header_uses_the_lab_logo(self):
+        """L'en-tete de l'add-on sert a TOUS les gabarits de rapport."""
+        header = self.read(HEADER_TEMPLATE, mode="r")
+        self.assertIn("logo-trimeta-agrofood.png", header)
+        self.assertIn("senaite.trimeta.samplefields.static", header)
+        self.assertNotIn("senaite.svg", header)
 
-    def test_coa_does_not_use_the_senaite_header(self):
-        """render_header ramenerait le logo SENAITE, fige dans impress."""
-        self.assertNotIn("render_header", self.read(COA_TEMPLATE, mode="r"))
+    def test_coa_renders_the_standard_header(self):
+        """Pas de duplication: le COA appelle l'en-tete de la vue."""
+        self.assertIn("render_header", self.read(COA_TEMPLATE, mode="r"))
 
     def test_no_double_hyphen_inside_comments(self):
         """"--" dans un commentaire XML: le gabarit ne compile plus.
@@ -75,10 +78,12 @@ class TestReportLogo(unittest.TestCase):
         comment". Le tiret cadratin des commentaires francais est donc
         proscrit ici.
         """
-        for comment in re.findall("<!--(.*?)-->", self.read(COA_TEMPLATE, mode="r"),
-                                  re.DOTALL):
-            self.assertNotIn("--", comment,
-                             "commentaire du COA avec un double tiret")
+        for path in (COA_TEMPLATE, HEADER_TEMPLATE):
+            for comment in re.findall("<!--(.*?)-->", self.read(path, mode="r"),
+                                      re.DOTALL):
+                self.assertNotIn("--", comment,
+                                 "%s: commentaire avec un double tiret"
+                                 % os.path.basename(path))
 
 
 def test_suite():

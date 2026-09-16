@@ -37,6 +37,31 @@
        specifique et gagne. Tant que browserlayer.xml n'a pas ete importe
        (profil non installe ou etape 1004 non jouee), les vues de
        senaite.core restent actives. -->
+  <!-- Logo du laboratoire sur TOUS les rapports.
+
+       senaite.impress cherche d'abord une vue de rapport qui adapte aussi
+       le contexte, et ne prend la sienne qu'a defaut: c'est son point
+       d'extension pour une couche navigateur. Voir reportview.py. -->
+  <adapter
+      for="zope.interface.Interface
+           zope.interface.Interface
+           senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
+      name="AnalysisRequest"
+      factory=".reportview.TrimetaSingleReportView"
+      provides="senaite.impress.interfaces.IReportView"
+      permission="zope2.View"
+      />
+
+  <adapter
+      for="zope.interface.Interface
+           zope.interface.Interface
+           senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
+      name="AnalysisRequest"
+      factory=".reportview.TrimetaMultiReportView"
+      provides="senaite.impress.interfaces.IMultiReportView"
+      permission="zope2.View"
+      />
+
   <browser:page
       for="*"
       name="download_pdf"
