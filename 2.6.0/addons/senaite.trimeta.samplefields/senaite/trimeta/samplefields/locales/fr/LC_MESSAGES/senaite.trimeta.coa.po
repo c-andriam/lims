@@ -1,0 +1,86 @@
+# Libellés du COA Trimeta (gabarit coa/templates/reports/COA-Trimeta.pt).
+#
+# Le gabarit porte son propre domaine de traduction: ses libellés sont
+# écrits en anglais dans le fichier, comme le cahier des charges les
+# énumère, et traduits ici. Les parties rendues par senaite.impress
+# (titre du rapport, résultats, mentions légales) sont dans
+# senaite.impress.po.
+msgid ""
+msgstr ""
+"Project-Id-Version: senaite.trimeta.samplefields 1.0.0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: fr\n"
+"Language-Team: Trimeta Group\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Domain: senaite.trimeta.coa\n"
+
+msgid "Summary"
+msgstr "Synthèse"
+
+msgid "Sample ID"
+msgstr "Identifiant de l'échantillon"
+
+msgid "Report reference"
+msgstr "Référence du rapport"
+
+msgid "Sample Type"
+msgstr "Type d'échantillon"
+
+msgid "Specification"
+msgstr "Spécification"
+
+msgid "Date Received"
+msgstr "Date de réception"
+
+msgid "Beginning of analysis"
+msgstr "Début d'analyse"
+
+msgid "End of analysis"
+msgstr "Fin d'analyse"
+
+msgid "Date Validated"
+msgstr "Date de validation"
+
+msgid "Validated by"
+msgstr "Validé par"
+
+msgid "Date Published"
+msgstr "Date de publication"
+
+msgid "Published by"
+msgstr "Publié par"
+
+msgid "Sample weight"
+msgstr "Poids de l'échantillon"
+
+msgid "Sample information"
+msgstr "Informations sur l'échantillon"
+
+msgid "Reception temperature"
+msgstr "Température à la réception"
+
+msgid "Designation"
+msgstr "Désignation"
+
+msgid "Lot"
+msgstr "Lot"
+
+msgid "Client"
+msgstr "Client"
+
+msgid "Organoleptic analysis"
+msgstr "Analyse organoleptique"
+
+msgid "Texture"
+msgstr "Texture"
+
+msgid "Color"
+msgstr "Couleur"
+
+msgid "Aroma"
+msgstr "Arôme"
+
+msgid "Responsibles"
+msgstr "Responsables"

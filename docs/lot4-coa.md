@@ -179,16 +179,27 @@ sauf si le laboratoire en avait déjà choisi un autre que
 
 ## Langue du COA
 
-Le COA reste **en anglais**, avec les libellés du cahier des charges
-(« Sample reference », « Report reference », « ORGANOLEPTIC
-ANALYSIS »…), alors que l'interface est en français. Le gabarit utilise
-son propre domaine de traduction (`senaite.trimeta.coa`), sans catalogue.
-Sous `senaite.impress`, il empruntait les traductions françaises de
-l'écran de publication et mélangeait les deux langues (« Type
-d'échantillon » au milieu de libellés anglais).
+Le COA est **en français**, sur demande du laboratoire (16/09/2026). Il
+avait d'abord été laissé en anglais, les libellés du cahier des charges
+étant énumérés en anglais (« Sample reference », « Report reference »,
+« ORGANOLEPTIC ANALYSIS »…).
 
-Pour un COA en français, il suffirait de fournir un catalogue
-`senaite.trimeta.coa` en français.
+Deux catalogues sont en jeu, car le PDF mêle deux origines :
+
+- `senaite.trimeta.coa.po` : les libellés de notre gabarit (Synthèse,
+  Référence du rapport, Informations sur l'échantillon, Analyse
+  organoleptique…) ;
+- `senaite.impress.po` : les parties rendues par SENAITE (titre du
+  rapport, tableau des résultats, responsables, mentions légales, pied
+  de page, pagination).
+
+Les libellés restent écrits en anglais **dans le gabarit** : ce sont les
+identifiants de traduction. Pour repasser le COA en anglais, il suffirait
+de retirer `senaite.trimeta.coa.po`.
+
+Attention aux libellés à variable (`Results for ${id}`, la phrase de
+reproduction avec le nom du laboratoire) : la variable doit être
+conservée telle quelle dans la traduction. Un test le vérifie.
 
 ## Logo du laboratoire sur le COA
 
