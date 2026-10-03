@@ -73,3 +73,29 @@ bout en bout sur les domaines listés. Ils ne certifient pas tous les
 workflows possibles, les droits de chaque rôle ou une autre installation
 accessible sur le réseau. Les procédures d'installation, de sauvegarde
 et de restauration sont décrites dans [installation.md](installation.md).
+
+## Correction complémentaire : date de réception obligatoire
+
+La date native `DateReceived` devient obligatoire à la création et à la
+modification. Son calendrier et son champ d'heure utilisent les widgets
+SENAITE existants. La permission native d'écriture de `DateSampled` est
+réutilisée : le workflow interdisait `DateReceived` dans l'état
+`sample_due`, ce qui masquait ses entrées et empêchait sa sauvegarde.
+Les permissions globales et les autres champs ne sont pas modifiés.
+
+Le contrôle serveur conserve les bornes natives : après le prélèvement
+et pas dans le futur. Une date déjà enregistrée reste conservée lors du
+passage à l'état reçu grâce au patch de workflow existant.
+
+Contrôles Firefox sur la copie isolée :
+
+- création refusée sans date, avec message global et message de champ ;
+- création avec `03/10/2026 08:00`, valeur relue identique ;
+- suppression de la date en modification refusée, date initiale conservée ;
+- correction à `08:15`, sauvegarde et relecture réussies ;
+- code échantillon et poids inchangés après modification.
+
+La suite complète passe désormais **348 tests**, zéro échec et zéro erreur.
+Le schéma est modifié à l'exécution ; aucun remplissage automatique des
+anciennes dates vides ni migration de données n'est effectué. Une ancienne
+fiche sans date demandera sa date réelle lors de sa prochaine modification.

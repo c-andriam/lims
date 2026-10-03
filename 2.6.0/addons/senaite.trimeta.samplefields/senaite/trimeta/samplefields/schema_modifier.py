@@ -8,8 +8,8 @@ qu'en ajouter.
 
 Trois retouches:
 
-1. DateReceived redevient saisissable manuellement, pour corriger une
-   reception enregistree en retard.
+1. DateReceived devient obligatoire et saisissable manuellement, pour
+   enregistrer la date reelle de reception.
 2. ClientSampleID est renomme "Lot". C'est la mise en oeuvre cote
    interface de la decision d'architecture: le "Lot" du cahier des
    charges est ce champ natif, deja indexe et deja en colonne de
@@ -89,6 +89,13 @@ class DateReceivedSchemaModifier(object):
         if field is None:
             return
         field.mode = "rw"
+        field.required = True
+        # DateReceived est interdite dans l'etat sample_due natif. Reutilise
+        # les droits de la date de prelevement pour permettre la saisie
+        # a la creation, sans modifier les permissions globales du site.
+        sampled = schema.get("DateSampled")
+        if sampled is not None:
+            field.write_permission = sampled.write_permission
         field.widget.visible = VISIBLE
         field.widget.description = _(
             u"Actual date and time the sample was received. "
