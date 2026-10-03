@@ -7,7 +7,7 @@ besoins ni le meme rendu:
 
 - ReceptionSeparatorViewlet, sur le formulaire d'ajout d'echantillon:
   separateurs Reception/Analyse, autocompletion des champs libres,
-  clavier numerique, et masquage du bandeau d'erreur recapitulatif.
+  clavier numerique, et affichage des erreurs de validation.
 
 - QualitySectionsViewlet, sur les formulaires de modification: intitules
   des 7 sous-sections de l'onglet Assurance Qualite. Ces champs sont
@@ -33,7 +33,7 @@ SCRIPT_TAG = (
     '<script type="text/javascript" '
     'id="trimeta-samplefields-script" '
     'data-portal-url="{portal_url}" '
-    'src="{portal_url}/{resources}/reception_separator.js"></script>'
+    'src="{portal_url}/{resources}/reception_separator.js?v=2"></script>'
 )
 
 QA_SCRIPT_TAG = (
@@ -43,17 +43,6 @@ QA_SCRIPT_TAG = (
     '<script type="text/javascript" '
     'id="trimeta-qa-sections-script" '
     'src="{portal_url}/{resources}/quality_sections.js"></script>'
-)
-
-# Masque le bandeau d'erreur recapitulatif natif de SENAITE sur la seule
-# page de creation. En CSS plutot qu'en JS: garanti, et independant du
-# moment ou le script se charge.
-STYLE_TAG = (
-    "<style>"
-    "#viewlet-above-content .portalMessage.alert-danger { "
-    "display: none !important; "
-    "}"
-    "</style>"
 )
 
 # Pages de modification, selon le rendu (Archetypes ou vue SENAITE).
@@ -83,7 +72,7 @@ class ReceptionSeparatorViewlet(TrimetaViewletBase):
     def render(self):
         if "/ar_add" not in self.get_request_url():
             return ""
-        return STYLE_TAG + SCRIPT_TAG.format(
+        return SCRIPT_TAG.format(
             portal_url=self.get_portal_url(),
             resources=RESOURCE_BASE,
         )
@@ -158,3 +147,12 @@ class QualitySectionsViewlet(TrimetaViewletBase):
             resources=RESOURCE_BASE,
             sections=self.get_sections_json(),
         )
+
+
+class NumericFieldsViewlet(TrimetaViewletBase):
+    """Conserve les virgules et signes sur les champs decimaux natifs."""
+
+    def render(self):
+        return (
+            '<script src="{portal}/{resources}/numeric_fields.js?v=1"></script>'
+        ).format(portal=self.get_portal_url(), resources=RESOURCE_BASE)

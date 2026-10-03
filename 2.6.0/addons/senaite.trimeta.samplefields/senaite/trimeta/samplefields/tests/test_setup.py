@@ -33,7 +33,14 @@ class TestProfileInstallation(TrimetaTestCase):
         """
         setup_tool = self.portal.portal_setup
         version = setup_tool.getLastVersionForProfile(PROFILE)
-        self.assertEqual(version, ("1007",))
+        self.assertEqual(version, ("1008",))
+
+    def test_sample_has_controller_edit_action(self):
+        fti = self.portal.portal_types.AnalysisRequest
+        action = fti.getActionObject("object/edit")
+        self.assertIsNotNone(action)
+        self.assertFalse(action.getVisibility())
+        self.assertIn("Modify portal content", action.getPermissions())
 
     def test_toolbar_shows_the_trimeta_logo(self):
         from bika.lims import api

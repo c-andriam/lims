@@ -41,6 +41,8 @@ VERSION = "1005"
 def upgrade(tool):
     """:param tool: portal_setup, fourni par GenericSetup."""
     logger.info("Upgrade Trimeta -> %s : demarrage", VERSION)
+    tool.runImportStepFromProfile(
+        "profile-senaite.trimeta.samplefields:default", "plone.app.registry")
     apply_defaults(api.get_portal())
     logger.info("Upgrade Trimeta -> %s : termine", VERSION)
     return True

@@ -3,6 +3,8 @@ services:
     image: docker.io/senaite/senaite:v2.6.0
     container_name: senaite
     restart: unless-stopped
+    stop_grace_period: 60s
+    stop_signal: SIGINT
     ports:
       # Port publie sur l'hote, configurable: cette machine heberge
       # d'autres applications qui peuvent revendiquer le meme port.
@@ -10,8 +12,10 @@ services:
       - "${SENAITE_PORT:-8080}:8080"
     volumes:
       - senaite-data:/data
-      - ./addons/senaite.trimeta.samplefields:/home/senaite/senaitelims/src/senaite.trimeta.samplefields
-      - ./custom.cfg:/home/senaite/senaitelims/custom.cfg
+      - ./addons/senaite.trimeta.samplefields:/home/senaite/senaitelims/src/senaite.trimeta.samplefields:z
+      - ./custom.cfg:/home/senaite/senaitelims/custom.cfg:z
+      - ./test.cfg:/opt/trimeta-test.cfg:ro,z
+      - ./scripts:/opt/trimeta-scripts:ro,z
     environment:
       # Python 2 ecrit ses .pyc A COTE des sources, pas dans un
       # __pycache__. Le container en produirait donc dans le repertoire

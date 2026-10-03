@@ -52,7 +52,7 @@ ARGS ?=
 .PHONY: help debug up down restart logs ps pull shell status \
         clean fclean re install backup restore redeploy-addon \
         first-setup redeploy-instance test test-list test-pure check-engine fix-perms doctor require-running test-env impress-info dashboard-info sync \
-        audit-listes i18n
+        audit-listes i18n wait-ready test-setup stop test-backup
 
 check-engine:
 	@if [ -z "$(ENGINE)" ]; then \
@@ -82,6 +82,9 @@ up: ## Demarre SENAITE en arriere-plan
 	@echo "SENAITE demarre -> $(SITE_URL)"
 
 install: pull up ## Pull + up en une commande
+
+stop: check-engine ## Arrete le serveur en gardant le conteneur (restauration)
+	$(COMPOSE) stop $(SERVICE)
 
 down: ## Arrete et supprime les containers (garde les volumes)
 	$(COMPOSE) down
@@ -125,23 +128,27 @@ redeploy-instance: require-running ## Alias de redeploy-addon (joue 'buildout in
 	@ENGINE=$(ENGINE) SERVICE=$(SERVICE) INSTANCE_DIR=$(INSTANCE_DIR) PARTS=instance sh scripts/redeploy.sh
 	$(MAKE) restart
 
-first-setup: ## Premiere installation complete sur une nouvelle machine
-	@echo "=== Installation initiale SENAITE + add-on Trimeta ==="
-	$(MAKE) install
-	@echo "Attente du demarrage (30s)..."
-	@sleep 30
-	$(MAKE) redeploy-addon
-	@echo "=== Termine. Verifie sur $(SITE_URL) ==="
+first-setup: check-engine ## Installe et active Trimeta, sauvegarde et verification HTTP incluses
+	@ENGINE="$(ENGINE)" COMPOSE="$(COMPOSE)" SERVICE="$(SERVICE)" INSTANCE_DIR="$(INSTANCE_DIR)" PORT="$(PORT)" SITE_URL="$(SITE_URL)" sh scripts/install.sh
+
+wait-ready: ## Attend que le site reponde en HTTP (READY_TIMEOUT=600 par defaut)
+	@PORT="$(PORT)" SITE_URL="$(SITE_URL)" sh scripts/wait-ready.sh
 
 # ---------------------------------------------------------------------
 # Tests
 # ---------------------------------------------------------------------
 
+test-setup: require-running ## Installe le lanceur des tests Plone dans le conteneur
+	@$(ENGINE) exec -i $(SERVICE) sh -c 'cd $(INSTANCE_DIR) && buildout -c /opt/trimeta-test.cfg buildout:parts=test'
+	@ENGINE=$(ENGINE) TARGET=addons QUIET=1 sh scripts/fix-perms.sh
+
 test: require-running ## Lance les tests de l'add-on dans le container
 	@echo "Tests de $(ADDON)..."
 	@$(ENGINE) exec -i $(SERVICE) bash -c '\
 	  cd $(INSTANCE_DIR); \
-	  if [ -x bin/test ]; then \
+	  if [ -x /opt/bin/test ]; then \
+	    RUNNER="/opt/bin/test"; \
+	  elif [ -x bin/test ]; then \
 	    RUNNER="bin/test"; \
 	  elif [ -x bin/zope-testrunner ]; then \
 	    RUNNER="bin/zope-testrunner"; \
@@ -174,6 +181,9 @@ test-env: require-running ## Inventorie ce qui permet de lancer les tests
 
 test-list: require-running ## Liste les tests sans les executer
 	$(MAKE) test ARGS="--list-tests"
+
+test-backup: ## Verifie le refus des archives incompletes ou corrompues
+	@$(PYTHON) scripts/test-backup.py
 
 test-pure: ## Tests de logique pure, sans container (instantane)
 	@if [ -z "$(PYTHON)" ]; then \

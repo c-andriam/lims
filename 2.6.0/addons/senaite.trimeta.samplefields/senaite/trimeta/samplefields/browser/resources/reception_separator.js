@@ -120,8 +120,19 @@
         return;
       }
       var data = xhr.responseJSON;
-      if (data && data.errors && data.errors.fielderrors) {
+      if (data && data.errors) {
         fixInlineErrors(data.errors.fielderrors);
+        // Le bandeau natif explique aussi les erreurs sans champ cible
+        // (analyses manquantes, erreur serveur). Ne jamais le masquer.
+        var summary = document.querySelector(
+          "#viewlet-above-content .portalMessage.alert-danger"
+        );
+        if (summary) {
+          summary.setAttribute("role", "alert");
+          summary.setAttribute("tabindex", "-1");
+          summary.focus();
+          summary.scrollIntoView({block: "center"});
+        }
       }
     });
   }
@@ -173,12 +184,7 @@
         }
         input.setAttribute("data-trimeta-numeric", "1");
         input.setAttribute("inputmode", "decimal");
-        input.addEventListener("keypress", function (e) {
-          var char = String.fromCharCode(e.which);
-          if (!/[0-9.,]/.test(char)) {
-            e.preventDefault();
-          }
-        });
+
       });
     });
   }

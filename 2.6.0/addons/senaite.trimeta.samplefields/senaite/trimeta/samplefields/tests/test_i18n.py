@@ -10,6 +10,7 @@ import os
 import unittest
 
 from senaite.trimeta.samplefields import i18n
+from senaite.trimeta.samplefields.compat import to_text
 
 
 class TestPrioritizeCatalogs(unittest.TestCase):
@@ -61,8 +62,8 @@ class TestParsePo(unittest.TestCase):
         messages = {u"": u"Content-Type: text/plain; charset=UTF-8\n",
                     u"Batch": u"S\u00e9rie", u"Save": u"Enregistrer"}
         catalog = gettext.GNUTranslations(io.BytesIO(i18n.build_mo(messages)))
-        self.assertEqual(catalog.gettext(u"Batch"), u"S\u00e9rie")
-        self.assertEqual(catalog.gettext(u"Save"), u"Enregistrer")
+        self.assertEqual(to_text(catalog.gettext(u"Batch")), u"S\u00e9rie")
+        self.assertEqual(to_text(catalog.gettext(u"Save")), u"Enregistrer")
 
 
 class TestShippedCatalogs(unittest.TestCase):

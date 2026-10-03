@@ -147,6 +147,14 @@ class TestSchemaOnSample(TrimetaTestCase):
         self.assertEqual(field.mode, "rw")
         self.assertEqual(field.widget.visible.get("add"), "edit")
 
+    def test_parent_client_is_not_validated_as_missing_edit_input(self):
+        sample = self.factory.create()
+        field = sample.getField("Client")
+        self.assertTrue(field.required)
+        self.assertEqual(field.widget.visible.get("add"), "edit")
+        self.assertEqual(field.widget.visible.get("edit"), "invisible")
+        self.assertIsNotNone(sample.getClient())
+
 
 def test_suite():
     suite = unittest.TestSuite()

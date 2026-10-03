@@ -112,6 +112,11 @@ def apply_defaults(portal):
     """
     from senaite.trimeta.samplefields import defaults
 
+    ensure_archetypes_edit_actions(portal)
+    set_lab_defaults()
+    set_first_weekday()
+    set_site_logo()
+
     # D11 -- gabarit de publication unitaire par defaut.
     try:
         defaults.set_default_coa_template()
@@ -297,3 +302,61 @@ def reindex_catalog(catalog_id, indexes):
 
     logger.info("Reindexation de %s terminee (%s objets)",
                 catalog_id, total)
+
+
+def set_lab_defaults():
+    """Ne remplace que les valeurs d'usine des champs du laboratoire."""
+    setup = api.get_setup()
+    changed = {}
+    for name, (value, factory) in LAB_SETUP_DEFAULTS.items():
+        field = setup.getField(name)
+        if field is None or field.get(setup) not in factory:
+            continue
+        vocabulary = field.Vocabulary(setup)
+        if value not in vocabulary:
+            logger.warning("Valeur %r absente du vocabulaire %s", value, name)
+            continue
+        field.set(setup, value)
+        changed[name] = value
+    return changed
+
+
+def set_first_weekday():
+    """Conserve le jour choisi si ce n'est pas la valeur d'usine."""
+    value = api.get_registry_record(FIRST_WEEKDAY_RECORD, default=None)
+    if value in FIRST_WEEKDAY_FACTORY:
+        ploneapi.portal.set_registry_record(FIRST_WEEKDAY_RECORD, FIRST_WEEKDAY)
+
+
+def set_site_logo():
+    """Pose le logo embarque seulement si aucun logo n'est choisi."""
+    from plone.formwidget.namedfile.converter import b64encode_file
+    setup = api.get_senaite_setup()
+    if setup.getSiteLogo():
+        return
+    with open(SITE_LOGO_FILE, "rb") as handle:
+        data = handle.read()
+    setup.setSiteLogo(b64encode_file(u"logo-trimeta-groupe-blanc.png", data))
+    setup.setSiteLogoCSS(SITE_LOGO_CSS)
+
+
+def ensure_archetypes_edit_actions(portal):
+    """Le controleur AT doit pouvoir reafficher un formulaire invalide.
+
+    Certaines FTI ont l'alias edit=base_edit sans l'action object/edit.
+    Le controleur traverse cette action en cas d'erreur de validation et
+    leve sinon 'No edit action found', avec annulation de l'enregistrement.
+    L'action ajoutee est masquee: aucun changement des menus ou permissions.
+    """
+    added = []
+    for fti in portal.portal_types.objectValues():
+        aliases = getattr(fti, "getMethodAliases", lambda: {})()
+        if aliases.get("edit") != "base_edit":
+            continue
+        if any(action.getId() == "edit" for action in fti.listActions()):
+            continue
+        fti.addAction("edit", "Edit", "string:${object_url}/base_edit", "",
+                      ("Modify portal content",), "object", visible=0)
+        added.append(fti.getId())
+    logger.info("Actions de retour au formulaire ajoutees: %r", added)
+    return added

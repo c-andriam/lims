@@ -88,22 +88,6 @@
       profile="senaite.trimeta.samplefields:default"
       />
 
-  <!-- 1004 -> 1005 : langue et fuseau horaire du site
-
-       Francais par defaut, langues proposees francais et anglais,
-       langue du navigateur ignoree, fuseau Indian/Antananarivo
-       (profiles/default/registry.xml). -->
-  <genericsetup:upgradeStep
-      title="Trimeta 1004 -> 1005 : francais et fuseau de Madagascar"
-      description="Importe le registre de l'add-on: langue par defaut,
-                   langues proposees, mode de choix de la langue et
-                   fuseau horaire du portail."
-      source="1004"
-      destination="1005"
-      handler=".v1005.upgrade"
-      profile="senaite.trimeta.samplefields:default"
-      />
-
   <!-- 1005 -> 1006 : parametres de base
 
        Virgule decimale des rapports et lundi premier jour de semaine,
@@ -130,6 +114,15 @@
       source="1006"
       destination="1007"
       handler=".v1007.upgrade"
+      profile="senaite.trimeta.samplefields:default"
+      />
+
+  <genericsetup:upgradeStep
+      title="Trimeta 1007 -> 1008 : retour des formulaires invalides"
+      description="Ajoute les actions edit manquantes pour les formulaires Archetypes."
+      source="1007"
+      destination="1008"
+      handler=".v1008.upgrade"
       profile="senaite.trimeta.samplefields:default"
       />
 

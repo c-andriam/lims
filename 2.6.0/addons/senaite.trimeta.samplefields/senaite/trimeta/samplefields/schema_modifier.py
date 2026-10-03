@@ -63,10 +63,21 @@ class DateReceivedSchemaModifier(object):
         self.context = context
 
     def fiddle(self, schema):
+        self.protect_sample_client(schema)
         self.unlock_date_received(schema)
         self.relabel_client_sample_id(schema)
         self.hide_redundant_fields(schema)
         return schema
+
+    def protect_sample_client(self, schema):
+        # Client is an add-only reference; existing samples get their client
+        # from their parent folder. No input is rendered in base_edit, so AT
+        # must not validate an absent Client reference on that form.
+        field = schema.get("Client")
+        if field is not None:
+            visible = dict(field.widget.visible)
+            visible["edit"] = "invisible"
+            field.widget.visible = visible
 
     def unlock_date_received(self, schema):
         """Rend la date de reception modifiable a la main.

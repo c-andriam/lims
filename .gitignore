@@ -20,3 +20,6 @@ docker-compose.yml.orig
 # Configuration propre a chaque machine (adresse, ports libres).
 # Voir 2.6.0/.env.example.
 /2.6.0/.env
+
+# Archives completes, empreintes et fichiers provisoires de la base locale.
+/2.6.0/backups/
