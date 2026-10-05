@@ -78,6 +78,7 @@ class DateReceivedSchemaModifier(object):
         if field is None:
             return
         field.mode = "rw"
+        field.required = True
         field.widget.visible = VISIBLE
         field.widget.description = _(
             u"Actual date and time the sample was received. "

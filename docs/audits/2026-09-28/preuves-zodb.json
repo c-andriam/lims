@@ -1,0 +1,759 @@
+{
+  "catalog_count": 6, 
+  "catalog_not_in_direct_scope": 0, 
+  "declared_reception_fields": [
+    {
+      "name": "SampleCode", 
+      "required": false
+    }, 
+    {
+      "name": "CodeArticle", 
+      "required": false
+    }, 
+    {
+      "name": "Designation", 
+      "required": false
+    }, 
+    {
+      "name": "ReceptionWeight", 
+      "required": false
+    }, 
+    {
+      "name": "QuantityReceived", 
+      "required": false
+    }, 
+    {
+      "name": "QuantityUnderAnalysis", 
+      "required": false
+    }, 
+    {
+      "name": "TechSampleWeight", 
+      "required": false
+    }, 
+    {
+      "name": "ReceptionTemperature", 
+      "required": false
+    }, 
+    {
+      "name": "SampleCondition", 
+      "required": false
+    }, 
+    {
+      "name": "PackagingCondition", 
+      "required": false
+    }, 
+    {
+      "name": "Origin", 
+      "required": false
+    }, 
+    {
+      "name": "SupplierCustomerDetail", 
+      "required": false
+    }, 
+    {
+      "name": "Receptionist", 
+      "required": false
+    }, 
+    {
+      "name": "Contract", 
+      "required": false
+    }, 
+    {
+      "name": "EntryVoucher", 
+      "required": false
+    }, 
+    {
+      "name": "AnalysisSheetNumber", 
+      "required": false
+    }, 
+    {
+      "name": "AnalysisStart", 
+      "required": false
+    }, 
+    {
+      "name": "AnalysisEnd", 
+      "required": false
+    }, 
+    {
+      "name": "AnalysisPreparer", 
+      "required": false
+    }, 
+    {
+      "name": "PodLength", 
+      "required": false
+    }, 
+    {
+      "name": "AromaDevelopment", 
+      "required": false
+    }, 
+    {
+      "name": "Aroma", 
+      "required": false
+    }, 
+    {
+      "name": "Color", 
+      "required": false
+    }, 
+    {
+      "name": "Texture", 
+      "required": false
+    }
+  ], 
+  "direct_count": 6, 
+  "direct_missing_from_catalog": 0, 
+  "profile_version": [
+    "1007"
+  ], 
+  "read_only": true, 
+  "samples": [
+    {
+      "code_matches_catalog": true, 
+      "custom_required_fields": [
+        {
+          "name": "SampleCode", 
+          "required": false
+        }, 
+        {
+          "name": "CodeArticle", 
+          "required": false
+        }, 
+        {
+          "name": "Designation", 
+          "required": false
+        }, 
+        {
+          "name": "ReceptionWeight", 
+          "required": false
+        }, 
+        {
+          "name": "QuantityReceived", 
+          "required": false
+        }, 
+        {
+          "name": "QuantityUnderAnalysis", 
+          "required": false
+        }, 
+        {
+          "name": "TechSampleWeight", 
+          "required": false
+        }, 
+        {
+          "name": "ReceptionTemperature", 
+          "required": false
+        }, 
+        {
+          "name": "SampleCondition", 
+          "required": false
+        }, 
+        {
+          "name": "PackagingCondition", 
+          "required": false
+        }, 
+        {
+          "name": "Origin", 
+          "required": false
+        }, 
+        {
+          "name": "SupplierCustomerDetail", 
+          "required": false
+        }, 
+        {
+          "name": "Receptionist", 
+          "required": false
+        }, 
+        {
+          "name": "Contract", 
+          "required": false
+        }, 
+        {
+          "name": "EntryVoucher", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisSheetNumber", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisStart", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisEnd", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisPreparer", 
+          "required": false
+        }, 
+        {
+          "name": "PodLength", 
+          "required": false
+        }, 
+        {
+          "name": "AromaDevelopment", 
+          "required": false
+        }, 
+        {
+          "name": "Aroma", 
+          "required": false
+        }, 
+        {
+          "name": "Color", 
+          "required": false
+        }, 
+        {
+          "name": "Texture", 
+          "required": false
+        }
+      ], 
+      "id": "VAN-0001", 
+      "schema_required_fields": [
+        "Client", 
+        "Contact", 
+        "SampleType", 
+        "Analyses"
+      ]
+    }, 
+    {
+      "code_matches_catalog": true, 
+      "custom_required_fields": [
+        {
+          "name": "SampleCode", 
+          "required": false
+        }, 
+        {
+          "name": "CodeArticle", 
+          "required": false
+        }, 
+        {
+          "name": "Designation", 
+          "required": false
+        }, 
+        {
+          "name": "ReceptionWeight", 
+          "required": false
+        }, 
+        {
+          "name": "QuantityReceived", 
+          "required": false
+        }, 
+        {
+          "name": "QuantityUnderAnalysis", 
+          "required": false
+        }, 
+        {
+          "name": "TechSampleWeight", 
+          "required": false
+        }, 
+        {
+          "name": "ReceptionTemperature", 
+          "required": false
+        }, 
+        {
+          "name": "SampleCondition", 
+          "required": false
+        }, 
+        {
+          "name": "PackagingCondition", 
+          "required": false
+        }, 
+        {
+          "name": "Origin", 
+          "required": false
+        }, 
+        {
+          "name": "SupplierCustomerDetail", 
+          "required": false
+        }, 
+        {
+          "name": "Receptionist", 
+          "required": false
+        }, 
+        {
+          "name": "Contract", 
+          "required": false
+        }, 
+        {
+          "name": "EntryVoucher", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisSheetNumber", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisStart", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisEnd", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisPreparer", 
+          "required": false
+        }, 
+        {
+          "name": "PodLength", 
+          "required": false
+        }, 
+        {
+          "name": "AromaDevelopment", 
+          "required": false
+        }, 
+        {
+          "name": "Aroma", 
+          "required": false
+        }, 
+        {
+          "name": "Color", 
+          "required": false
+        }, 
+        {
+          "name": "Texture", 
+          "required": false
+        }
+      ], 
+      "id": "VAN-0002", 
+      "schema_required_fields": [
+        "Client", 
+        "Contact", 
+        "SampleType", 
+        "Analyses"
+      ]
+    }, 
+    {
+      "code_matches_catalog": true, 
+      "custom_required_fields": [
+        {
+          "name": "SampleCode", 
+          "required": false
+        }, 
+        {
+          "name": "CodeArticle", 
+          "required": false
+        }, 
+        {
+          "name": "Designation", 
+          "required": false
+        }, 
+        {
+          "name": "ReceptionWeight", 
+          "required": false
+        }, 
+        {
+          "name": "QuantityReceived", 
+          "required": false
+        }, 
+        {
+          "name": "QuantityUnderAnalysis", 
+          "required": false
+        }, 
+        {
+          "name": "TechSampleWeight", 
+          "required": false
+        }, 
+        {
+          "name": "ReceptionTemperature", 
+          "required": false
+        }, 
+        {
+          "name": "SampleCondition", 
+          "required": false
+        }, 
+        {
+          "name": "PackagingCondition", 
+          "required": false
+        }, 
+        {
+          "name": "Origin", 
+          "required": false
+        }, 
+        {
+          "name": "SupplierCustomerDetail", 
+          "required": false
+        }, 
+        {
+          "name": "Receptionist", 
+          "required": false
+        }, 
+        {
+          "name": "Contract", 
+          "required": false
+        }, 
+        {
+          "name": "EntryVoucher", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisSheetNumber", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisStart", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisEnd", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisPreparer", 
+          "required": false
+        }, 
+        {
+          "name": "PodLength", 
+          "required": false
+        }, 
+        {
+          "name": "AromaDevelopment", 
+          "required": false
+        }, 
+        {
+          "name": "Aroma", 
+          "required": false
+        }, 
+        {
+          "name": "Color", 
+          "required": false
+        }, 
+        {
+          "name": "Texture", 
+          "required": false
+        }
+      ], 
+      "id": "VAN-0003", 
+      "schema_required_fields": [
+        "Client", 
+        "Contact", 
+        "SampleType", 
+        "Analyses"
+      ]
+    }, 
+    {
+      "code_matches_catalog": true, 
+      "custom_required_fields": [
+        {
+          "name": "SampleCode", 
+          "required": false
+        }, 
+        {
+          "name": "CodeArticle", 
+          "required": false
+        }, 
+        {
+          "name": "Designation", 
+          "required": false
+        }, 
+        {
+          "name": "ReceptionWeight", 
+          "required": false
+        }, 
+        {
+          "name": "QuantityReceived", 
+          "required": false
+        }, 
+        {
+          "name": "QuantityUnderAnalysis", 
+          "required": false
+        }, 
+        {
+          "name": "TechSampleWeight", 
+          "required": false
+        }, 
+        {
+          "name": "ReceptionTemperature", 
+          "required": false
+        }, 
+        {
+          "name": "SampleCondition", 
+          "required": false
+        }, 
+        {
+          "name": "PackagingCondition", 
+          "required": false
+        }, 
+        {
+          "name": "Origin", 
+          "required": false
+        }, 
+        {
+          "name": "SupplierCustomerDetail", 
+          "required": false
+        }, 
+        {
+          "name": "Receptionist", 
+          "required": false
+        }, 
+        {
+          "name": "Contract", 
+          "required": false
+        }, 
+        {
+          "name": "EntryVoucher", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisSheetNumber", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisStart", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisEnd", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisPreparer", 
+          "required": false
+        }, 
+        {
+          "name": "PodLength", 
+          "required": false
+        }, 
+        {
+          "name": "AromaDevelopment", 
+          "required": false
+        }, 
+        {
+          "name": "Aroma", 
+          "required": false
+        }, 
+        {
+          "name": "Color", 
+          "required": false
+        }, 
+        {
+          "name": "Texture", 
+          "required": false
+        }
+      ], 
+      "id": "VAN-0004", 
+      "schema_required_fields": [
+        "Client", 
+        "Contact", 
+        "SampleType", 
+        "Analyses"
+      ]
+    }, 
+    {
+      "code_matches_catalog": true, 
+      "custom_required_fields": [
+        {
+          "name": "SampleCode", 
+          "required": false
+        }, 
+        {
+          "name": "CodeArticle", 
+          "required": false
+        }, 
+        {
+          "name": "Designation", 
+          "required": false
+        }, 
+        {
+          "name": "ReceptionWeight", 
+          "required": false
+        }, 
+        {
+          "name": "QuantityReceived", 
+          "required": false
+        }, 
+        {
+          "name": "QuantityUnderAnalysis", 
+          "required": false
+        }, 
+        {
+          "name": "TechSampleWeight", 
+          "required": false
+        }, 
+        {
+          "name": "ReceptionTemperature", 
+          "required": false
+        }, 
+        {
+          "name": "SampleCondition", 
+          "required": false
+        }, 
+        {
+          "name": "PackagingCondition", 
+          "required": false
+        }, 
+        {
+          "name": "Origin", 
+          "required": false
+        }, 
+        {
+          "name": "SupplierCustomerDetail", 
+          "required": false
+        }, 
+        {
+          "name": "Receptionist", 
+          "required": false
+        }, 
+        {
+          "name": "Contract", 
+          "required": false
+        }, 
+        {
+          "name": "EntryVoucher", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisSheetNumber", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisStart", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisEnd", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisPreparer", 
+          "required": false
+        }, 
+        {
+          "name": "PodLength", 
+          "required": false
+        }, 
+        {
+          "name": "AromaDevelopment", 
+          "required": false
+        }, 
+        {
+          "name": "Aroma", 
+          "required": false
+        }, 
+        {
+          "name": "Color", 
+          "required": false
+        }, 
+        {
+          "name": "Texture", 
+          "required": false
+        }
+      ], 
+      "id": "VAN-0005", 
+      "schema_required_fields": [
+        "Client", 
+        "Contact", 
+        "SampleType", 
+        "Analyses"
+      ]
+    }, 
+    {
+      "code_matches_catalog": true, 
+      "custom_required_fields": [
+        {
+          "name": "SampleCode", 
+          "required": false
+        }, 
+        {
+          "name": "CodeArticle", 
+          "required": false
+        }, 
+        {
+          "name": "Designation", 
+          "required": false
+        }, 
+        {
+          "name": "ReceptionWeight", 
+          "required": false
+        }, 
+        {
+          "name": "QuantityReceived", 
+          "required": false
+        }, 
+        {
+          "name": "QuantityUnderAnalysis", 
+          "required": false
+        }, 
+        {
+          "name": "TechSampleWeight", 
+          "required": false
+        }, 
+        {
+          "name": "ReceptionTemperature", 
+          "required": false
+        }, 
+        {
+          "name": "SampleCondition", 
+          "required": false
+        }, 
+        {
+          "name": "PackagingCondition", 
+          "required": false
+        }, 
+        {
+          "name": "Origin", 
+          "required": false
+        }, 
+        {
+          "name": "SupplierCustomerDetail", 
+          "required": false
+        }, 
+        {
+          "name": "Receptionist", 
+          "required": false
+        }, 
+        {
+          "name": "Contract", 
+          "required": false
+        }, 
+        {
+          "name": "EntryVoucher", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisSheetNumber", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisStart", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisEnd", 
+          "required": false
+        }, 
+        {
+          "name": "AnalysisPreparer", 
+          "required": false
+        }, 
+        {
+          "name": "PodLength", 
+          "required": false
+        }, 
+        {
+          "name": "AromaDevelopment", 
+          "required": false
+        }, 
+        {
+          "name": "Aroma", 
+          "required": false
+        }, 
+        {
+          "name": "Color", 
+          "required": false
+        }, 
+        {
+          "name": "Texture", 
+          "required": false
+        }
+      ], 
+      "id": "VAN-0006", 
+      "schema_required_fields": [
+        "Client", 
+        "Contact", 
+        "SampleType", 
+        "Analyses"
+      ]
+    }
+  ], 
+  "scope": "samples directly contained in clients"
+}

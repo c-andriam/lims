@@ -412,3 +412,9 @@ msgstr "Op. AW"
 
 msgid "Report reference"
 msgstr "Référence du rapport"
+# Erreurs de creation: conserver le formulaire sans fausse confirmation.
+msgid "No sample was saved. Complete the required fields and select the analyses before saving."
+msgstr "Aucun échantillon n’a été enregistré. Complétez les champs obligatoires et sélectionnez les analyses avant d’enregistrer."
+
+msgid "No sample was saved. Check the entered values."
+msgstr "Aucun échantillon n’a été enregistré. Vérifiez les valeurs saisies."

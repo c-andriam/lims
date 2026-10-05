@@ -11,6 +11,7 @@ rester lisibles par quelqu'un qui ne connait pas Archetypes.
 import unittest
 
 from senaite.trimeta.samplefields.extender import ReceptionFieldsExtender
+from senaite.trimeta.samplefields.schema_modifier import DateReceivedSchemaModifier
 from senaite.trimeta.samplefields.tests.base import TrimetaTestCase
 from senaite.trimeta.samplefields.tests.utils import SampleFactory
 
@@ -110,6 +111,19 @@ class TestExtenderDeclaration(unittest.TestCase):
         self.assertEqual(ordered, declared)
 
 
+class TestNativeRequiredFields(unittest.TestCase):
+
+    def test_received_date_is_required_and_visible(self):
+        field = type("Field", (object,), {})()
+        field.widget = type("Widget", (object,), {})()
+        field.required = False
+        field.mode = "r"
+        DateReceivedSchemaModifier(None).fiddle({"DateReceived": field})
+        self.assertTrue(field.required)
+        self.assertEqual(field.mode, "rw")
+        self.assertEqual(field.widget.visible["add"], "edit")
+
+
 class TestSchemaOnSample(TrimetaTestCase):
     """Verifications sur un echantillon reellement cree."""
 
@@ -123,6 +137,13 @@ class TestSchemaOnSample(TrimetaTestCase):
             self.assertIsNotNone(
                 sample.getField(name),
                 "Champ {} absent du schema de l'echantillon".format(name))
+
+    def test_required_flags_on_real_schema(self):
+        sample = self.factory.create()
+        for name, required in RECEPTION_FIELDS + ANALYSE_FIELDS:
+            self.assertEqual(bool(sample.getField(name).required), required,
+                             "Obligation incorrecte: {}".format(name))
+        self.assertTrue(sample.getField("DateReceived").required)
 
     def test_values_are_stored_and_read_back(self):
         sample = self.factory.create(
@@ -145,6 +166,7 @@ class TestSchemaOnSample(TrimetaTestCase):
         sample = self.factory.create()
         field = sample.getField("DateReceived")
         self.assertEqual(field.mode, "rw")
+        self.assertTrue(field.required)
         self.assertEqual(field.widget.visible.get("add"), "edit")
 
 
@@ -152,5 +174,6 @@ def test_suite():
     suite = unittest.TestSuite()
     loader = unittest.TestLoader()
     suite.addTest(loader.loadTestsFromTestCase(TestExtenderDeclaration))
+    suite.addTest(loader.loadTestsFromTestCase(TestNativeRequiredFields))
     suite.addTest(loader.loadTestsFromTestCase(TestSchemaOnSample))
     return suite

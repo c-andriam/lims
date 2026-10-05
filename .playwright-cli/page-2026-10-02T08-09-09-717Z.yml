@@ -1,0 +1,715 @@
+- generic [active] [ref=f3e1]:
+  - navigation [ref=f3e3]:
+    - link [ref=f3e4] [cursor=pointer]:
+      - /url: http://localhost:8080/senaite
+    - text: 
+    - generic [ref=f3e6]:
+      - list
+      - list [ref=f3e7]:
+        - listitem [ref=f3e8]:
+          - navigation [ref=f3e9]:
+            - link "" [ref=f3e10] [cursor=pointer]:
+              - /url: "#"
+        - listitem [ref=f3e12]:
+          - navigation [ref=f3e13]:
+            - link "" [ref=f3e14] [cursor=pointer]:
+              - /url: "#"
+        - listitem [ref=f3e16]:
+          - link "" [ref=f3e17] [cursor=pointer]:
+            - /url: http://localhost:8080/senaite/spotlight
+        - listitem [ref=f3e19]:
+          - link "" [ref=f3e20] [cursor=pointer]:
+            - /url: http://localhost:8080/senaite/@@lims-setup
+        - listitem [ref=f3e22]:
+          - button "admin" [ref=f3e23] [cursor=pointer]
+          - text:   
+  - generic [ref=f3e24]:
+    - navigation [ref=f3e25]:
+      - generic [ref=f3e26]:
+        - button "" [ref=f3e28] [cursor=pointer]
+        - list [ref=f3e31]:
+          - listitem [ref=f3e32]:
+            - link [ref=f3e33] [cursor=pointer]:
+              - /url: http://localhost:8080/senaite/clients
+              - img "Clients" [ref=f3e35]
+          - listitem [ref=f3e36]:
+            - link [ref=f3e37] [cursor=pointer]:
+              - /url: http://localhost:8080/senaite/samples
+              - img "Samples" [ref=f3e39]
+          - listitem [ref=f3e40]:
+            - link [ref=f3e41] [cursor=pointer]:
+              - /url: http://localhost:8080/senaite/batches
+              - img "Batches" [ref=f3e43]
+          - listitem [ref=f3e44]:
+            - link [ref=f3e45] [cursor=pointer]:
+              - /url: http://localhost:8080/senaite/worksheets
+              - img "Worksheets" [ref=f3e47]
+          - listitem [ref=f3e48]:
+            - link [ref=f3e49] [cursor=pointer]:
+              - /url: http://localhost:8080/senaite/methods
+              - img "Methods" [ref=f3e51]
+          - listitem [ref=f3e52]:
+            - link "Tableau de bord" [ref=f3e53] [cursor=pointer]:
+              - /url: http://localhost:8080/senaite/trimeta-dashboard
+    - generic [ref=f3e58]:
+      - generic:
+        - generic:
+          - banner
+      - generic:
+        - generic:
+          - complementary
+      - navigation "breadcrumb" [ref=f3e62]:
+        - list [ref=f3e63]:
+          - listitem [ref=f3e64]:
+            - link "Accueil" [ref=f3e65] [cursor=pointer]:
+              - /url: http://localhost:8080/senaite
+          - listitem [ref=f3e66]:
+            - text: /
+            - link "Échantillons" [ref=f3e67] [cursor=pointer]:
+              - /url: http://localhost:8080/senaite/samples
+      - article [ref=f3e69]:
+        - article [ref=f3e71]:
+          - heading "Demander de nouvelles analyses 1 Ajouter" [level=1] [ref=f3e73]:
+            - generic [ref=f3e75]: Demander de nouvelles analyses
+            - generic [ref=f3e78]:
+              - spinbutton [ref=f3e79]: "1"
+              - button "Ajouter" [ref=f3e81] [cursor=pointer]
+          - generic [ref=f3e85]:
+            - list [ref=f3e86]:
+              - listitem [ref=f3e87]:
+                - link "Échantillon 1" [ref=f3e88] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=f3e89]:
+                - link "Tout afficher" [ref=f3e90] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=f3e91]:
+                - link "" [ref=f3e92] [cursor=pointer]:
+                  - /url: http://localhost:8080/senaite/samples/ar_add_manage
+            - table [ref=f3e94]:
+              - rowgroup [ref=f3e95]:
+                - row [ref=f3e96]:
+                  - cell "Échantillon primaire Sélectionner un échantillon pour créer un échantillon secondaire" [ref=f3e97]:
+                    - generic [ref=f3e98]:
+                      - text: Échantillon primaire
+                      - generic [ref=f3e99]: Sélectionner un échantillon pour créer un échantillon secondaire
+                  - cell [ref=f3e100]
+                  - cell [ref=f3e101]:
+                    - generic [ref=f3e103]:
+                      - generic:
+                        - list
+                      - generic [ref=f3e105]:
+                        - textbox [ref=f3e106]
+                        - generic [ref=f3e107]:
+                          - button "" [ref=f3e108] [cursor=pointer]
+                          - button "" [ref=f3e110] [cursor=pointer]
+                - row [ref=f3e112]:
+                  - cell "Client · Sélectionner le client de cet échantillon" [ref=f3e113]:
+                    - generic [ref=f3e114]:
+                      - text: Client ·
+                      - generic [ref=f3e115]: Sélectionner le client de cet échantillon
+                  - cell [ref=f3e116]
+                  - cell [ref=f3e117]:
+                    - generic [ref=f3e119]:
+                      - generic:
+                        - list
+                      - generic [ref=f3e121]:
+                        - textbox [ref=f3e122]
+                        - generic [ref=f3e123]:
+                          - button "" [ref=f3e124] [cursor=pointer]
+                          - button "" [ref=f3e126] [cursor=pointer]
+                - row [ref=f3e128]:
+                  - cell "Contact · Sélectionner le contact principal de cet échantillon" [ref=f3e129]:
+                    - generic [ref=f3e130]:
+                      - text: Contact ·
+                      - generic [ref=f3e131]: Sélectionner le contact principal de cet échantillon
+                  - cell [ref=f3e132]
+                  - cell [ref=f3e133]:
+                    - generic [ref=f3e135]:
+                      - generic:
+                        - list
+                      - generic [ref=f3e137]:
+                        - textbox [ref=f3e138]
+                        - generic [ref=f3e139]:
+                          - button "" [ref=f3e140] [cursor=pointer]
+                          - button "" [ref=f3e142] [cursor=pointer]
+                - row [ref=f3e144]:
+                  - cell "Contacts en copie Contacts en copie des notifications par courriel" [ref=f3e145]:
+                    - generic [ref=f3e146]:
+                      - text: Contacts en copie
+                      - generic [ref=f3e147]: Contacts en copie des notifications par courriel
+                  - cell [ref=f3e148]
+                  - cell [ref=f3e149]:
+                    - generic [ref=f3e151]:
+                      - generic:
+                        - list
+                      - generic [ref=f3e153]:
+                        - textbox [ref=f3e154]
+                        - generic [ref=f3e155]:
+                          - button "" [ref=f3e156] [cursor=pointer]
+                          - button "" [ref=f3e158] [cursor=pointer]
+                - row [ref=f3e160]:
+                  - cell "Emails CC Adresses e-mail supplémentaires à notifier" [ref=f3e161]:
+                    - generic [ref=f3e162]:
+                      - text: Emails CC
+                      - generic [ref=f3e163]: Adresses e-mail supplémentaires à notifier
+                  - cell [ref=f3e164]
+                  - cell [ref=f3e165]:
+                    - textbox [ref=f3e167]
+                - row [ref=f3e168]:
+                  - cell "Série Rattacher l'échantillon à une série" [ref=f3e169]:
+                    - generic [ref=f3e170]:
+                      - text: Série
+                      - generic [ref=f3e171]: Rattacher l'échantillon à une série
+                  - cell [ref=f3e172]
+                  - cell [ref=f3e173]:
+                    - generic [ref=f3e175]:
+                      - generic:
+                        - list
+                      - generic [ref=f3e177]:
+                        - textbox [ref=f3e178]
+                        - generic [ref=f3e179]:
+                          - button "" [ref=f3e180] [cursor=pointer]
+                          - button "" [ref=f3e182] [cursor=pointer]
+                - row [ref=f3e184]:
+                  - cell "Sous-groupe de série Sous-groupe de série de cette demande" [ref=f3e185]:
+                    - generic [ref=f3e186]:
+                      - text: Sous-groupe de série
+                      - generic [ref=f3e187]: Sous-groupe de série de cette demande
+                  - cell [ref=f3e188]
+                  - cell [ref=f3e189]:
+                    - generic [ref=f3e191]:
+                      - generic:
+                        - list
+                      - generic [ref=f3e193]:
+                        - textbox [ref=f3e194]
+                        - generic [ref=f3e195]:
+                          - button "" [ref=f3e196] [cursor=pointer]
+                          - button "" [ref=f3e198] [cursor=pointer]
+                - row [ref=f3e200]:
+                  - cell "Modèle d'échantillon Sélectionner un modèle d'analyse pour cet échantillon" [ref=f3e201]:
+                    - generic [ref=f3e202]:
+                      - text: Modèle d'échantillon
+                      - generic [ref=f3e203]: Sélectionner un modèle d'analyse pour cet échantillon
+                  - cell [ref=f3e204]
+                  - cell [ref=f3e205]:
+                    - generic [ref=f3e207]:
+                      - generic:
+                        - list
+                      - generic [ref=f3e209]:
+                        - textbox [ref=f3e210]
+                        - generic [ref=f3e211]:
+                          - button "" [ref=f3e212] [cursor=pointer]
+                          - button "" [ref=f3e214] [cursor=pointer]
+                - row [ref=f3e216]:
+                  - cell "Profils d'analyse Sélectionner un profil d'analyse pour cet échantillon" [ref=f3e217]:
+                    - generic [ref=f3e218]:
+                      - text: Profils d'analyse
+                      - generic [ref=f3e219]: Sélectionner un profil d'analyse pour cet échantillon
+                  - cell [ref=f3e220]
+                  - cell [ref=f3e221]:
+                    - generic [ref=f3e223]:
+                      - generic:
+                        - list
+                      - generic [ref=f3e225]:
+                        - textbox [ref=f3e226]
+                        - generic [ref=f3e227]:
+                          - button "" [ref=f3e228] [cursor=pointer]
+                          - button "" [ref=f3e230] [cursor=pointer]
+                - row [ref=f3e232]:
+                  - cell "Date de prélèvement · Date à laquelle l'échantillon a été prélevé" [ref=f3e233]:
+                    - generic [ref=f3e234]:
+                      - text: Date de prélèvement ·
+                      - generic [ref=f3e235]: Date à laquelle l'échantillon a été prélevé
+                  - cell [ref=f3e236]
+                  - cell [ref=f3e237]:
+                    - generic [ref=f3e240]:
+                      - textbox [ref=f3e241]
+                      - textbox [ref=f3e242]
+                - row [ref=f3e243]:
+                  - cell "Type d'échantillon · Sélectionner le type de cet échantillon" [ref=f3e244]:
+                    - generic [ref=f3e245]:
+                      - text: Type d'échantillon ·
+                      - generic [ref=f3e246]: Sélectionner le type de cet échantillon
+                  - cell [ref=f3e247]
+                  - cell [ref=f3e248]:
+                    - generic [ref=f3e250]:
+                      - generic:
+                        - list
+                      - generic [ref=f3e252]:
+                        - textbox [ref=f3e253]
+                        - generic [ref=f3e254]:
+                          - button "" [ref=f3e255] [cursor=pointer]
+                          - button "" [ref=f3e257] [cursor=pointer]
+                - row [ref=f3e259]:
+                  - cell "Contenant Sélectionner un contenant pour cet échantillon" [ref=f3e260]:
+                    - generic [ref=f3e261]:
+                      - text: Contenant
+                      - generic [ref=f3e262]: Sélectionner un contenant pour cet échantillon
+                  - cell [ref=f3e263]
+                  - cell [ref=f3e264]:
+                    - generic [ref=f3e266]:
+                      - generic:
+                        - list
+                      - generic [ref=f3e268]:
+                        - textbox [ref=f3e269]
+                        - generic [ref=f3e270]:
+                          - button "" [ref=f3e271] [cursor=pointer]
+                          - button "" [ref=f3e273] [cursor=pointer]
+                - row [ref=f3e275]:
+                  - cell "Conservation Sélectionner la conservation requise pour cet échantillon" [ref=f3e276]:
+                    - generic [ref=f3e277]:
+                      - text: Conservation
+                      - generic [ref=f3e278]: Sélectionner la conservation requise pour cet échantillon
+                  - cell [ref=f3e279]
+                  - cell [ref=f3e280]:
+                    - generic [ref=f3e282]:
+                      - generic:
+                        - list
+                      - generic [ref=f3e284]:
+                        - textbox [ref=f3e285]
+                        - generic [ref=f3e286]:
+                          - button "" [ref=f3e287] [cursor=pointer]
+                          - button "" [ref=f3e289] [cursor=pointer]
+                - row [ref=f3e291]:
+                  - cell "Spécification d'analyse Sélectionner une spécification d'analyse pour cet échantillon" [ref=f3e292]:
+                    - generic [ref=f3e293]:
+                      - text: Spécification d'analyse
+                      - generic [ref=f3e294]: Sélectionner une spécification d'analyse pour cet échantillon
+                  - cell [ref=f3e295]
+                  - cell [ref=f3e296]:
+                    - generic [ref=f3e298]:
+                      - generic:
+                        - list
+                      - generic [ref=f3e300]:
+                        - textbox [ref=f3e301]
+                        - generic [ref=f3e302]:
+                          - button "" [ref=f3e303] [cursor=pointer]
+                          - button "" [ref=f3e305] [cursor=pointer]
+                - row [ref=f3e307]:
+                  - cell "Point de prélèvement Lieu où l'échantillon a été prélevé" [ref=f3e308]:
+                    - generic [ref=f3e309]:
+                      - text: Point de prélèvement
+                      - generic [ref=f3e310]: Lieu où l'échantillon a été prélevé
+                  - cell [ref=f3e311]
+                  - cell [ref=f3e312]:
+                    - generic [ref=f3e314]:
+                      - generic:
+                        - list
+                      - generic [ref=f3e316]:
+                        - textbox [ref=f3e317]
+                        - generic [ref=f3e318]:
+                          - button "" [ref=f3e319] [cursor=pointer]
+                          - button "" [ref=f3e321] [cursor=pointer]
+                - row [ref=f3e323]:
+                  - cell "Lieu de stockage Lieu où l'échantillon est conservé" [ref=f3e324]:
+                    - generic [ref=f3e325]:
+                      - text: Lieu de stockage
+                      - generic [ref=f3e326]: Lieu où l'échantillon est conservé
+                  - cell [ref=f3e327]
+                  - cell [ref=f3e328]:
+                    - generic [ref=f3e330]:
+                      - generic:
+                        - list
+                      - generic [ref=f3e332]:
+                        - textbox [ref=f3e333]
+                        - generic [ref=f3e334]:
+                          - button "" [ref=f3e335] [cursor=pointer]
+                          - button "" [ref=f3e337] [cursor=pointer]
+                - row [ref=f3e339]:
+                  - cell "Numéro de commande du client Numéro de commande du client pour cette demande" [ref=f3e340]:
+                    - generic [ref=f3e341]:
+                      - text: Numéro de commande du client
+                      - generic [ref=f3e342]: Numéro de commande du client pour cette demande
+                  - cell [ref=f3e343]
+                  - cell [ref=f3e344]:
+                    - textbox [ref=f3e346]
+                - row [ref=f3e347]:
+                  - cell "Lot Numéro du lot dont provient l'échantillon." [ref=f3e348]:
+                    - generic [ref=f3e349]:
+                      - text: Lot
+                      - generic [ref=f3e350]: Numéro du lot dont provient l'échantillon.
+                  - cell [ref=f3e351]
+                  - cell [ref=f3e352]:
+                    - textbox [ref=f3e354]
+                - row [ref=f3e355]:
+                  - cell "Écart de prélèvement Écart entre l'échantillon et son mode de prélèvement" [ref=f3e356]:
+                    - generic [ref=f3e357]:
+                      - text: Écart de prélèvement
+                      - generic [ref=f3e358]: Écart entre l'échantillon et son mode de prélèvement
+                  - cell [ref=f3e359]
+                  - cell [ref=f3e360]:
+                    - generic [ref=f3e362]:
+                      - generic:
+                        - list
+                      - generic [ref=f3e364]:
+                        - textbox [ref=f3e365]
+                        - generic [ref=f3e366]:
+                          - button "" [ref=f3e367] [cursor=pointer]
+                          - button "" [ref=f3e369] [cursor=pointer]
+                - row [ref=f3e371]:
+                  - cell "Priorité" [ref=f3e372]
+                  - cell [ref=f3e374]
+                  - cell [ref=f3e375]:
+                    - combobox [ref=f3e377]:
+                      - option "Plus haut"
+                      - option "Haut"
+                      - option "Moyen" [selected]
+                      - option "Bas"
+                      - option "Le plus bas"
+                - row [ref=f3e378]:
+                  - cell "Conditions environnementales Conditions environnementales lors du prélèvement" [ref=f3e379]:
+                    - generic [ref=f3e380]:
+                      - text: Conditions environnementales
+                      - generic [ref=f3e381]: Conditions environnementales lors du prélèvement
+                  - cell [ref=f3e382]
+                  - cell [ref=f3e383]:
+                    - textbox [ref=f3e385]
+                - row [ref=f3e386]:
+                  - cell "Composé" [ref=f3e387]
+                  - cell [ref=f3e389]
+                  - cell [ref=f3e390]:
+                    - checkbox [ref=f3e391]
+                - row [ref=f3e392]:
+                  - cell "Exclus de la facture Exclure les analyses de la facture ?" [ref=f3e393]:
+                    - generic [ref=f3e394]:
+                      - text: Exclus de la facture
+                      - generic [ref=f3e395]: Exclure les analyses de la facture ?
+                  - cell [ref=f3e396]
+                  - cell [ref=f3e397]:
+                    - checkbox [ref=f3e398]
+                - row [ref=f3e399]:
+                  - cell "Lien Ajouter une ou plusieurs pièce(s) jointe(s) à votre demande pour décrire plus spécifiquement votre échantillon." [ref=f3e400]:
+                    - generic [ref=f3e401]:
+                      - text: Lien
+                      - generic [ref=f3e402]: Ajouter une ou plusieurs pièce(s) jointe(s) à votre demande pour décrire plus spécifiquement votre échantillon.
+                  - cell [ref=f3e403]
+                  - cell [ref=f3e404]:
+                    - generic [ref=f3e407]:
+                      - button "Choose File" [ref=f3e408]
+                      - img [ref=f3e409] [cursor=pointer]
+                - row [ref=f3e410]:
+                  - cell "Date de réception de l'échantillon · Actual date and time the sample was received. Can be corrected manually if entered after the fact." [ref=f3e411]:
+                    - generic [ref=f3e412]:
+                      - text: Date de réception de l'échantillon ·
+                      - generic [ref=f3e413]: Actual date and time the sample was received. Can be corrected manually if entered after the fact.
+                  - cell [ref=f3e414]
+                  - cell [ref=f3e415]
+                - row [ref=f3e416]:
+                  - cell "Remarques Remarques et commentaires pour cette demande" [ref=f3e417]:
+                    - generic [ref=f3e418]:
+                      - text: Remarques
+                      - generic [ref=f3e419]: Remarques et commentaires pour cette demande
+                  - cell [ref=f3e420]
+                  - cell [ref=f3e421]:
+                    - textbox [ref=f3e423]
+                - row [ref=f3e424]:
+                  - cell "Usage interne Réserve l'échantillon pour un usage interne. Il ne pourra être accessible que par le personnel du laboratoire et non pour les clients." [ref=f3e425]:
+                    - generic [ref=f3e426]:
+                      - text: Usage interne
+                      - generic [ref=f3e427]: Réserve l'échantillon pour un usage interne. Il ne pourra être accessible que par le personnel du laboratoire et non pour les clients.
+                  - cell [ref=f3e428]
+                  - cell [ref=f3e429]:
+                    - checkbox [ref=f3e430]
+                - row [ref=f3e431]:
+                  - cell "Nombre d'échantillons Nombre d'échantillons à créer avec ces informations" [ref=f3e432]:
+                    - generic [ref=f3e433]:
+                      - text: Nombre d'échantillons
+                      - generic [ref=f3e434]: Nombre d'échantillons à créer avec ces informations
+                  - cell [ref=f3e435]
+                  - cell [ref=f3e436]:
+                    - textbox [ref=f3e438]: "1"
+                - row [ref=f3e439]:
+                  - cell "Reception" [ref=f3e440]
+                - row [ref=f3e441]:
+                  - cell "Code échantillon · Code interne unique attribué à l'échantillon." [ref=f3e442]:
+                    - generic [ref=f3e443]:
+                      - text: Code échantillon ·
+                      - generic [ref=f3e444]: Code interne unique attribué à l'échantillon.
+                  - cell [ref=f3e445]
+                  - cell [ref=f3e446]:
+                    - generic [ref=f3e447]:
+                      - generic [ref=f3e448]:
+                        - text: Code échantillon ·
+                        - generic [ref=f3e449]: Code interne unique attribué à l'échantillon.
+                      - textbox "Code échantillon · Code interne unique attribué à l'échantillon." [ref=f3e450]:
+                        - /placeholder: ""
+                - row [ref=f3e451]:
+                  - cell "Code article ·" [ref=f3e452]
+                  - cell [ref=f3e454]
+                  - cell [ref=f3e455]:
+                    - generic [ref=f3e456]:
+                      - generic [ref=f3e457]: Code article ·
+                      - combobox "Code article ·" [ref=f3e458]:
+                        - option "V-GNN"
+                        - option "V-GTK"
+                        - option "V-RAF"
+                        - option "V-RBF"
+                        - option "V-RCF"
+                        - option "V-LLB"
+                        - option "AUTRES" [selected]
+                - row [ref=f3e459]:
+                  - cell "Désignation ·" [ref=f3e460]
+                  - cell [ref=f3e462]
+                  - cell [ref=f3e463]:
+                    - generic [ref=f3e464]:
+                      - generic [ref=f3e465]: Désignation ·
+                      - textbox "Désignation ·" [ref=f3e466]:
+                        - /placeholder: ""
+                - row [ref=f3e467]:
+                  - cell "Poids à la réception (g) ·" [ref=f3e468]
+                  - cell [ref=f3e470]
+                  - cell [ref=f3e471]:
+                    - generic [ref=f3e472]:
+                      - generic [ref=f3e473]: Poids à la réception (g) ·
+                      - textbox "Poids à la réception (g) ·" [ref=f3e474]:
+                        - /placeholder: ""
+                - row [ref=f3e475]:
+                  - cell "Quantité reçue ·" [ref=f3e476]
+                  - cell [ref=f3e478]
+                  - cell [ref=f3e479]:
+                    - generic [ref=f3e480]:
+                      - generic [ref=f3e481]: Quantité reçue ·
+                      - textbox "Quantité reçue ·" [ref=f3e482]:
+                        - /placeholder: ""
+                - row [ref=f3e483]:
+                  - cell "Quantité mise sous analyse (g) ·" [ref=f3e484]
+                  - cell [ref=f3e486]
+                  - cell [ref=f3e487]:
+                    - generic [ref=f3e488]:
+                      - generic [ref=f3e489]: Quantité mise sous analyse (g) ·
+                      - textbox "Quantité mise sous analyse (g) ·" [ref=f3e490]:
+                        - /placeholder: ""
+                - row [ref=f3e491]:
+                  - cell "Poids de l'échantillon technique (g) ·" [ref=f3e492]
+                  - cell [ref=f3e494]
+                  - cell [ref=f3e495]:
+                    - generic [ref=f3e496]:
+                      - generic [ref=f3e497]: Poids de l'échantillon technique (g) ·
+                      - textbox "Poids de l'échantillon technique (g) ·" [ref=f3e498]:
+                        - /placeholder: ""
+                - row [ref=f3e499]:
+                  - cell "Température à la réception (°C) · Doit être comprise entre 15 et 31 °C." [ref=f3e500]:
+                    - generic [ref=f3e501]:
+                      - text: Température à la réception (°C) ·
+                      - generic [ref=f3e502]: Doit être comprise entre 15 et 31 °C.
+                  - cell [ref=f3e503]
+                  - cell [ref=f3e504]:
+                    - generic [ref=f3e505]:
+                      - generic [ref=f3e506]:
+                        - text: Température à la réception (°C) ·
+                        - generic [ref=f3e507]: Doit être comprise entre 15 et 31 °C.
+                      - combobox "Température à la réception (°C) · Doit être comprise entre 15 et 31 °C." [ref=f3e508]:
+                        - option "15 °C"
+                        - option "16 °C"
+                        - option "17 °C"
+                        - option "18 °C"
+                        - option "19 °C"
+                        - option "20 °C"
+                        - option "21 °C"
+                        - option "22 °C"
+                        - option "23 °C"
+                        - option "24 °C"
+                        - option "25 °C"
+                        - option "26 °C"
+                        - option "27 °C"
+                        - option "28 °C"
+                        - option "29 °C"
+                        - option "30 °C"
+                        - option "31 °C" [selected]
+                - row [ref=f3e509]:
+                  - cell "Condition de l'échantillon ·" [ref=f3e510]
+                  - cell [ref=f3e512]
+                  - cell [ref=f3e513]:
+                    - generic [ref=f3e514]:
+                      - generic [ref=f3e515]: Condition de l'échantillon ·
+                      - combobox "Condition de l'échantillon ·" [ref=f3e516]:
+                        - option "— Choisir —" [selected]
+                        - option "Conforme"
+                        - option "Non conforme"
+                - row [ref=f3e517]:
+                  - cell "État de l'emballage ·" [ref=f3e518]
+                  - cell [ref=f3e520]
+                  - cell "État de l'emballage ·" [ref=f3e521]:
+                    - combobox [ref=f3e526]:
+                      - option [selected]
+                      - option "Sous vide"
+                      - option "Sachet zip"
+                      - option "Kraft"
+                      - option "Autre…"
+                - row [ref=f3e527]:
+                  - cell "Provenance ·" [ref=f3e528]
+                  - cell [ref=f3e530]
+                  - cell [ref=f3e531]:
+                    - generic [ref=f3e532]:
+                      - generic [ref=f3e533]: Provenance ·
+                      - textbox "Provenance ·" [ref=f3e534]:
+                        - /placeholder: ""
+                - row [ref=f3e535]:
+                  - cell "Détail fournisseur / client ·" [ref=f3e536]
+                  - cell [ref=f3e538]
+                  - cell [ref=f3e539]:
+                    - generic [ref=f3e540]:
+                      - generic [ref=f3e541]: Détail fournisseur / client ·
+                      - textbox "Détail fournisseur / client ·" [ref=f3e542]:
+                        - /placeholder: ""
+                - row [ref=f3e543]:
+                  - cell "Received By · Sélectionner le contact du laboratoire ayant réceptionné l'échantillon." [ref=f3e544]:
+                    - generic [ref=f3e545]:
+                      - text: Received By ·
+                      - generic [ref=f3e546]: Sélectionner le contact du laboratoire ayant réceptionné l'échantillon.
+                  - cell [ref=f3e547]
+                  - cell [ref=f3e548]:
+                    - generic [ref=f3e550]:
+                      - generic:
+                        - list
+                      - generic [ref=f3e552]:
+                        - textbox [ref=f3e553]
+                        - generic [ref=f3e554]:
+                          - button "" [ref=f3e555] [cursor=pointer]
+                          - button "" [ref=f3e557] [cursor=pointer]
+                - row [ref=f3e559]:
+                  - cell "Contrat ·" [ref=f3e560]
+                  - cell [ref=f3e562]
+                  - cell [ref=f3e563]:
+                    - generic [ref=f3e564]:
+                      - generic [ref=f3e565]: Contrat ·
+                      - textbox "Contrat ·" [ref=f3e566]:
+                        - /placeholder: ""
+                - row [ref=f3e567]:
+                  - cell "BE LABO (bon d'entrée) ·" [ref=f3e568]
+                  - cell [ref=f3e570]
+                  - cell [ref=f3e571]:
+                    - generic [ref=f3e572]:
+                      - generic [ref=f3e573]: BE LABO (bon d'entrée) ·
+                      - textbox "BE LABO (bon d'entrée) ·" [ref=f3e574]:
+                        - /placeholder: ""
+                - row [ref=f3e575]:
+                  - cell "Analyse" [ref=f3e576]
+                - row [ref=f3e577]:
+                  - cell "Numéro de fiche d'analyse ·" [ref=f3e578]
+                  - cell [ref=f3e580]
+                  - cell [ref=f3e581]:
+                    - generic [ref=f3e582]:
+                      - generic [ref=f3e583]: Numéro de fiche d'analyse ·
+                      - textbox "Numéro de fiche d'analyse ·" [ref=f3e584]:
+                        - /placeholder: ""
+                - row [ref=f3e585]:
+                  - cell "Début d'analyse" [ref=f3e586]
+                  - cell [ref=f3e588]
+                  - cell [ref=f3e589]:
+                    - generic [ref=f3e592]:
+                      - textbox [ref=f3e593]
+                      - textbox [ref=f3e594]
+                - row [ref=f3e595]:
+                  - cell "Fin d'analyse" [ref=f3e596]
+                  - cell [ref=f3e598]
+                  - cell [ref=f3e599]:
+                    - generic [ref=f3e602]:
+                      - textbox [ref=f3e603]
+                      - textbox [ref=f3e604]
+                - row [ref=f3e605]:
+                  - cell "Préparateur d'analyse Une ou plusieurs personnes ayant préparé cette analyse." [ref=f3e606]:
+                    - generic [ref=f3e607]:
+                      - text: Préparateur d'analyse
+                      - generic [ref=f3e608]: Une ou plusieurs personnes ayant préparé cette analyse.
+                  - cell [ref=f3e609]
+                  - cell [ref=f3e610]:
+                    - generic [ref=f3e612]:
+                      - generic:
+                        - list
+                      - generic [ref=f3e614]:
+                        - textbox [ref=f3e615]
+                        - generic [ref=f3e616]:
+                          - button "" [ref=f3e617] [cursor=pointer]
+                          - button "" [ref=f3e619] [cursor=pointer]
+                - row [ref=f3e621]:
+                  - cell "Longueur des gousses (cm)" [ref=f3e622]
+                  - cell [ref=f3e624]
+                  - cell [ref=f3e625]:
+                    - generic [ref=f3e626]:
+                      - generic [ref=f3e627]: Longueur des gousses (cm)
+                      - textbox "Longueur des gousses (cm)" [ref=f3e628]:
+                        - /placeholder: ""
+                - row [ref=f3e629]:
+                  - cell "Développement de l'arôme" [ref=f3e630]
+                  - cell [ref=f3e632]
+                  - cell [ref=f3e633]:
+                    - generic [ref=f3e634]:
+                      - generic [ref=f3e635]: Développement de l'arôme
+                      - textbox "Développement de l'arôme" [ref=f3e636]:
+                        - /placeholder: ""
+                - row [ref=f3e637]:
+                  - cell "Arôme" [ref=f3e638]
+                  - cell [ref=f3e640]
+                  - cell [ref=f3e641]:
+                    - generic [ref=f3e642]:
+                      - generic [ref=f3e643]: Arôme
+                      - textbox "Arôme" [ref=f3e644]:
+                        - /placeholder: ""
+                - row [ref=f3e645]:
+                  - cell "Couleur" [ref=f3e646]
+                  - cell [ref=f3e648]
+                  - cell [ref=f3e649]:
+                    - generic [ref=f3e650]:
+                      - generic [ref=f3e651]: Couleur
+                      - textbox "Couleur" [ref=f3e652]:
+                        - /placeholder: ""
+                - row [ref=f3e653]:
+                  - cell "Texture" [ref=f3e654]
+                  - cell [ref=f3e656]
+                  - cell [ref=f3e657]:
+                    - generic [ref=f3e658]:
+                      - generic [ref=f3e659]: Texture
+                      - textbox "Texture" [ref=f3e660]:
+                        - /placeholder: ""
+                - row [ref=f3e661]:
+                  - cell "Analyses de laboratoire" [ref=f3e662] [cursor=pointer]
+                  - cell "" [ref=f3e664] [cursor=pointer]:
+                    - generic [ref=f3e665]:
+                      - textbox "Filtrer les analyses par nom…" [ref=f3e666]
+                      - generic [ref=f3e667]: 
+                - row [ref=f3e670]:
+                  - cell "Sous-total" [ref=f3e671]
+                  - cell "MGA" [ref=f3e672]
+                  - cell "0.00" [ref=f3e673]
+                - row [ref=f3e674]:
+                  - cell "Taxes" [ref=f3e675]
+                  - cell "MGA" [ref=f3e676]
+                  - cell "0.00" [ref=f3e677]
+                - row [ref=f3e678]:
+                  - cell "Total" [ref=f3e679]
+                  - cell "MGA" [ref=f3e680]
+                  - cell "0.00" [ref=f3e681]
+            - button "Enregistrer" [ref=f3e682] [cursor=pointer]
+            - button "Enregistrer et copier" [ref=f3e683] [cursor=pointer]
+            - button "Annuler" [ref=f3e684] [cursor=pointer]
+      - contentinfo [ref=f3e686]:
+        - contentinfo [ref=f3e687]:
+          - generic [ref=f3e689]:
+            - separator [ref=f3e690]
+            - generic [ref=f3e691]:
+              - text: © 2017-2026
+              - link "SENAITE LIMS" [ref=f3e692] [cursor=pointer]:
+                - /url: https://www.senaite.com
+            - list [ref=f3e694]:
+              - listitem [ref=f3e695]:
+                - link "" [ref=f3e696] [cursor=pointer]:
+                  - /url: https://www.senaite.com
+              - listitem [ref=f3e698]:
+                - link "" [ref=f3e699] [cursor=pointer]:
+                  - /url: https://www.senaite.com/docs/quickstart.html
+              - listitem [ref=f3e701]:
+                - link "" [ref=f3e702] [cursor=pointer]:
+                  - /url: https://github.com/senaite/senaite.lims
+              - listitem [ref=f3e704]:
+                - link "" [ref=f3e705] [cursor=pointer]:
+                  - /url: https://twitter.com/senaitelims
+              - listitem [ref=f3e707]:
+                - link "" [ref=f3e708] [cursor=pointer]:
+                  - /url: https://gitter.im/senaite
+        - list [ref=f3e715]:
+          - listitem [ref=f3e716]:
+            - text: SENAITE is powered by
+            - link "Plone" [ref=f3e717] [cursor=pointer]:
+              - /url: http://plone.org
+        - text: 
