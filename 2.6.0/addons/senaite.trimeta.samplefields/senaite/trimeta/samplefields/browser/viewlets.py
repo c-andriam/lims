@@ -7,7 +7,7 @@ besoins ni le meme rendu:
 
 - ReceptionSeparatorViewlet, sur le formulaire d'ajout d'echantillon:
   separateurs Reception/Analyse, autocompletion des champs libres,
-  clavier numerique, et affichage des erreurs de validation.
+  clavier numerique, et erreurs inline.
 
 - QualitySectionsViewlet, sur les formulaires de modification: intitules
   des 7 sous-sections de l'onglet Assurance Qualite. Ces champs sont

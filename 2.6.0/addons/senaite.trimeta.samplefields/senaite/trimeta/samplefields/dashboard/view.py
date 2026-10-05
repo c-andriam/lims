@@ -82,7 +82,9 @@ class DashboardView(ListingView):
         self.catalog = SAMPLE_CATALOG
         self.contentFilter = {
             "isRootAncestor": True,      # pas les partitions
-            "sort_on": "getDateReceived",
+            # DateReceived est absent avant reception: ZCatalog omettrait
+            # ces echantillons du tri. created existe des la sauvegarde.
+            "sort_on": "created",
             "sort_order": "descending",
         }
 

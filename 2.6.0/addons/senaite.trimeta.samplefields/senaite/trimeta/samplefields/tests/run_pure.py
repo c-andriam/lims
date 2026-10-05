@@ -249,7 +249,7 @@ PURE_CASES = [
                           "TestIndexDateNormalisation",
                           "TestContactTitleResolution",
                           "TestReferenceUid"]),
-    ("test_schema.py", ["TestExtenderDeclaration"]),
+    ("test_schema.py", ["TestExtenderDeclaration", "TestNativeRequiredFields"]),
     ("test_qualitydata.py", ["TestQualityDataDeclaration",
                              "TestVocabularyPlaceholders"]),
     ("test_listings.py", None),   # tout le fichier est pur

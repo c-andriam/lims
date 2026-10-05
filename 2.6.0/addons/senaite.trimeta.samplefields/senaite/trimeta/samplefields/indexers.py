@@ -136,7 +136,6 @@ def to_reference_uid(value):
         logger.debug("UID illisible sur %r", value)
         return u""
 
-
 # ---------------------------------------------------------------------
 # Section Reception / Analyse
 # ---------------------------------------------------------------------

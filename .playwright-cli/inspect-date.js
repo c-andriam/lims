@@ -1,0 +1,1 @@
+async page => { return await page.locator('tr[fieldName="DateReceived"]').evaluateAll(rows=>rows.map(r=>({html:r.outerHTML,visible:!!r.offsetParent}))); }

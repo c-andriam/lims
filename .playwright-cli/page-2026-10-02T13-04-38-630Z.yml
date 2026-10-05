@@ -1,0 +1,72 @@
+- generic [active] [ref=f1e1]:
+  - navigation [ref=f1e3]:
+    - link [ref=f1e4] [cursor=pointer]:
+      - /url: http://localhost:8080/senaite
+    - text: 
+    - generic [ref=f1e6]:
+      - list
+      - list [ref=f1e7]:
+        - listitem [ref=f1e8]:
+          - navigation [ref=f1e9]:
+            - link "" [ref=f1e10] [cursor=pointer]:
+              - /url: "#"
+        - listitem [ref=f1e12]:
+          - link "Se connecter" [ref=f1e13] [cursor=pointer]:
+            - /url: http://localhost:8080/senaite/login
+  - generic [ref=f1e15]:
+    - generic:
+      - generic:
+        - banner
+    - generic:
+      - generic:
+        - complementary
+    - article [ref=f1e17]:
+      - article [ref=f1e19]:
+        - generic [ref=f1e21]:
+          - generic [ref=f1e23]:
+            - generic [ref=f1e25]:
+              - generic [ref=f1e26]: Identifiant ·
+              - generic [ref=f1e27]:
+                - generic [ref=f1e28]: 
+                - textbox "Identifiant ·" [ref=f1e31]
+            - generic [ref=f1e33]:
+              - generic [ref=f1e34]: Mot de passe ·
+              - generic [ref=f1e35]:
+                - generic [ref=f1e36]: 
+                - textbox "Mot de passe ·" [ref=f1e39]
+            - button "Se connecter" [ref=f1e41] [cursor=pointer]
+          - paragraph [ref=f1e43]:
+            - text: Problème de connexion ?
+            - link "Obtenir de l'aide" [ref=f1e44] [cursor=pointer]:
+              - /url: http://localhost:8080/senaite/@@login-help
+            - text: .
+    - contentinfo [ref=f1e45]:
+      - contentinfo [ref=f1e46]:
+        - generic [ref=f1e48]:
+          - separator [ref=f1e49]
+          - generic [ref=f1e50]:
+            - text: © 2017-2026
+            - link "SENAITE LIMS" [ref=f1e51] [cursor=pointer]:
+              - /url: https://www.senaite.com
+          - list [ref=f1e53]:
+            - listitem [ref=f1e54]:
+              - link "" [ref=f1e55] [cursor=pointer]:
+                - /url: https://www.senaite.com
+            - listitem [ref=f1e57]:
+              - link "" [ref=f1e58] [cursor=pointer]:
+                - /url: https://www.senaite.com/docs/quickstart.html
+            - listitem [ref=f1e60]:
+              - link "" [ref=f1e61] [cursor=pointer]:
+                - /url: https://github.com/senaite/senaite.lims
+            - listitem [ref=f1e63]:
+              - link "" [ref=f1e64] [cursor=pointer]:
+                - /url: https://twitter.com/senaitelims
+            - listitem [ref=f1e66]:
+              - link "" [ref=f1e67] [cursor=pointer]:
+                - /url: https://gitter.im/senaite
+      - list [ref=f1e74]:
+        - listitem [ref=f1e75]:
+          - text: SENAITE is powered by
+          - link "Plone" [ref=f1e76] [cursor=pointer]:
+            - /url: http://plone.org
+      - text: 

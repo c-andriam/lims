@@ -12,6 +12,14 @@
       />
 
   <!-- Formulaire de creation d'echantillon -->
+  <browser:page
+      for="*"
+      name="ajax_ar_add"
+      class=".sample_add.SampleAddView"
+      permission="senaite.core.permissions.AddAnalysisRequest"
+      layer="senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
+      />
+
   <browser:viewlet
       name="senaite.trimeta.samplefields.reception_separator"
       manager="plone.app.layout.viewlets.interfaces.IHtmlHead"

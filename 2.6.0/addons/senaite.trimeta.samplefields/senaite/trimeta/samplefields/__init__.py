@@ -22,8 +22,7 @@ logger = logging.getLogger(PRODUCT_NAME)
 # NOTE: le monkey patch ajax_submit (limitation a un seul message
 # d'erreur a la fois) a ete retire sur demande. Le comportement natif
 # (un message par champ obligatoire manquant) est conserve. Seul le
-# bandeau recapitulatif en haut de page est supprime, via le JS
-# reception_separator.js (voir browser/viewlets.py).
+# bandeau recapitulatif natif reste visible, avec les erreurs inline.
 import senaite.trimeta.samplefields.patches  # noqa: E402
 
 

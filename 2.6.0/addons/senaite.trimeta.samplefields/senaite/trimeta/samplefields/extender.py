@@ -149,6 +149,8 @@ class ReceptionFieldsExtender(object):
         ExtFixedPointField(
             "QuantityReceived",
             required=True,
+            # Deux decimales partout: 500.00, et non 500.000. Les autres
+            # champs numeriques de la section etaient deja a deux.
             precision=2,
             schemata="Reception",
             widget=DecimalWidget(
