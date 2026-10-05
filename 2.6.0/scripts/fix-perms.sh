@@ -42,7 +42,7 @@ clean_bytecode() {
     fi
 }
 
-if [ ! -d "$TARGET" ]; then
+if [ ! -e "$TARGET" ]; then
     echo "ERREUR: '$TARGET' introuvable." >&2
     echo "Lance ce script depuis le repertoire 2.6.0/." >&2
     exit 1

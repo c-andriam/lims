@@ -20,12 +20,12 @@ class TestBuildCoaFilename(unittest.TestCase):
 
     def test_replaces_unsafe_characters(self):
         self.assertEqual(build_coa_filename("ECH 001/A;b", "VAN-0005"),
-                         "ECH_001_A_b.pdf")
+                         "ECH_001-A-b.pdf")
 
     def test_neutralises_header_injection(self):
         self.assertEqual(
             build_coa_filename('ECH"\r\nX-Evil: 1', "VAN-0005"),
-            "ECH_X-Evil_1.pdf")
+            "ECH-X-Evil-1.pdf")
 
     def test_code_made_only_of_unsafe_characters_falls_back(self):
         self.assertEqual(build_coa_filename("///", "VAN-0005"),

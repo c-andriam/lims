@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configure
     xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:i18n="http://namespaces.zope.org/i18n"
     i18n_domain="senaite.trimeta.samplefields">
@@ -156,5 +157,13 @@
   <include package=".worksheet" />
 
   <include package=".browser" />
+
+  <browser:page
+      for="*"
+      name="ajax_ar_add"
+      class=".browser.sample_submit.TrimetaSampleSubmitView"
+      permission="zope.Public"
+      layer=".interfaces.ISenaiteTrimetaLayer"
+      />
 
 </configure>

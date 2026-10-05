@@ -147,3 +147,12 @@ class QualitySectionsViewlet(TrimetaViewletBase):
             resources=RESOURCE_BASE,
             sections=self.get_sections_json(),
         )
+
+
+class NumericFieldsViewlet(TrimetaViewletBase):
+    """Conserve les virgules et signes sur les champs decimaux natifs."""
+
+    def render(self):
+        return (
+            '<script src="{portal}/{resources}/numeric_fields.js?v=1"></script>'
+        ).format(portal=self.get_portal_url(), resources=RESOURCE_BASE)

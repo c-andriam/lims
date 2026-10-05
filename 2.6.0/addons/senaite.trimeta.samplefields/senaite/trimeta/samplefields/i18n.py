@@ -30,6 +30,7 @@ import os
 import re
 import struct
 
+
 logger = logging.getLogger("senaite.trimeta.samplefields")
 
 LOCALES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -99,7 +100,7 @@ def parse_po(text):
                     line = line[len(key):].strip()
                     break
             if current and line.startswith(u'"'):
-                parts[current].append(ast.literal_eval(line))
+                parts[current].append(ast.literal_eval(u"u" + line))
         if not parts[u"msgid"] and not parts[u"msgstr"]:
             continue
         msgid = u"".join(parts[u"msgid"])

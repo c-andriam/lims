@@ -56,4 +56,12 @@
       layer="bika.lims.interfaces.IBikaLIMS"
       />
 
+  <browser:viewlet
+      name="senaite.trimeta.samplefields.numeric_fields"
+      manager="plone.app.layout.viewlets.interfaces.IHtmlHead"
+      class=".viewlets.NumericFieldsViewlet"
+      permission="zope2.View"
+      layer="bika.lims.interfaces.IBikaLIMS"
+      />
+
 </configure>

@@ -1,81 +1,51 @@
 #!/bin/sh
-# Sauvegarde le volume de donnees de SENAITE.
-#
-# Appele par `make backup`. Variables attendues:
-#   ENGINE   podman ou docker
-#   SERVICE  nom du container
-#
-# Pourquoi ce script plutot qu'une recette Makefile
-# -------------------------------------------------
-# La logique tient en une vingtaine de lignes de shell avec des
-# conditions et des variables. Ecrite dans un Makefile, chaque ligne
-# doit se terminer par un antislash et chaque $ doit etre double: une
-# erreur d'echappement y passe inapercue. Sur une commande qui touche
-# aux donnees de production, ce risque ne vaut pas la peine.
-#
-# Le piege que ce script evite
-# ----------------------------
-# compose ne cree pas un volume nomme "senaite-data" mais
-# "<projet>_senaite-data". Monter "senaite-data" en dur ne provoque
-# aucune erreur: le moteur cree un volume vide et on archive... rien.
-# On obtient une sauvegarde d'apparence normale, sans donnees.
-# On resout donc le vrai nom depuis le container.
-
+# Archive tout /data: tous les objets ZODB et les fichiers joints (blobs).
 set -eu
-
-ENGINE="${ENGINE:-}"
+: "${ENGINE:?Moteur requis}"
 SERVICE="${SERVICE:-senaite}"
 BACKUP_DIR="${BACKUP_DIR:-backups}"
+IMAGE="${IMAGE:-docker.io/senaite/senaite:v2.6.0}"
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+PYTHON="${PYTHON:-python3}"
 
-# Une base SENAITE reellement utilisee pese plusieurs Mio. En dessous,
-# c'est probablement une base vide ou un volume qui n'est pas le bon.
-MIN_SIZE_BYTES=102400
-
-if [ -z "$ENGINE" ]; then
-    echo "ERREUR: ni podman ni docker n'est installe." >&2
-    exit 1
-fi
-
-resolve_volume() {
-    "$ENGINE" inspect \
-        -f '{{range .Mounts}}{{if eq .Destination "/data"}}{{.Name}}{{end}}{{end}}' \
-        "$SERVICE" 2>/dev/null || true
+SOURCE=$("$ENGINE" inspect -f '{{range .Mounts}}{{if eq .Destination "/data"}}{{.Source}}{{end}}{{end}}' "$SERVICE")
+[ -n "$SOURCE" ] || { echo 'ERREUR: aucun stockage /data' >&2; exit 1; }
+# Refuse une sauvegarde si un autre serveur partage cette base.
+for other in $("$ENGINE" ps --format '{{.Names}}'); do
+    [ "$other" = "$SERVICE" ] && continue
+    mount=$("$ENGINE" inspect -f '{{range .Mounts}}{{if eq .Destination "/data"}}{{.Source}}{{end}}{{end}}' "$other")
+    if [ "$mount" = "$SOURCE" ]; then
+        echo "ERREUR: $other utilise aussi la base. Arreter les autres serveurs." >&2
+        exit 1
+    fi
+done
+WAS_RUNNING=$("$ENGINE" inspect -f '{{.State.Running}}' "$SERVICE")
+PARTIAL=""
+cleanup() {
+    status=$?
+    trap - EXIT HUP INT TERM
+    if [ "$WAS_RUNNING" = true ]; then
+        "$ENGINE" start "$SERVICE" >/dev/null || status=1
+    fi
+    if [ "$status" -ne 0 ]; then
+        echo "ERREUR: sauvegarde non validee. Fichier provisoire: $PARTIAL" >&2
+    fi
+    exit "$status"
 }
-
-VOLUME="$(resolve_volume)"
-if [ -z "$VOLUME" ]; then
-    echo "ERREUR: aucun volume monte sur /data pour le container '$SERVICE'." >&2
-    echo "Le container doit exister. Lance-le avec: make up" >&2
-    exit 1
+trap cleanup EXIT
+trap 'exit 1' HUP INT TERM
+if [ "$WAS_RUNNING" = true ]; then
+    echo 'Arret temporaire de SENAITE pour une sauvegarde coherente...'
+    "$ENGINE" stop --time 60 "$SERVICE" >/dev/null
 fi
-
 mkdir -p "$BACKUP_DIR"
-FILE="senaite-data-$(date +%Y%m%d-%H%M%S).tar.gz"
-
-echo "Container     : $SERVICE"
-echo "Volume source : $VOLUME"
-echo "Archive       : $BACKUP_DIR/$FILE"
-echo ""
-
-"$ENGINE" run --rm \
-    -v "$VOLUME":/data:ro \
-    -v "$(pwd)/$BACKUP_DIR":/backup \
-    alpine tar czf "/backup/$FILE" -C /data .
-
-SIZE="$(wc -c < "$BACKUP_DIR/$FILE" | tr -d ' ')"
-echo "Taille        : $((SIZE / 1024)) Kio"
-
-if [ "$SIZE" -lt "$MIN_SIZE_BYTES" ]; then
-    echo ""
-    echo "ATTENTION: archive suspecte (moins de 100 Kio)."
-    echo "Une base SENAITE utilisee pese plusieurs Mio."
-    echo "Contenu de l'archive:"
-    tar tzf "$BACKUP_DIR/$FILE" | head -20
-    echo ""
-    echo "Ne te fie pas a cette sauvegarde tant que tu n'as pas verifie"
-    echo "qu'elle contient bien filestorage/ et blobstorage/."
-    exit 1
-fi
-
-echo ""
-echo "Sauvegarde terminee."
+BACKUP_DIR=$(CDPATH= cd -- "$BACKUP_DIR" && pwd)
+FILE="senaite-data-$(date +%Y%m%d-%H%M%S)-$$.tar.gz"
+PARTIAL="$BACKUP_DIR/$FILE.partial"
+echo "Stockage sauvegarde: $SOURCE"
+# La redirection est cote hote: pas de droits/labels requis sur /backup.
+"$ENGINE" run --rm --volumes-from "$SERVICE:ro" --entrypoint /bin/tar "$IMAGE" czf - -C /data . > "$PARTIAL"
+"$PYTHON" "$SCRIPT_DIR/validate-backup.py" "$PARTIAL"
+mv "$PARTIAL" "$BACKUP_DIR/$FILE"
+(cd "$BACKUP_DIR" && sha256sum "$FILE" > "$FILE.sha256")
+echo "Sauvegarde complete: $BACKUP_DIR/$FILE"

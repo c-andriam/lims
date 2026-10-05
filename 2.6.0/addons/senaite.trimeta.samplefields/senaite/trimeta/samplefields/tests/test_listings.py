@@ -395,6 +395,16 @@ class FakeInstrument(object):
 
 
 class TestInstrumentMaintenanceType(unittest.TestCase):
+
+    def setUp(self):
+        from senaite.trimeta.samplefields.listings import instruments
+        self.original_get_object = instruments.api.get_object
+        instruments.api.get_object = lambda obj: obj
+
+    def tearDown(self):
+        from senaite.trimeta.samplefields.listings import instruments
+        instruments.api.get_object = self.original_get_object
+
     """senaite.core affichait obj.getType()[0], soit "R" ou "P"."""
 
     def make_adapter(self, context=None):
@@ -441,7 +451,7 @@ class TestReportsExport(unittest.TestCase):
     """
 
     def make_adapter(self):
-        listing = TestReportsColumns.make_listing(self)
+        listing = TestReportsColumns("test_columns_follow_the_primary_sample").make_listing()
         adapter = ReportsListingAdapter(listing, None)
         adapter.before_render()
         adapter.get_cached_sample = lambda uid: FakeSample(

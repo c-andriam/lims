@@ -168,6 +168,60 @@ class TestSchemaOnSample(TrimetaTestCase):
         self.assertEqual(field.mode, "rw")
         self.assertTrue(field.required)
         self.assertEqual(field.widget.visible.get("add"), "edit")
+        self.assertEqual(field.widget.visible.get("edit"), "visible")
+
+    def test_empty_received_date_is_rejected(self):
+        sample = self.factory.create()
+        field = sample.getField("DateReceived")
+        errors = {}
+        self.assertTrue(field.validate(None, sample, errors=errors,
+                                       REQUEST=self.request))
+        self.assertIn("DateReceived", errors)
+
+    def test_received_date_is_saved_without_changing_sampled_date(self):
+        from DateTime import DateTime
+        sampled = DateTime("2026/09/30 10:00:00 GMT+3")
+        received = DateTime("2026/10/01 11:30:00 GMT+3")
+        sample = self.factory.create(DateSampled=sampled,
+                                     DateReceived=received)
+        self.assertEqual(sample.getDateReceived(), received)
+        self.assertEqual(sample.getDateSampled(), sampled)
+
+    def test_create_form_rejects_missing_received_date(self):
+        from senaite.trimeta.samplefields.browser.sample_submit import (
+            TrimetaSampleSubmitView)
+        sample = self.factory.create()
+        view = TrimetaSampleSubmitView(self.factory.client, self.request)
+        before = self.factory.client.objectIds()
+        view.check_confirmation = lambda: None
+        view.get_ar = lambda: sample
+        view.get_records = lambda: [{"SampleCode": "DATE-OBLIGATOIRE"}]
+        view.create_samples = lambda records: self.fail(
+            "La creation ne doit pas etre appelee sans date de reception")
+        result = view.ajax_submit()
+        self.assertIn("DateReceived-0", result["errors"]["fielderrors"])
+        self.assertEqual(self.factory.client.objectIds(), before)
+
+    def test_received_date_rejects_future_and_before_sampling(self):
+        from DateTime import DateTime
+        sampled = DateTime() - 2
+        sample = self.factory.create(DateSampled=sampled)
+        field = sample.getField("DateReceived")
+        self.assertTrue(field.validate(sampled - 1, sample,
+                                       REQUEST=self.request))
+        self.assertTrue(field.validate(DateTime() + 1, sample,
+                                       REQUEST=self.request))
+        self.assertFalse(field.validate(sampled + 1, sample,
+                                        REQUEST=self.request))
+        self.assertTrue(field.checkPermission("w", sample))
+
+    def test_parent_client_is_not_validated_as_missing_edit_input(self):
+        sample = self.factory.create()
+        field = sample.getField("Client")
+        self.assertTrue(field.required)
+        self.assertEqual(field.widget.visible.get("add"), "edit")
+        self.assertEqual(field.widget.visible.get("edit"), "invisible")
+        self.assertIsNotNone(sample.getClient())
 
 
 def test_suite():

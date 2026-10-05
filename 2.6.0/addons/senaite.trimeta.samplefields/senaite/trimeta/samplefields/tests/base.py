@@ -51,6 +51,7 @@ class TrimetaTestCase(BaseTestCase):
         super(TrimetaTestCase, self).setUp()
         # On ne suppose pas que la classe de base les expose: on les
         # relit depuis la couche, seule source fiable.
+        self.setRoles(["Manager"])
         self.app = self.layer["app"]
         self.portal = self.layer["portal"]
         self.request = self.layer["request"]
