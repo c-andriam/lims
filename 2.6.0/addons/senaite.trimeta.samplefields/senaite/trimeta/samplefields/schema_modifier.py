@@ -90,6 +90,12 @@ class DateReceivedSchemaModifier(object):
             return
         field.mode = "rw"
         field.required = True
+        # DateReceived est interdite dans l'etat sample_due natif. Reutilise
+        # les droits de la date de prelevement pour permettre la saisie
+        # a la creation, sans modifier les permissions globales du site.
+        sampled = schema.get("DateSampled")
+        if sampled is not None:
+            field.write_permission = sampled.write_permission
         field.widget.visible = VISIBLE
         field.widget.description = _(
             u"Actual date and time the sample was received. "
