@@ -158,12 +158,4 @@
 
   <include package=".browser" />
 
-  <browser:page
-      for="*"
-      name="ajax_ar_add"
-      class=".browser.sample_submit.TrimetaSampleSubmitView"
-      permission="zope.Public"
-      layer=".interfaces.ISenaiteTrimetaLayer"
-      />
-
 </configure>

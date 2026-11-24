@@ -2,7 +2,7 @@
 """La creation d'un lot d'echantillons doit etre atomique."""
 import logging
 import transaction
-from bika.lims.browser.analysisrequest.add2 import ajaxAnalysisRequestAddView
+from senaite.trimeta.samplefields.browser.sample_add import SampleAddView
 
 logger = logging.getLogger("senaite.trimeta.samplefields")
 
@@ -27,8 +27,8 @@ def atomic_submit(submit):
     return result
 
 
-class TrimetaSampleSubmitView(ajaxAnalysisRequestAddView):
-    """Garde la validation native et annule tout le lot en cas d'echec."""
+class TrimetaSampleSubmitView(SampleAddView):
+    """Refuse les creations vides et annule tout le lot en cas d'echec."""
 
     def ajax_submit(self):
         return atomic_submit(super(TrimetaSampleSubmitView, self).ajax_submit)

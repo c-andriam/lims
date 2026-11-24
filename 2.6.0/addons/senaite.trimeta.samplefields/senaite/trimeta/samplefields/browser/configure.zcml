@@ -11,11 +11,12 @@
       directory="resources"
       />
 
-  <!-- Formulaire de creation d'echantillon -->
+  <!-- Vue unique: garde les controles de SampleAddView et le rollback
+       de toute la soumission quand le core renvoie une erreur JSON. -->
   <browser:page
       for="*"
       name="ajax_ar_add"
-      class=".sample_add.SampleAddView"
+      class=".sample_submit.TrimetaSampleSubmitView"
       permission="senaite.core.permissions.AddAnalysisRequest"
       layer="senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
       />
