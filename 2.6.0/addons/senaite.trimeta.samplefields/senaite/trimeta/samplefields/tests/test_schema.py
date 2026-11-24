@@ -118,10 +118,17 @@ class TestNativeRequiredFields(unittest.TestCase):
         field.widget = type("Widget", (object,), {})()
         field.required = False
         field.mode = "r"
-        DateReceivedSchemaModifier(None).fiddle({"DateReceived": field})
+        field.write_permission = "Receive sample"
+        sampled = type("Field", (object,), {})()
+        sampled.write_permission = "Modify portal content"
+        DateReceivedSchemaModifier(None).fiddle({
+            "DateReceived": field,
+            "DateSampled": sampled,
+        })
         self.assertTrue(field.required)
         self.assertEqual(field.mode, "rw")
         self.assertEqual(field.widget.visible["add"], "edit")
+        self.assertEqual(field.write_permission, sampled.write_permission)
 
 
 class TestSchemaOnSample(TrimetaTestCase):
