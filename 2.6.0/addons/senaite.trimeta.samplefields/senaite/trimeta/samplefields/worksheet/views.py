@@ -9,6 +9,7 @@ senaite.core.
 import logging
 
 from bika.lims import api
+from bika.lims import senaiteMessageFactory as _
 from bika.lims.browser.worksheet.views import AnalysesTransposedView
 from bika.lims.browser.worksheet.views import AnalysesView
 from bika.lims.interfaces import IRoutineAnalysis
@@ -72,7 +73,18 @@ class TrimetaAnalysesTransposedView(SampleCodeSlotHeaderMixin,
     def folderitems(self):
         rows = super(TrimetaAnalysesTransposedView, self).folderitems()
         try:
-            fill_export_values(rows, self.get_slots(), self.cell_sample_label)
+            slots = list(self.get_slots())
+            # Le core conserve les colonnes classiques dans self.columns.
+            # React les ajoute a l'export meme hors de l'etat de revue.
+            keys = ["column_key"] + slots
+            for key, definition in self.columns.items():
+                # Les metadonnees Result restent necessaires aux cellules
+                # React, meme quand Result n'est pas une colonne externe.
+                definition["toggle"] = key in keys
+            self.columns["column_key"]["title"] = _(u"Analysis")
+            for slot in slots:
+                self.columns[slot]["title"] = u"Position {}".format(slot)
+            fill_export_values(rows, slots, self.cell_sample_label)
         except Exception:
             # Un export incomplet vaut mieux qu'une grille qui ne s'affiche plus
             logger.exception("Valeurs d'export Transposed impossibles")

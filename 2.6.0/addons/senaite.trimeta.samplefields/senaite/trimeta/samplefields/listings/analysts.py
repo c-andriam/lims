@@ -2,7 +2,7 @@
 """Analyste affecte par analyse dans les echantillons et Work Sheets."""
 from xml.sax.saxutils import escape, quoteattr
 from bika.lims import api
-from senaite.app.listing.interfaces import IListingViewAdapter
+from senaite.app.listing.interfaces import IListingViewAdapter, ITransposedListingView
 from zope.interface import implementer
 from zope.i18nmessageid import MessageFactory
 from senaite.core.i18n import translate as t
@@ -17,7 +17,15 @@ _ = MessageFactory("senaite.trimeta.samplefields")
 class AssignedAnalystAdapter(BaseListingAdapter):
     portal_types = ("Analysis",)
 
+    def applies(self):
+        query = getattr(self.listing, "contentFilter", None) or {}
+        if "getWorksheetUID" in query:
+            return True
+        return super(AssignedAnalystAdapter, self).applies()
+
     def add_columns(self):
+        if ITransposedListingView.providedBy(self.listing):
+            return
         insert_column_after(self.listing.columns, "Analyst", analysts.FIELD, {
             "title": _(u"Assigned laboratory analyst"), "sortable":False})
         show_in_all_states(self.listing, analysts.FIELD)
@@ -36,3 +44,9 @@ class AssignedAnalystAdapter(BaseListingAdapter):
             label = escape(to_text(t(_(u"Assign"), context=self.listing.request)))
             rendered += ' <a class="btn btn-sm btn-outline-secondary" href={}>{}</a>'.format(quoteattr(url),label)
         item.setdefault("replace", {})[analysts.FIELD] = rendered
+        if ITransposedListingView.providedBy(self.listing) and rendered:
+            # Chaque cellule transposee represente une analyse distincte.
+            # Conserver ses resultats et son export natif, ajouter seulement
+            # le contact et le lien d'affectation a la suite de la cellule.
+            after = item.setdefault("after", {})
+            after["Result"] = (after.get("Result", "") + '<br />' + rendered)

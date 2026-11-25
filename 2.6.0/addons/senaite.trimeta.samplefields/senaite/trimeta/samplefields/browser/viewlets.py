@@ -156,3 +156,24 @@ class NumericFieldsViewlet(TrimetaViewletBase):
         return (
             '<script src="{portal}/{resources}/numeric_fields.js?v=1"></script>'
         ).format(portal=self.get_portal_url(), resources=RESOURCE_BASE)
+
+
+class WorksheetAnalystColumnsViewlet(TrimetaViewletBase):
+    """Ajoute la nouvelle colonne aux preferences natives deja memorisees."""
+
+    def render(self):
+        try:
+            from bika.lims import api
+            from xml.sax.saxutils import quoteattr
+            listing = api.get_view("analyses_classic_view", context=self.context,
+                                   request=self.request)
+            key = quoteattr("columns-" + listing.listing_identifier)
+            return ('<script data-storage-key={key} '
+                    'src="{portal}/{resources}/analyst_columns.js?v=1"></script>'
+                    '<script data-worksheet-id={worksheet} '
+                    'src="{portal}/{resources}/worksheet_csv.js?v=1"></script>').format(
+                        key=key, worksheet=quoteattr(api.get_id(self.context)),
+                        portal=self.get_portal_url(), resources=RESOURCE_BASE)
+        except Exception:
+            logger.exception("Preferences de colonnes de la Work Sheet inaccessibles")
+            return ""

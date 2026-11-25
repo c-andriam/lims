@@ -94,4 +94,13 @@
       layer="bika.lims.interfaces.IBikaLIMS"
       />
 
+  <browser:viewlet
+      name="senaite.trimeta.samplefields.worksheet_analyst_columns"
+      for="bika.lims.interfaces.IWorksheet"
+      manager="plone.app.layout.viewlets.interfaces.IHtmlHead"
+      class=".viewlets.WorksheetAnalystColumnsViewlet"
+      permission="zope2.View"
+      layer="senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
+      />
+
 </configure>
