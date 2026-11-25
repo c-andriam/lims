@@ -1,0 +1,39 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="context/main_template/macros/master">
+  <metal:main fill-slot="main">
+    <h1>Répétitions — <span tal:replace="context/Title" /></h1>
+    <p>Ajoutez une case pour chaque mesure. Toutes les cases doivent être renseignées.
+      L'enregistrement calcule la moyenne sans soumettre l'analyse à vérification.</p>
+    <div class="alert alert-danger" role="alert" tal:condition="view/error"
+         tal:content="view/error" />
+    <div class="alert alert-success" role="status" tal:condition="view/saved">
+      Répétitions et moyenne enregistrées.
+    </div>
+    <p>Moyenne enregistrée : <strong tal:content="python:context.getResult() or 'Non calculée'" /></p>
+    <form method="post" id="trimeta-repetitions-form">
+      <tal:auth replace="structure context/@@authenticator" />
+      <input type="hidden" name="revision" tal:attributes="value view/token" />
+      <div id="trimeta-repetition-rows">
+        <div class="form-group" tal:repeat="value view/values">
+          <label tal:attributes="for string:repetition-${repeat/value/number}">
+            Répétition <span tal:replace="repeat/value/number" />
+          </label>
+          <input type="text" inputmode="decimal" name="repetitions:list"
+                 required="required" class="form-control"
+                 tal:attributes="value value; id string:repetition-${repeat/value/number}" />
+        </div>
+      </div>
+      <div class="form-group">
+        <button type="button" class="btn btn-outline-secondary" id="trimeta-add-repetition">Ajouter une répétition</button>
+        <button type="button" class="btn btn-outline-secondary" id="trimeta-remove-repetition">Retirer la dernière répétition</button>
+      </div>
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary">Enregistrer et calculer la moyenne</button>
+        <a class="btn btn-secondary" tal:attributes="href view/back_url">Retour à l'échantillon</a>
+      </div>
+    </form>
+    <script tal:attributes="src string:${context/portal_url}/++resource++senaite.trimeta.samplefields.static/repetitions.js?v=1" />
+  </metal:main>
+</html>

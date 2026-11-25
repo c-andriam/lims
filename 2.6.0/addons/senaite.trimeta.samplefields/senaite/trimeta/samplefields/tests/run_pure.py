@@ -259,6 +259,7 @@ PURE_CASES = [
     ("test_catalog_wiring.py", None),
     ("test_field_references.py", None),
     ("test_defaults.py", None),
+    ("test_repetitions.py", None),
 ]
 
 

@@ -49,4 +49,9 @@
       factory=".instruments.InstrumentMaintenanceAdapter"
       />
 
+  <subscriber
+      for="senaite.app.listing.interfaces.IListingView *"
+      provides="senaite.app.listing.interfaces.IListingViewAdapter"
+      factory=".repetitions.RepetitionsListingAdapter"
+      />
 </configure>

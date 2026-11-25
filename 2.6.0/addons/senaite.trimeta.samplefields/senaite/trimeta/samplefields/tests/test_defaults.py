@@ -2,9 +2,9 @@
 """
 Configuration livree en code (defaults.py).
 
-Ne sont testees ici que les parties PURES: la forme des formules et des
-champs de saisie. La creation effective des objets dans l'instance
-demande un vrai site et releve de `make test`.
+Tests purs des formules et de la configuration des services avec des
+doublures. La creation effective des objets dans l'instance demande un
+vrai site et releve des controles d'integration.
 
 Le point le plus important de ce module est
 `test_no_default_value_on_repetitions`. Il protege une decision dont
@@ -40,11 +40,9 @@ class TestRepetitionFormulas(unittest.TestCase):
             self.assertTrue(title)
             self.assertEqual(len(defaults.build_interims(count)), count)
 
-    def test_default_calculation_is_declared(self):
-        """Le calcul rattache par defaut doit exister dans CALCULATIONS,
-        sinon setup_repetitions ne rattache rien."""
-        declared = [count for count, _title in defaults.CALCULATIONS]
-        self.assertIn(defaults.DEFAULT_REPETITIONS, declared)
+    def test_formula_for_more_than_three_repetitions(self):
+        self.assertEqual(defaults.build_formula(5),
+                         "([R1] + [R2] + [R3] + [R4] + [R5]) / 5")
 
 
 class TestRepetitionInterims(unittest.TestCase):
@@ -137,10 +135,170 @@ class TestKeywordsAreShared(unittest.TestCase):
         self.assertEqual(len(defaults.get_keywords()), 7)
 
 
+class RepetitionCalculation(object):
+    def Title(self):
+        return u"Moyenne de 3 repetitions"
+
+
+class RepetitionField(object):
+    def set(self, service, calculation):
+        service.calculation = calculation
+        service.assignments += 1
+
+
+class RepetitionService(object):
+    def __init__(self, keyword, title, active=True, calculation=None):
+        self.keyword = keyword
+        self.title = title
+        self.active = active
+        self.calculation = calculation
+        self.use_default = True
+        self.assignments = 0
+        self.reindexed = 0
+
+    def getKeyword(self):
+        return self.keyword
+
+    def Title(self):
+        return self.title
+
+    def getCalculation(self):
+        return self.calculation
+
+    def getField(self, name):
+        return RepetitionField() if name == "Calculation" else None
+
+    def setUseDefaultCalculation(self, value):
+        self.use_default = value
+
+    def reindexObject(self):
+        self.reindexed += 1
+
+
+class RepetitionFolder(object):
+    def __init__(self, services):
+        self.services = services
+
+    def objectValues(self):
+        return self.services
+
+
+class RepetitionInstaller(object):
+    installed = True
+
+    def isProductInstalled(self, name):
+        return self.installed
+
+
+class RepetitionContainer(object):
+    pass
+
+
+class TestRepetitionServiceDefaults(unittest.TestCase):
+    def patch(self, obj, name, value):
+        if hasattr(obj, name):
+            self.addCleanup(setattr, obj, name, getattr(obj, name))
+        else:
+            self.addCleanup(delattr, obj, name)
+        setattr(obj, name, value)
+
+    def setUp(self):
+        self.services = []
+        self.calculation = RepetitionCalculation()
+        self.portal = RepetitionContainer()
+        self.portal.setup = RepetitionContainer()
+        self.portal.setup.analysisservices = RepetitionFolder(self.services)
+        self.portal.portal_quickinstaller = RepetitionInstaller()
+        self.patch(defaults.api, "is_active", lambda service: service.active)
+        self.patch(defaults.api, "get_title", lambda obj: obj.Title())
+        self.patch(defaults.api, "get_portal", lambda: self.portal)
+        self.patch(defaults, "setup_calculations",
+                   lambda portal: {defaults.DEFAULT_REPETITIONS: self.calculation})
+
+    def test_title_alias_receives_the_calculation_with_its_actual_keyword(self):
+        service = RepetitionService("VAN", u"Vanillin")
+        self.services.append(service)
+        self.assertEqual(defaults.setup_repetitions(self.portal), ["VAN"])
+        self.assertIs(service.calculation, self.calculation)
+        self.assertFalse(service.use_default)
+        self.assertEqual(service.reindexed, 1)
+
+    def test_configured_keyword_keeps_priority_over_an_alias(self):
+        canonical = RepetitionService("VANILLINE", u"Vanillin")
+        alias = RepetitionService("VAN", u"Vanillin")
+        self.services.extend([canonical, alias])
+        self.assertEqual(defaults.setup_repetitions(self.portal), ["VANILLINE"])
+        self.assertIs(canonical.calculation, self.calculation)
+        self.assertIsNone(alias.calculation)
+
+    def test_inactive_keyword_does_not_hide_an_active_alias(self):
+        inactive = RepetitionService("VANILLINE", u"Vanillin", active=False)
+        active = RepetitionService("VAN", u"Vanillin")
+        self.services.extend([inactive, active])
+        self.assertEqual(defaults.setup_repetitions(self.portal), ["VAN"])
+        self.assertIsNone(inactive.calculation)
+        self.assertIs(active.calculation, self.calculation)
+
+    def test_existing_calculation_and_method_choice_are_preserved(self):
+        existing = object()
+        service = RepetitionService("VANILLINE", u"Vanillin", calculation=existing)
+        self.services.append(service)
+        self.assertEqual(defaults.setup_repetitions(self.portal), [])
+        self.assertIs(service.calculation, existing)
+        self.assertTrue(service.use_default)
+        self.assertEqual(service.reindexed, 0)
+
+    def test_unrelated_services_are_not_configured(self):
+        service = RepetitionService("PROT", u"Protein")
+        self.services.append(service)
+        self.assertEqual(defaults.setup_repetitions(self.portal), [])
+        self.assertIsNone(service.calculation)
+
+    def test_reapplying_defaults_does_not_assign_twice(self):
+        service = RepetitionService("TH", u"Moisture")
+        self.services.append(service)
+        defaults.setup_repetitions(self.portal)
+        self.assertEqual(defaults.setup_repetitions(self.portal), [])
+        self.assertEqual(service.assignments, 1)
+
+    def test_event_configures_only_the_service_being_saved(self):
+        target = RepetitionService("VAN", u"Vanillin")
+        other = RepetitionService("TH", u"Moisture")
+        self.services.extend([target, other])
+        defaults.on_analysis_service_modified(target, None)
+        self.assertIs(target.calculation, self.calculation)
+        self.assertIsNone(other.calculation)
+
+    def test_editing_a_service_can_make_its_title_recognizable(self):
+        service = RepetitionService("VAN", u"Other service")
+        self.services.append(service)
+        defaults.on_analysis_service_modified(service, None)
+        self.assertIsNone(service.calculation)
+        service.title = u"Vanillin"
+        defaults.on_analysis_service_modified(service, None)
+        self.assertIs(service.calculation, self.calculation)
+
+    def test_event_preserves_an_existing_calculation(self):
+        existing = object()
+        service = RepetitionService("VAN", u"Vanillin", calculation=existing)
+        self.services.append(service)
+        defaults.on_analysis_service_modified(service, None)
+        self.assertIs(service.calculation, existing)
+        self.assertEqual(service.assignments, 0)
+
+    def test_event_does_nothing_when_the_addon_is_not_installed(self):
+        service = RepetitionService("VAN", u"Vanillin")
+        self.services.append(service)
+        self.portal.portal_quickinstaller.installed = False
+        defaults.on_analysis_service_modified(service, None)
+        self.assertIsNone(service.calculation)
+
+
 def test_suite():
     suite = unittest.TestSuite()
     loader = unittest.TestLoader()
     for case in (TestRepetitionFormulas, TestRepetitionInterims,
-                 TestPublishingDefaults, TestKeywordsAreShared):
+                 TestPublishingDefaults, TestKeywordsAreShared,
+                 TestRepetitionServiceDefaults):
         suite.addTest(loader.loadTestsFromTestCase(case))
     return suite

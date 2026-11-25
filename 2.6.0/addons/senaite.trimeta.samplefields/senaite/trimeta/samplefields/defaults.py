@@ -32,6 +32,7 @@ pire. Seule l'attribution du role est automatisable -- voir
 import logging
 
 from bika.lims import api
+from senaite.trimeta.samplefields import PRODUCT_NAME
 
 logger = logging.getLogger("senaite.trimeta.samplefields")
 
@@ -121,33 +122,10 @@ def set_default_coa_template():
 # des cases de saisie supplementaires sur la ligne d'analyse, dont un
 # CALCUL tire le resultat publie.
 #
-# Ce que fait SENAITE d'un champ vide -- verifie sur le code
-# -----------------------------------------------------------
-# C'est le point qui decide de la forme des formules ci-dessous, et une
-# version anterieure de docs/lot1-parametrage.md l'annoncait a
-# l'envers. Dans AbstractAnalysis.calculateResult (senaite.core
-# v2.6.0):
-#
-#     # skip unset values
-#     interim_value = i.get("value", "")
-#     if interim_value == "":
-#         continue
-#
-# Un champ vide n'entre donc PAS dans le mapping. Son marqueur [R2]
-# survit dans la formule, y devient "%(R2)f", et le formatage leve un
-# KeyError -- rattrape juste apres:
-#
-#     except (KeyError, TypeError, ImportError) as e:
-#         self.setResult("NA")
-#
-# Autrement dit: une repetition manquante ne donne PAS une moyenne
-# faussee par un zero implicite. Elle donne le resultat "NA", visible a
-# l'ecran comme sur le rapport.
-#
-# C'est une excellente nouvelle: la formule simple est SURE. Elle ne
-# peut pas produire un nombre plausible et faux -- le seul risque qui
-# aurait justifie d'imposer une convention de travail au laboratoire.
-# Le logiciel fait respecter la regle a la place des operateurs.
+# Les formules fixes ci-dessous sont conservees pour les anciens profils.
+# Le nouveau calcul delegue a repetitions.mean_repetitions et utilise
+# toutes les cases de l'analyse, avec au moins deux mesures valides.
+# Une case vide ou invalide renvoie NA, jamais une moyenne partielle.
 REPETITION_KEYWORD = "R{}"
 
 # (nombre de repetitions, titre du calcul)
@@ -156,15 +134,14 @@ CALCULATIONS = (
     (3, u"Moyenne de 3 repetitions"),
 )
 
-# Le calcul rattache par defaut aux services. Trois repetitions est le
-# protocole courant; un service qui n'en demande que deux se bascule
-# sur l'autre calcul depuis Configuration > Analyses, sans developpement.
-DEFAULT_REPETITIONS = 3
+# Les deux anciens calculs restent disponibles pour l'historique.
+# Les nouvelles affectations utilisent le calcul variable.
+DEFAULT_REPETITIONS = "dynamic"
 
-# Les services concernes, par mot-cle. Memes mots-cles que le tableau de
-# bord: une seule source de verite, et la meme incertitude a lever une
-# seule fois (voir dashboard/columns.py).
+# Meme resolution des services actifs que le tableau de bord: mots-cles
+# configures, puis intitules reconnus si ces mots-cles sont absents.
 from senaite.trimeta.samplefields.dashboard.columns import get_keywords
+from senaite.trimeta.samplefields.dashboard.columns import resolve_column_keywords
 
 
 def build_interims(count):
@@ -287,7 +264,63 @@ def setup_calculations(portal):
             logger.info("Calcul '%s' cree: %s", title, build_formula(count))
         except Exception:
             logger.exception("Creation du calcul '%s' impossible", title)
+    created[DEFAULT_REPETITIONS] = setup_dynamic_calculation(portal)
     return created
+
+
+def setup_dynamic_calculation(portal):
+    """Un calcul partage; le nombre de cases appartient a chaque analyse."""
+    from senaite.trimeta.samplefields import repetitions
+    folder = get_setup_folder(portal, "calculations")
+    if folder is None:
+        return None
+    for calculation in folder.objectValues():
+        if repetitions.is_dynamic_calculation(calculation):
+            return calculation
+    calculation = api.create(folder, "Calculation", title=repetitions.TITLE)
+    calculation.setInterimFields(build_interims(2))
+    calculation.setPythonImports(repetitions.IMPORTS)
+    calculation.setFormula(repetitions.FORMULA)
+    calculation.trimeta_variable_repetitions = True
+    return calculation
+
+
+def get_repetition_keywords(portal):
+    """Mots-cles reels des services actifs reconnus par le tableau de bord."""
+    folder = get_setup_folder(portal, "analysisservices")
+    if folder is None:
+        return get_keywords()
+    services = []
+    for service in folder.objectValues():
+        try:
+            if api.is_active(service):
+                services.append((service.getKeyword(), api.get_title(service)))
+        except Exception:
+            logger.exception("Service illisible pour les calculs de repetitions")
+    resolved = resolve_column_keywords(services)
+    return sorted(set(keyword for keywords in resolved.values()
+                      for keyword in keywords))
+
+
+def attach_calculation_to_service(service, calculation):
+    """Pose le calcul uniquement sur un service actif sans calcul existant."""
+    if calculation is None:
+        return False
+    try:
+        if not api.is_active(service) or service.getCalculation() is not None:
+            return False
+        field = service.getField("Calculation")
+        if field is None:
+            return False
+        field.set(service, calculation)
+        service.setUseDefaultCalculation(False)
+        service.reindexObject()
+        logger.info("Service %s: calcul '%s' rattache",
+                    service.getKeyword(), api.get_title(calculation))
+        return True
+    except Exception:
+        logger.exception("Rattachement du calcul de repetitions impossible")
+        return False
 
 
 def attach_calculation_to_services(portal, calculation, keywords):
@@ -312,20 +345,8 @@ def attach_calculation_to_services(portal, calculation, keywords):
             continue
         if keyword not in wanted:
             continue
-        try:
-            if service.getCalculation() is not None:
-                logger.info(
-                    "Service %s: calcul deja defini, laisse tel quel",
-                    keyword)
-                continue
-            service.setUseDefaultCalculation(False)
-            service.getField("Calculation").set(service, calculation)
+        if attach_calculation_to_service(service, calculation):
             attached.append(keyword)
-            logger.info("Service %s: calcul '%s' rattache",
-                        keyword, api.get_title(calculation))
-        except Exception:
-            logger.exception(
-                "Rattachement du calcul au service %s impossible", keyword)
     return attached
 
 
@@ -335,11 +356,10 @@ def setup_repetitions(portal):
     calculation = calculations.get(DEFAULT_REPETITIONS)
     if calculation is None:
         logger.warning(
-            "Calcul a %s repetitions absent: aucun rattachement.",
-            DEFAULT_REPETITIONS)
+            "Calcul de moyenne variable absent: aucun rattachement.")
         return []
 
-    keywords = get_keywords()
+    keywords = get_repetition_keywords(portal)
     attached = attach_calculation_to_services(portal, calculation, keywords)
 
     missing = sorted(set(keywords) - set(attached))
@@ -353,6 +373,26 @@ def setup_repetitions(portal):
             "correspond a rien: verifier la colonne Keyword dans "
             "Configuration > Analyses.", ", ".join(missing))
     return attached
+
+
+def on_analysis_service_modified(service, event):
+    """Configure un service cree ou modifie apres installation du profil."""
+    try:
+        portal = api.get_portal()
+        installer = getattr(portal, "portal_quickinstaller", None)
+        if installer is None or not installer.isProductInstalled(PRODUCT_NAME):
+            return
+        if not api.is_active(service) or service.getCalculation() is not None:
+            return
+        if service.getKeyword() not in get_repetition_keywords(portal):
+            return
+        calculations = setup_calculations(portal)
+        attach_calculation_to_service(
+            service, calculations.get(DEFAULT_REPETITIONS))
+    except Exception:
+        # L'enregistrement natif doit rester possible; le profil peut
+        # rejouer le rattachement si un calcul n'a pas pu etre pose.
+        logger.exception("Calcul de repetitions du service non configure")
 
 
 # ---------------------------------------------------------------------

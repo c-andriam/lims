@@ -11,6 +11,14 @@
       directory="resources"
       />
 
+  <browser:page
+      for="bika.lims.interfaces.IAnalysis"
+      name="trimeta-repetitions"
+      class=".repetitions.RepetitionsView"
+      permission="zope2.View"
+      layer="senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
+      />
+
   <!-- Vue unique: garde les controles de SampleAddView et le rollback
        de toute la soumission quand le core renvoie une erreur JSON. -->
   <browser:page

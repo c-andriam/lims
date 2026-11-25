@@ -49,6 +49,15 @@
 
   <include package=".upgrades" />
 
+  <!-- ObjectInitializedEvent et ObjectEditedEvent d'Archetypes etendent
+       IObjectModifiedEvent: les nouveaux services sont configures apres
+       remplissage de leurs champs, ainsi que les services modifies. -->
+  <subscriber
+      for="bika.lims.interfaces.IAnalysisService
+           zope.lifecycleevent.interfaces.IObjectModifiedEvent"
+      handler=".defaults.on_analysis_service_modified"
+      />
+
   <!-- =============================================================
        Schema du type Sample (AnalysisRequest)
        ============================================================= -->
