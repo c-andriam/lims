@@ -1,5 +1,12 @@
 # Lot 1 — quatre demandes réglées par paramétrage
 
+> **Mise à jour du 25 novembre 2026 — D6 et D7.** Les sections ci-dessous
+> décrivent l'ancien paramétrage. Elles sont remplacées par
+> [la correction des analystes et historiques](correction-analystes-historiques.md) :
+> l'affectation référence désormais les contacts du laboratoire, même sans
+> compte, et deux onglets distinguent les pannes des entretiens.
+> Pour D9, voir aussi [les répétitions variables](correction-repetitions.md).
+
 Ces quatre points du document *AMÉLIORATIONS SENAITE LIMS* ne
 demandaient à l'origine aucun développement : la fonctionnalité existe
 déjà dans SENAITE, elle n'était simplement pas configurée.

@@ -9,8 +9,8 @@ rapport selectionne donne un PDF; plusieurs donnent une archive ZIP.
 
 Ici, contrairement aux deux autres surcharges, on ne peut pas se
 contenter de redefinir une methode: l'amont fabrique le nom EN LIGNE
-dans `__call__`. On reprend donc la boucle, en gardant telles quelles
-`get_pdf()` et `download()` heritees.
+dans `__call__`. La boucle construit des couples (nom, donnees), avec
+une lecture commune des PDF et des en-tetes de telechargement quotes.
 
 Trois corrections en passant
 ----------------------------
@@ -43,15 +43,17 @@ import logging
 import tempfile
 import zipfile
 
-from bika.lims import _
 from bika.lims import api
 from bika.lims.browser.workflow.client import (
     WorkflowActionDownloadReportsAdapter)
 from DateTime import DateTime
+from zope.i18nmessageid import MessageFactory
 
 from senaite.trimeta.samplefields.coa import filename as fn
+from senaite.trimeta.samplefields.coa.pdf import get_pdf
 
 logger = logging.getLogger("senaite.trimeta.samplefields")
+_ = MessageFactory("senaite.trimeta.samplefields")
 
 
 class TrimetaDownloadReportsAdapter(WorkflowActionDownloadReportsAdapter):
@@ -69,13 +71,18 @@ class TrimetaDownloadReportsAdapter(WorkflowActionDownloadReportsAdapter):
                 report = api.get_object_by_uid(uid)
             except Exception:
                 logger.exception("Rapport %r introuvable", uid)
+                self.add_status_message(_("Report not found"), "warning")
+                continue
+
+            if report is None:
+                self.add_status_message(_("Report not found"), "warning")
                 continue
 
             pdf = self.get_pdf(report)
             if pdf is None:
                 self.add_status_message(
-                    _("Could not load PDF for sample {}".format(
-                        self.describe(report))), "warning")
+                    _("Could not load PDF for sample ${sample}",
+                      mapping={"sample": self.describe(report)}), "warning")
                 continue
 
             name = fn.unique_name(fn.get_report_filename(report), taken)
@@ -93,11 +100,14 @@ class TrimetaDownloadReportsAdapter(WorkflowActionDownloadReportsAdapter):
             name, data = entries[0]
             return self.download(data, name, type="application/pdf")
 
-        with self.create_archive(entries) as archive:
+        with self.create_entries_archive(entries) as archive:
             timestamp = DateTime().strftime("%Y%m%d_%H%M%S")
             archive_name = "COA-{}.zip".format(timestamp)
             data = archive.file.read()
             return self.download(data, archive_name, type="application/zip")
+
+    def get_pdf(self, report):
+        return get_pdf(report)
 
     def describe(self, report):
         """Identifiant lisible d'un rapport, pour un message d'erreur.
@@ -109,9 +119,9 @@ class TrimetaDownloadReportsAdapter(WorkflowActionDownloadReportsAdapter):
             sample = report.getAnalysisRequest()
             return fn.get_sample_code(sample) or api.get_id(sample)
         except Exception:
-            return api.get_id(report)
+            return getattr(report, "id", None) or "unknown"
 
-    def create_archive(self, entries):
+    def create_entries_archive(self, entries):
         """Archive ZIP a partir de couples (nom, donnees).
 
         Signature volontairement differente de celle de l'amont, qui

@@ -106,11 +106,11 @@ de `senaite.core` qui répondent.
 2. l'ID SENAITE si le code est vide ou n'est fait que de caractères
    retirés.
 
-Le nettoyage n'est pas cosmétique. Le nom finit **non quoté** dans
-l'en-tête `Content-Disposition` et comme nom d'entrée dans le zip : un
-espace, un `;`, un `/` ou un retour à la ligne saisi dans le code
-casserait le téléchargement, ou permettrait d'injecter un en-tête. Couvert
-par `tests/test_coa.py`.
+Le nettoyage protège les en-têtes HTTP, les entrées du ZIP et les noms
+utilisés sur les postes Windows. Depuis la correction du 25 novembre 2026,
+le nom est aussi entouré de guillemets dans `Content-Disposition`.
+Le nommage est couvert par `tests/test_coa_filename.py` et les exports par
+`tests/test_coa_delivery.py`. Voir [la correction des exports COA](correction-export-coa.md).
 
 ### Plusieurs rapports d'un même échantillon
 
@@ -122,7 +122,8 @@ l'extraction (défaut déjà présent dans `senaite.core` avec l'ID).
 
 ### Vérifié
 
-Par de vraies requêtes sur l'instance de démonstration, pour VAN-0005
+Vérification historique, avant la correction des exports du 25 novembre 2026,
+par de vraies requêtes sur l'instance de démonstration, pour VAN-0005
 (Code échantillon `ECH-DEMO-001`, trois rapports) :
 
 | Point | Résultat |

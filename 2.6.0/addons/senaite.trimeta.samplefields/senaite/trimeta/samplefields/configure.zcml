@@ -64,6 +64,20 @@
 
   <!-- Ajoute les champs des sections Reception et Analyse -->
   <adapter
+      factory=".analyst_extender.AnalysisAnalystExtender"
+      provides="archetypes.schemaextender.interfaces.IOrderableSchemaExtender"
+      for="bika.lims.interfaces.IAnalysis"
+      />
+  <adapter
+      factory=".equipment_history.MaintenanceTaskSchemaModifier"
+      provides="archetypes.schemaextender.interfaces.ISchemaModifier"
+      for="bika.lims.interfaces.ICancellable"
+      />
+  <subscriber
+      for="bika.lims.interfaces.ICancellable zope.lifecycleevent.interfaces.IObjectAddedEvent"
+      handler=".equipment_history.preset_task_type"
+      />
+  <adapter
       factory=".extender.ReceptionFieldsExtender"
       provides="archetypes.schemaextender.interfaces.IOrderableSchemaExtender"
       for="bika.lims.interfaces.IAnalysisRequest"
@@ -96,6 +110,10 @@
   <adapter
       name="getSampleCode"
       factory=".indexers.getSampleCode"
+      />
+  <adapter
+      name="getTrimetaDetectionLimitOperand"
+      factory=".indexers.getTrimetaDetectionLimitOperand"
       />
 
   <!-- Colonnes du tableau de bord (lot 5). getOrigin est en plus un

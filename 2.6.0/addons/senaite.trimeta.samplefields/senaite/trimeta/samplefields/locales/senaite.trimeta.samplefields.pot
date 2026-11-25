@@ -6,3 +6,27 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Domain: senaite.trimeta.samplefields\n"
+
+msgid "Report not found"
+msgstr ""
+
+msgid "Could not load PDF for sample ${sample}"
+msgstr ""
+
+msgid "No report could be downloaded"
+msgstr ""
+
+msgid "Assigned laboratory analyst"
+msgstr ""
+
+msgid "Assign"
+msgstr ""
+
+msgid "Breakdown history"
+msgstr ""
+
+msgid "Maintenance history"
+msgstr ""
+
+msgid "Add intervention"
+msgstr ""

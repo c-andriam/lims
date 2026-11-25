@@ -132,6 +132,8 @@ def apply_defaults(portal):
     # D7 -- role Analyst sur les comptes deja crees.
     try:
         defaults.grant_analyst_role(portal)
+        from senaite.trimeta.samplefields.analysts import migrate_assignments
+        migrate_assignments(portal)
     except Exception:
         logger.exception("Role Analyst: echec")
 
@@ -139,6 +141,8 @@ def apply_defaults(portal):
     # livre masque; la vue existe et fonctionne.
     try:
         defaults.show_instrument_maintenance_tab()
+        from senaite.trimeta.samplefields.equipment_history import setup_history_actions
+        setup_history_actions(portal)
     except Exception:
         logger.exception("Onglet Maintenance: echec")
 
@@ -216,7 +220,9 @@ def post_uninstall(portal_setup):
     # masque. Les taches de maintenance deja saisies sont conservees,
     # seule l'entree de barre disparait.
     from senaite.trimeta.samplefields import defaults
+    from senaite.trimeta.samplefields.equipment_history import remove_history_actions
     try:
+        remove_history_actions(api.get_portal())
         defaults.hide_instrument_maintenance_tab()
     except Exception:
         logger.exception("Remasquage de l'onglet Maintenance: echec")

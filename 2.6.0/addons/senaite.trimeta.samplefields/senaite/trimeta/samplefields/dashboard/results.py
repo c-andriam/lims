@@ -11,12 +11,15 @@ Elles ne peuvent donc pas venir du sample_catalog, et il n'y a rien a
 ajouter de ce cote.
 
 Elles sont lues dans l'analysis_catalog, en UNE requete pour toute la
-page affichee, et uniquement dans des elements qui y existent deja:
+page affichee, dans les metadonnees natives suivantes:
 
     getRequestID   identifiant de l'echantillon parent   index + colonne
     getKeyword     mot-cle du service                    index + colonne
     getResult      resultat saisi                        colonne
     getResultCaptureDate  date de saisie du resultat     index + colonne
+
+Le profil 1011 ajoute getTrimetaDetectionLimitOperand pour conserver le
+signe < ou >, stocke separement de getResult par le moteur natif.
 
 Aucun objet n'est reveille depuis la ZODB: le cout est d'une requete
 catalogue par affichage, quel que soit le nombre de lignes.
@@ -46,6 +49,7 @@ ne le verrait.
 """
 
 import logging
+import math
 
 from senaite.trimeta.samplefields.compat import string_types
 from senaite.trimeta.samplefields.compat import to_text
@@ -66,8 +70,9 @@ def to_number(value):
     if not text:
         return None
     try:
-        return float(text)
-    except (TypeError, ValueError):
+        number = float(text)
+        return None if math.isnan(number) or math.isinf(number) else number
+    except (TypeError, ValueError, OverflowError):
         return None
 
 
@@ -139,8 +144,12 @@ def group_by_sample(brains, keywords=None):
         if wanted is not None and keyword not in wanted:
             continue
 
+        result = to_text(getattr(brain, "getResult", "")).strip()
+        operand = getattr(brain, "getTrimetaDetectionLimitOperand", "")
+        if result and operand in ("<", ">") and not result.startswith(("<", ">")):
+            result = operand + result
         candidate = (
-            to_text(getattr(brain, "getResult", "")).strip(),
+            result,
             getattr(brain, "getResultCaptureDate", None),
         )
         key = (sample_id, keyword)

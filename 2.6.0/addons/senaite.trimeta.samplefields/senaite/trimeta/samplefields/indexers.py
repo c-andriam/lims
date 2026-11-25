@@ -25,12 +25,24 @@ import logging
 
 from bika.lims import api
 from bika.lims.interfaces import IAnalysisRequest
+from bika.lims.interfaces import IAnalysis
 from plone.indexer import indexer
 
 from senaite.trimeta.samplefields.compat import string_types
 from senaite.trimeta.samplefields.compat import to_text
 
 logger = logging.getLogger("senaite.trimeta.samplefields")
+
+
+@indexer(IAnalysis)
+def getTrimetaDetectionLimitOperand(instance):
+    """Signe stocke a part du resultat dans les analyses natives."""
+    try:
+        operand = instance.getDetectionLimitOperand()
+        return operand if operand in ("<", ">") else ""
+    except Exception:
+        logger.exception("Limite de detection de l'analyse illisible")
+        return ""
 
 
 def get_field_value(instance, fieldname, default=""):

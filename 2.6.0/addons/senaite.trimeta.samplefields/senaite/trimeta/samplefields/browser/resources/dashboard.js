@@ -30,7 +30,7 @@
    * Doit rester en accord avec SCRIPT_VERSION dans viewlets.py, qui la
    * reporte en parametre d'URL. Un test verifie cette concordance.
    */
-  var VERSION = 5;
+  var VERSION = 6;
   window.TRIMETA_DASHBOARD_VERSION = VERSION;
 
   /* Dimensions maximales d'une entree de barre laterale.
@@ -279,7 +279,32 @@
   // Application, et re-application apres les rendus AJAX
   // ------------------------------------------------------------------
 
+  function migrateColumnOrder() {
+    var root = document.querySelector("#trimeta_dashboard [data-listing_identifier]");
+    if (!root) { return; }
+    var identifier = root.getAttribute("data-listing_identifier");
+    if (!identifier) { return; }
+    var storageKey = "columns-" + identifier;
+    var saved = JSON.parse(window.localStorage.getItem(storageKey) || "[]");
+    if (!Array.isArray(saved) || !saved.length) { return; }
+    var desired = Object.keys(JSON.parse(root.getAttribute("data-columns") || "{}"));
+    var operators = ["HPLCOperator", "MoistureOperator", "WaterActivityOperator"];
+    if (desired.length !== 20 || operators.some(function (key) { return desired.indexOf(key) < 0; })) { return; }
+    var legacy = desired.filter(function (key) { return operators.indexOf(key) < 0; }).concat(operators);
+    var previous = saved.map(function (entry) { return entry && entry.key; });
+    // Seul l'ancien ordre par defaut est migre; les autres choix restent intacts.
+    if (JSON.stringify(previous) !== JSON.stringify(legacy)) { return; }
+    var byKey = {};
+    saved.forEach(function (entry) { byKey[entry.key] = entry; });
+    window.localStorage.setItem(storageKey, JSON.stringify(desired.map(function (key) { return byKey[key]; })));
+  }
+
   function apply() {
+    try {
+      migrateColumnOrder();
+    } catch (error) {
+      log("ordre des colonnes enregistre non migre", error);
+    }
     try {
       addSidebarEntry();
     } catch (error) {

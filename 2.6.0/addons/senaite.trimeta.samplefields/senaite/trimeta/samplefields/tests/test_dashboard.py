@@ -88,6 +88,11 @@ class TestToNumber(unittest.TestCase):
     def test_text_is_none(self):
         self.assertIsNone(to_number("conforme"))
 
+    def test_non_finite_numbers_are_not_comparable(self):
+        for value in ("nan", "NaN", "inf", "-inf", "1e999"):
+            self.assertIsNone(to_number(value))
+            self.assertFalse(in_range(value, 1, 10))
+
     def test_detection_limits_are_not_numbers(self):
         """"<0.5" n'est pas 0.5. Le traiter comme tel le ferait entrer
         dans un intervalle auquel il n'appartient peut-etre pas, sans
@@ -121,6 +126,16 @@ class TestInRange(unittest.TestCase):
 
 
 class TestGroupBySample(unittest.TestCase):
+
+    def test_native_detection_limit_operand_is_preserved(self):
+        brain = FakeBrain('S1', 'VAN', '0.5')
+        brain.getTrimetaDetectionLimitOperand = '<'
+        self.assertEqual(group_by_sample([brain]), {'S1': {'VAN': '<0.5'}})
+
+    def test_detection_limit_is_not_prefixed_twice(self):
+        brain = FakeBrain('S1', 'VAN', '>100')
+        brain.getTrimetaDetectionLimitOperand = '>'
+        self.assertEqual(group_by_sample([brain]), {'S1': {'VAN': '>100'}})
 
     def test_groups_by_sample_then_keyword(self):
         brains = [
@@ -232,6 +247,12 @@ class TestFetchResults(unittest.TestCase):
 
 
 class TestSampleIdsInRange(unittest.TestCase):
+
+    def test_native_censored_result_is_excluded_from_numeric_range(self):
+        brain = FakeBrain('S1', 'VAN', '2')
+        brain.getTrimetaDetectionLimitOperand = '<'
+        catalog = FakeCatalog([brain, FakeBrain('S2', 'VAN', '3')])
+        self.assertEqual(sample_ids_in_range(catalog, 'VAN', '1', '4'), ['S2'])
 
     def setUp(self):
         self.catalog = FakeCatalog([

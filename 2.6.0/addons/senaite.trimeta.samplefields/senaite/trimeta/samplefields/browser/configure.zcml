@@ -18,6 +18,27 @@
       permission="zope2.View"
       layer="senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
       />
+  <browser:page
+      for="bika.lims.interfaces.IAnalysis"
+      name="trimeta-assign-analyst"
+      class=".analyst.AssignAnalystView"
+      permission="zope2.View"
+      layer="senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
+      />
+  <browser:page
+      for="bika.lims.interfaces.IInstrument"
+      name="trimeta-breakdown-history"
+      class=".equipment_history.BreakdownHistoryView"
+      permission="zope2.View"
+      layer="senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
+      />
+  <browser:page
+      for="bika.lims.interfaces.IInstrument"
+      name="trimeta-maintenance-history"
+      class=".equipment_history.MaintenanceHistoryView"
+      permission="zope2.View"
+      layer="senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
+      />
 
   <!-- Vue unique: garde les controles de SampleAddView et le rollback
        de toute la soumission quand le core renvoie une erreur JSON. -->

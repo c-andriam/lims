@@ -143,7 +143,7 @@ def install_stubs():
     bika = make_module("bika")
     bika.lims = make_module("bika.lims", api=FakeAPI(),
                             senaiteMessageFactory=lambda msgid: msgid)
-    make_module("bika.lims.interfaces", IAnalysisRequest=Interface)
+    make_module("bika.lims.interfaces", IAnalysisRequest=Interface, IAnalysis=Interface)
     make_module("bika.lims.browser")
     make_module("bika.lims.browser.fields", UIDReferenceField=StubField)
     make_module("bika.lims.browser.widgets", DateTimeWidget=StubWidget)
@@ -167,6 +167,7 @@ def install_stubs():
                 add_column=lambda *a, **k: True)
     make_module("senaite.core.catalog",
                 CONTACT_CATALOG="contact_catalog",
+                ANALYSIS_CATALOG="analysis_catalog",
                 SAMPLE_CATALOG="sample_catalog")
     make_module("senaite.core.browser")
     make_module("senaite.core.browser.fields")
@@ -254,6 +255,7 @@ PURE_CASES = [
                              "TestVocabularyPlaceholders"]),
     ("test_listings.py", None),   # tout le fichier est pur
     ("test_dashboard.py", None),  # idem
+    ("test_dashboard_sorting.py", None),
     ("test_dashboard_filters.py", None),
     ("test_coa_filename.py", None),
     ("test_catalog_wiring.py", None),

@@ -171,16 +171,17 @@ class TestColumns(unittest.TestCase):
         self.assertEqual(keys[:5],
                          ["SampleCode", "Lot", "Client", "SampleType",
                           "Origin"])
-        self.assertEqual(keys[-3:],
-                         ["HPLCOperator", "MoistureOperator",
-                          "WaterActivityOperator"])
+        self.assertEqual(keys[10:],
+                         ["Vanillin", "GlucoVanillin", "VanillicAcid", "PHB",
+                          "PHBAcid", "HPLCOperator", "Moisture", "MoistureOperator",
+                          "WaterActivity", "WaterActivityOperator"])
 
     def test_every_column_has_a_title(self):
         for key, definition in build_columns().items():
             self.assertTrue(definition.get("title"),
                             "colonne sans intitule: %s" % key)
 
-    def test_only_indexed_columns_are_sortable(self):
+    def test_sortable_columns_declare_their_sort_criterion(self):
         """Un en-tete cliquable qui ne trie rien est pire qu'un en-tete
         inerte: l'utilisateur croit que le tri a eu lieu."""
         for key, definition in build_columns().items():
@@ -188,11 +189,15 @@ class TestColumns(unittest.TestCase):
                 self.assertIn("index", definition,
                               "colonne triable sans index: %s" % key)
 
-    def test_analysis_columns_are_never_sortable(self):
-        """Un resultat d'analyse ne vit pas dans le sample_catalog."""
+    def test_only_vanillin_analysis_has_a_global_sort(self):
         columns = build_columns()
         for column_id, _keyword, _label in DASHBOARD_ANALYSES:
-            self.assertFalse(columns[column_id].get("sortable"))
+            self.assertEqual(columns[column_id].get("sortable"), column_id == "Vanillin")
+
+    def test_all_six_requested_criteria_can_be_sorted(self):
+        columns = build_columns()
+        for key in ("DateReceived", "Lot", "Client", "SampleType", "Origin", "Vanillin"):
+            self.assertTrue(columns[key].get("sortable"), key)
 
     def test_seven_analysis_columns(self):
         self.assertEqual(len(DASHBOARD_ANALYSES), 7)

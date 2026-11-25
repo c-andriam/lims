@@ -1,0 +1,25 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="context/main_template/macros/master">
+  <metal:main fill-slot="main">
+    <h1>Affecter un analyste — <span tal:replace="context/Title" /></h1>
+    <p>Choisissez le contact du laboratoire responsable de cette analyse.</p>
+    <div class="alert alert-danger" role="alert" tal:condition="view/error" tal:content="view/error" />
+    <div class="alert alert-success" role="status" tal:condition="view/saved">Affectation enregistrée.</div>
+    <form method="post">
+      <tal:auth replace="structure context/@@authenticator" />
+      <input type="hidden" name="revision" tal:attributes="value view/token" />
+      <div class="form-group">
+        <label for="lab-analyst">Analyste (contact du laboratoire)</label>
+        <select class="form-control" id="lab-analyst" name="lab_analyst">
+          <option value="">Non affecté</option>
+          <option tal:repeat="contact view/contacts" tal:attributes="value python:contact[0]; selected python:contact[0] == view.selected" tal:content="python:contact[1]" />
+        </select>
+      </div>
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary">Enregistrer l'affectation</button>
+        <a class="btn btn-secondary" tal:attributes="href view/back_url">Retour à l'échantillon</a>
+      </div>
+    </form>
+  </metal:main>
+</html>

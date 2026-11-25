@@ -27,14 +27,22 @@ Deux differences avec l'amont
 import logging
 
 from bika.lims.browser.publish.downloadview import DownloadView
+from zExceptions import NotFound
 
 from senaite.trimeta.samplefields.coa import filename as fn
+from senaite.trimeta.samplefields.coa.pdf import get_pdf
 
 logger = logging.getLogger("senaite.trimeta.samplefields")
 
 
 class TrimetaDownloadView(DownloadView):
     """Telechargement d'un COA nomme par le Code echantillon."""
+
+    def __call__(self):
+        pdf = get_pdf(self.context)
+        if pdf is None:
+            raise NotFound("PDF du rapport indisponible")
+        return self.download(pdf.data, self.get_report_filename(self.context))
 
     def get_report_filename(self, report):
         return fn.get_report_filename(report)

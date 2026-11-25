@@ -88,7 +88,7 @@ Les deux coûtent à l'écriture, mais pas la même chose :
 - un **index** permet en plus de filtrer et trier, au prix d'une
   structure maintenue à chaque modification d'échantillon.
 
-Seule la **Provenance** est indexée, parce qu'elle porte un filtre. Le
+La **Provenance** et l’UID du type portent des index ajoutés pour les filtres. Le
 poids, les dates d'analyse et les trois opérateurs sont de simples
 colonnes. Ajouter un index plus tard reste une ligne dans `catalog.py`
 et une étape de mise à jour.
@@ -102,7 +102,9 @@ seuil ou une case à cocher « a une valeur » ne le permettrait pas.
 Conséquence technique : ce filtre ne peut pas être une requête
 catalogue sur le `sample_catalog`, puisque la vanilline n'est pas un
 champ de l'échantillon mais le résultat d'une analyse. Il s'applique
-donc **après** la requête, sur les résultats déjà rapatriés.
+par une première requête sur le catalogue d’analyses. Les identifiants
+retenus sont ensuite ajoutés à la requête du catalogue d’échantillons,
+avant la pagination.
 
 ### Les colonnes de résultats
 
@@ -117,10 +119,17 @@ en index **et** en colonne de métadonnées :
 | `getKeyword` | mot-clé du service | index + colonne |
 | `getResult` | résultat saisi | colonne |
 | `getResultCaptureDate` | date de saisie | index + colonne |
+| `getTrimetaDetectionLimitOperand` | signe de limite de détection | colonne ajoutée par le profil 1011 |
 
 Une **seule requête** ramène donc les résultats de toute la page
-affichée, sans réveiller un seul objet depuis la ZODB. Le coût ne
-dépend pas du nombre de lignes.
+affichée, sans réveiller un seul objet depuis la ZODB. Le nombre de requêtes
+ne dépend pas du nombre de lignes ; le volume de données, lui, en dépend.
+
+Depuis la correction du 25 novembre 2026, les tris Type et Vanilline sont
+appliqués à toute la sélection avant pagination. Le tri Vanilline demande
+une requête groupée supplémentaire sur les résultats de cette sélection.
+Les limites de détection et les valeurs non comparables restent en fin
+de liste dans les deux sens. Voir [la correction des tris](correction-tri-tableau-de-bord.md).
 
 L'alternative — dénormaliser le résultat dans le `sample_catalog` au
 moment de l'indexation — aurait été plus rapide encore à l'affichage,

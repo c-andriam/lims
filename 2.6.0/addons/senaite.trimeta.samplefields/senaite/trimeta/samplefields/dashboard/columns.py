@@ -82,6 +82,12 @@ DASHBOARD_ANALYSES = (
 # La colonne sur laquelle porte le filtre de plage du document.
 VANILLIN_COLUMN = "Vanillin"
 
+# Criteres de tri transmis au listing. Ils sont resolus avant pagination,
+# sans ajouter d'index ni recopier les resultats sur l'echantillon.
+SAMPLE_TYPE_SORT = "getSampleTypeTitle"
+VANILLIN_SORT = "trimeta_vanillin"
+MANUAL_SORTS = (SAMPLE_TYPE_SORT, VANILLIN_SORT)
+
 
 def get_keywords():
     """Mots-cles des services affiches, dans l'ordre des colonnes."""
@@ -177,7 +183,8 @@ def resolve_column_keywords(services):
 # Les colonnes issues du catalogue
 # ---------------------------------------------------------------------
 #
-# (identifiant, intitule, attribut du brain, index de tri ou None)
+# (identifiant, intitule, attribut du brain, critere de tri ou None)
+# Un critere est un index natif ou l'un des tris MANUAL_SORTS.
 #
 # L'identifiant sert de cle de colonne dans le listing; l'attribut est
 # la colonne de metadonnees lue sur le brain. Les deux different quand
@@ -190,7 +197,7 @@ METADATA_COLUMNS = (
     ("Client", col("dashboard_client", u"Client"),
      "getClientTitle", "getClientTitle"),
     ("SampleType", col("dashboard_sample_type", u"Type"),
-     "getSampleTypeTitle", None),
+     "getSampleTypeTitle", SAMPLE_TYPE_SORT),
     ("Origin", col("dashboard_origin", u"Origin"),
      "getOrigin", "getOrigin"),
     ("ReceptionWeight", col("dashboard_weight", u"Weight (g)"),
@@ -205,8 +212,7 @@ METADATA_COLUMNS = (
      "getDateVerified", "getDateVerified"),
 )
 
-# Les trois operateurs, places apres les resultats qu'ils concernent
-# dans le document. Ils ferment donc le tableau.
+# Chaque operateur suit les resultats qu'il concerne dans le document.
 OPERATOR_COLUMNS = (
     ("HPLCOperator", col("dashboard_op_hplc", u"Op. HPLC"),
      "getHPLCOperator"),
@@ -236,15 +242,19 @@ def build_columns():
         columns[key] = {
             "title": title,
             "toggle": True,
-            # Un resultat d'analyse ne vit pas dans le sample_catalog:
-            # aucun index ne peut le trier.
             "sortable": False,
         }
+
+    columns[VANILLIN_COLUMN].update(index=VANILLIN_SORT, sortable=True)
 
     for key, title, _attr in OPERATOR_COLUMNS:
         columns[key] = {"title": title, "toggle": True, "sortable": False}
 
-    return columns
+    order = [key for key, _title, _attr, _index in METADATA_COLUMNS]
+    order.extend(["Vanillin", "GlucoVanillin", "VanillicAcid", "PHB",
+                  "PHBAcid", "HPLCOperator", "Moisture", "MoistureOperator",
+                  "WaterActivity", "WaterActivityOperator"])
+    return collections.OrderedDict((key, columns[key]) for key in order)
 
 
 # ---------------------------------------------------------------------

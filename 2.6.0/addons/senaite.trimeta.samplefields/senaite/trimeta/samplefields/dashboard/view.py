@@ -57,6 +57,7 @@ from zope.i18nmessageid import MessageFactory
 from senaite.trimeta.samplefields.compat import to_text
 from senaite.trimeta.samplefields.dashboard import columns as cols
 from senaite.trimeta.samplefields.dashboard import filters as flt
+from senaite.trimeta.samplefields.dashboard import sorting
 from senaite.trimeta.samplefields.dashboard.results import fetch_results
 from senaite.trimeta.samplefields.dashboard.results import pick_result
 from senaite.trimeta.samplefields.dashboard.results import sample_ids_in_range
@@ -199,6 +200,32 @@ class DashboardView(ListingView):
         if matching is None:
             return
         self.contentFilter["getId"] = matching or [NO_MATCH]
+
+    # -- tri avant pagination ---------------------------------------------
+
+    def is_valid_sort_index(self, sort_on):
+        # Ces criteres sont geres par sort_brains(), jamais par un index
+        # inexistant ni par un tri des seules lignes de la page courante.
+        if sort_on in cols.MANUAL_SORTS:
+            return False
+        return super(DashboardView, self).is_valid_sort_index(sort_on)
+
+    def sort_brains(self, brains, sort_on=None, instance_fallback=True):
+        if sort_on not in cols.MANUAL_SORTS:
+            return super(DashboardView, self).sort_brains(
+                brains, sort_on=sort_on, instance_fallback=instance_fallback)
+        brains = list(brains)
+        try:
+            descending = self.get_sort_order() == "descending"
+            if sort_on == cols.SAMPLE_TYPE_SORT:
+                return sorting.sort_sample_types(brains, descending)
+            keywords = self.get_column_keywords().get(cols.VANILLIN_COLUMN, [])
+            sample_ids = [getattr(brain, "getId", "") for brain in brains]
+            results = fetch_results(api.get_tool(ANALYSIS_CATALOG), sample_ids, keywords)
+            return sorting.sort_vanillin(brains, results, keywords, descending)
+        except Exception:
+            logger.exception("Tri du tableau de bord impossible sur %s", sort_on)
+            return brains
 
     # -- remplissage des lignes -------------------------------------------
 

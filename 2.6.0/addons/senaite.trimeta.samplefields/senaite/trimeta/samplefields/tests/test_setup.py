@@ -33,7 +33,7 @@ class TestProfileInstallation(TrimetaTestCase):
         """
         setup_tool = self.portal.portal_setup
         version = setup_tool.getLastVersionForProfile(PROFILE)
-        self.assertEqual(version, ("1010",))
+        self.assertEqual(version, ("1012",))
 
     def test_sample_has_controller_edit_action(self):
         fti = self.portal.portal_types.AnalysisRequest

@@ -28,7 +28,7 @@
       name="senaite.trimeta.samplefields"
       />
 
-  <!-- Nom des PDF: Code echantillon au lieu de l'ID (voir views.py).
+  <!-- Nom des PDF: Code echantillon au lieu de l'ID.
 
        Memes noms, memes "for" et memes permissions que dans
        bika/lims/browser/publish/configure.zcml et
@@ -65,7 +65,7 @@
   <browser:page
       for="*"
       name="download_pdf"
-      class=".views.TrimetaDownloadView"
+      class=".download.TrimetaDownloadView"
       permission="senaite.core.permissions.ManageAnalysisRequests"
       layer="senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
       />
@@ -73,7 +73,7 @@
   <browser:page
       for="bika.lims.interfaces.IClient"
       name="email"
-      class=".views.TrimetaEmailView"
+      class=".email.TrimetaEmailView"
       permission="senaite.core.permissions.ManageAnalysisRequests"
       layer="senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
       />
@@ -81,7 +81,7 @@
   <browser:page
       for="bika.lims.interfaces.IAnalysisRequest"
       name="email"
-      class=".views.TrimetaEmailView"
+      class=".email.TrimetaEmailView"
       permission="senaite.core.permissions.ManageAnalysisRequests"
       layer="senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
       />
@@ -90,7 +90,7 @@
       name="workflow_action_download_reports"
       for="bika.lims.interfaces.IClient
            senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
-      factory=".views.TrimetaDownloadReportsAdapter"
+      factory=".workflow.TrimetaDownloadReportsAdapter"
       provides="bika.lims.interfaces.IWorkflowActionAdapter"
       permission="zope.Public"
       />
@@ -99,7 +99,7 @@
       name="workflow_action_download_reports"
       for="bika.lims.interfaces.IAnalysisRequest
            senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
-      factory=".views.TrimetaDownloadReportsAdapter"
+      factory=".workflow.TrimetaDownloadReportsAdapter"
       provides="bika.lims.interfaces.IWorkflowActionAdapter"
       permission="zope.Public"
       />

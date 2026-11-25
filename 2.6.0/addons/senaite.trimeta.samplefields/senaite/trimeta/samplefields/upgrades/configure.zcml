@@ -143,4 +143,20 @@
       handler=".v1010.upgrade"
       profile="senaite.trimeta.samplefields:default"
       />
+  <genericsetup:upgradeStep
+      title="Trimeta 1010 -> 1011 : limites de detection du tableau de bord"
+      description="Conserve le signe des limites de detection dans les metadonnees des analyses."
+      source="1010"
+      destination="1011"
+      handler=".v1011.upgrade"
+      profile="senaite.trimeta.samplefields:default"
+      />
+  <genericsetup:upgradeStep
+      title="Trimeta 1011 -> 1012 : analystes et historiques des equipements"
+      description="Affecte un contact du laboratoire par analyse et separe les historiques de pannes et d'entretiens."
+      source="1011"
+      destination="1012"
+      handler=".v1012.upgrade"
+      profile="senaite.trimeta.samplefields:default"
+      />
 </configure>

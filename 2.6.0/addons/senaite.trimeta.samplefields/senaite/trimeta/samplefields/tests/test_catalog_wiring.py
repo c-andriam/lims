@@ -191,7 +191,7 @@ class TestDashboardWiring(unittest.TestCase):
                 "NATIVE_COLUMNS apres l'avoir vu dans "
                 "`make dashboard-info`." % (key, attr))
 
-    def test_every_sortable_column_really_has_an_index(self):
+    def test_every_sortable_column_has_an_index_or_a_manual_handler(self):
         """Un en-tete cliquable qui ne trie rien est pire qu'un en-tete
         inerte: l'utilisateur croit que le tri a eu lieu et lit le
         tableau de travers."""
@@ -208,9 +208,10 @@ class TestDashboardWiring(unittest.TestCase):
                 index,
                 "la colonne '%s' est declaree triable sans index" % key)
             self.assertTrue(
-                index in our_indexes or index in NATIVE_INDEXES,
-                "la colonne '%s' trie sur '%s', qui n'est un index ni "
-                "chez nous ni chez senaite.core" % (key, index))
+                index in our_indexes or index in NATIVE_INDEXES
+                or index in cols.MANUAL_SORTS,
+                "la colonne '%s' trie sur '%s', sans index ni traitement "
+                "manuel declare" % (key, index))
 
     def test_unsortable_columns_declare_it(self):
         """senaite.app.listing rend l'en-tete cliquable par defaut."""

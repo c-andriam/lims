@@ -37,6 +37,7 @@ Date de reception et la Date de validation, tous natifs.
 """
 
 from senaite.core.catalog import SAMPLE_CATALOG
+from senaite.core.catalog import ANALYSIS_CATALOG
 
 # (id de l'index, type d'index, attribut indexe ou None)
 #
@@ -84,4 +85,5 @@ SAMPLE_COLUMNS = (
 # Regroupement par catalogue, consomme par setuphandlers et upgrades.
 CATALOGS = (
     (SAMPLE_CATALOG, SAMPLE_INDEXES, SAMPLE_COLUMNS),
+    (ANALYSIS_CATALOG, (), ("getTrimetaDetectionLimitOperand",)),
 )

@@ -418,3 +418,28 @@ msgstr "Aucun échantillon n’a été enregistré. Complétez les champs obliga
 
 msgid "No sample was saved. Check the entered values."
 msgstr "Aucun échantillon n’a été enregistré. Vérifiez les valeurs saisies."
+
+# Export des COA
+msgid "Report not found"
+msgstr "Rapport introuvable."
+
+msgid "Could not load PDF for sample ${sample}"
+msgstr "Le PDF de l’échantillon ${sample} est indisponible."
+
+msgid "No report could be downloaded"
+msgstr "Aucun rapport ne peut être téléchargé."
+
+msgid "Assigned laboratory analyst"
+msgstr "Analyste (contact labo)"
+
+msgid "Assign"
+msgstr "Affecter"
+
+msgid "Breakdown history"
+msgstr "Historique des pannes"
+
+msgid "Maintenance history"
+msgstr "Historique des entretiens"
+
+msgid "Add intervention"
+msgstr "Ajouter une intervention"
