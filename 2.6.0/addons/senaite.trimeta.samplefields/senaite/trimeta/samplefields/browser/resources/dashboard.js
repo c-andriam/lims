@@ -30,7 +30,7 @@
    * Doit rester en accord avec SCRIPT_VERSION dans viewlets.py, qui la
    * reporte en parametre d'URL. Un test verifie cette concordance.
    */
-  var VERSION = 4;
+  var VERSION = 5;
   window.TRIMETA_DASHBOARD_VERSION = VERSION;
 
   /* Dimensions maximales d'une entree de barre laterale.
@@ -54,22 +54,6 @@
   // Nombre minimal d'entrees pour qu'une liste soit une barre de
   // navigation. Ecarte le pied de page et les liens isoles.
   var MIN_ENTRIES = 3;
-
-  /* Trace de l'icone, dans le style trait fin des icones SENAITE:
-   * un cadre, une separation horizontale, une verticale -- un tableau.
-   * `currentColor` la fait suivre la couleur des autres entrees, etats
-   * survole et actif compris. */
-  var ICON_PATHS =
-    '<rect x="3" y="3" width="18" height="18" rx="2"/>' +
-    '<line x1="3" y1="9" x2="21" y2="9"/>' +
-    '<line x1="9" y1="9" x2="9" y2="21"/>';
-
-  function svgWithSize(size) {
-    return '<svg xmlns="http://www.w3.org/2000/svg" width="' + size +
-      '" height="' + size + '" viewBox="0 0 24 24" fill="none" ' +
-      'stroke="currentColor" stroke-width="1.5" stroke-linecap="round" ' +
-      'stroke-linejoin="round">' + ICON_PATHS + "</svg>";
-  }
 
   function log(message, detail) {
     if (window.console && window.console.debug) {
@@ -197,36 +181,24 @@
     return link;
   }
 
-  /* Icone: on remplace le CONTENU de celle du clone, en gardant son
-   * element et donc ses classes, sa taille et sa couleur. C'est ce qui
-   * garantit l'alignement avec les autres entrees.
-   *
-   * On ne tente pas de charger une icone du theme: un nom inconnu
-   * renvoyait une reponse que le navigateur acceptait comme image sans
-   * pouvoir la dessiner, d'ou le "?" observe a l'ecran. */
+  /* Meme image et meme taille que les entrees natives. "report" est
+   * une icone effectivement livree par SENAITE 2.6.0. On conserve le
+   * conteneur, les classes et la largeur du clone (16 px dans le theme).
+   * Un SVG dessine a part en 24 px decalait la hauteur de cette entree. */
   function setIcon(link) {
-    var holder = link.querySelector("svg");
-    if (holder) {
-      holder.setAttribute("viewBox", "0 0 24 24");
-      holder.setAttribute("fill", "none");
-      holder.setAttribute("stroke", "currentColor");
-      holder.setAttribute("stroke-width", "1.5");
-      holder.innerHTML = ICON_PATHS;
-      return;
-    }
-
     var img = link.querySelector("img");
-    if (img) {
-      var span = document.createElement("span");
-      span.innerHTML = svgWithSize(img.clientWidth || 24);
-      span.className = img.className || "";
-      img.parentNode.replaceChild(span, img);
+    if (!img) {
       return;
     }
-
-    var solo = document.createElement("span");
-    solo.innerHTML = svgWithSize(24);
-    link.insertBefore(solo, link.firstChild);
+    var source = img.getAttribute("src") || "";
+    var marker = "/senaite_theme/icon/";
+    var index = source.indexOf(marker);
+    if (index === -1) {
+      return;
+    }
+    img.setAttribute("src", source.slice(0, index + marker.length) + "report");
+    img.setAttribute("title", CONFIG.label || "Dashboard");
+    img.setAttribute("alt", CONFIG.label || "Dashboard");
   }
 
   function addSidebarEntry() {

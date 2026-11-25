@@ -47,6 +47,7 @@ ne le verrait.
 
 import logging
 
+from senaite.trimeta.samplefields.compat import string_types
 from senaite.trimeta.samplefields.compat import to_text
 
 logger = logging.getLogger("senaite.trimeta.samplefields")
@@ -198,8 +199,7 @@ def fetch_results(catalog, sample_ids, keywords):
 
 
 def sample_ids_in_range(catalog, keyword, minimum=None, maximum=None):
-    """Identifiants des echantillons dont le resultat `keyword` est dans
-    l'intervalle.
+    """Identifiants dont le resultat affiche est dans l'intervalle.
 
     Sert au filtre de plage du tableau de bord. Il doit s'appliquer
     AVANT la pagination -- sinon le nombre de pages annonce serait faux
@@ -208,7 +208,11 @@ def sample_ids_in_range(catalog, keyword, minimum=None, maximum=None):
 
     La requete ne porte que sur le mot-cle, qui est indexe; le tri
     numerique se fait en Python, `getResult` n'etant qu'une colonne de
-    metadonnees. Le volume reste celui des analyses d'un seul service.
+    metadonnees. `keyword` accepte un mot-cle ou une liste ordonnee,
+    comme la colonne du tableau. Les reprises et le choix du service
+    suivent exactement group_by_sample() puis pick_result(), utilises
+    aussi par l'affichage. Une ancienne valeur dans l'intervalle ne
+    doit pas retenir une ligne dont la valeur affichee est hors plage.
 
     :returns: liste d'identifiants, ou None si aucune borne n'est posee
         (aucun filtrage a appliquer -- a distinguer d'une liste vide,
@@ -217,17 +221,18 @@ def sample_ids_in_range(catalog, keyword, minimum=None, maximum=None):
     if to_number(minimum) is None and to_number(maximum) is None:
         return None
 
+    keywords = [keyword] if isinstance(keyword, string_types) \
+        else list(keyword or [])
+    if not keywords:
+        return []
+
     try:
         brains = catalog({"getKeyword": keyword})
     except Exception:
         logger.exception("Filtre de plage impossible sur %s", keyword)
         return None
 
-    matching = set()
-    for brain in brains:
-        sample_id = to_text(getattr(brain, "getRequestID", "")).strip()
-        if not sample_id:
-            continue
-        if in_range(getattr(brain, "getResult", ""), minimum, maximum):
-            matching.add(sample_id)
-    return sorted(matching)
+    grouped = group_by_sample(brains, keywords)
+    return sorted(
+        sample_id for sample_id, per_sample in grouped.items()
+        if in_range(pick_result(per_sample, keywords), minimum, maximum))

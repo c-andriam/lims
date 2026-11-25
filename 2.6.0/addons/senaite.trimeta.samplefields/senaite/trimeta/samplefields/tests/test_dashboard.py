@@ -266,6 +266,57 @@ class TestSampleIdsInRange(unittest.TestCase):
         sample_ids_in_range(self.catalog, "VAN", 1, 100)
         self.assertEqual(self.catalog.queries, [{"getKeyword": "VAN"}])
 
+    def test_latest_retest_outside_range_excludes_the_sample(self):
+        brains = [FakeBrain("VAN-0010", "VAN", "2.0", captured=1),
+                  FakeBrain("VAN-0010", "VAN", "8.0", captured=2)]
+        for ordered in (brains, list(reversed(brains))):
+            self.assertEqual(
+                sample_ids_in_range(FakeCatalog(ordered), "VAN", 1, 3), [])
+
+    def test_latest_retest_inside_range_includes_the_sample(self):
+        catalog = FakeCatalog([
+            FakeBrain("VAN-0010", "VAN", "8.0", captured=1),
+            FakeBrain("VAN-0010", "VAN", "2.0", captured=2),
+        ])
+        self.assertEqual(sample_ids_in_range(catalog, "VAN", 1, 3),
+                         ["VAN-0010"])
+
+    def test_empty_retest_does_not_replace_a_filled_result(self):
+        catalog = FakeCatalog([
+            FakeBrain("VAN-0010", "VAN", "2.0", captured=1),
+            FakeBrain("VAN-0010", "VAN", "", captured=2),
+        ])
+        self.assertEqual(sample_ids_in_range(catalog, "VAN", 1, 3),
+                         ["VAN-0010"])
+
+    def test_keyword_preference_matches_the_displayed_column(self):
+        catalog = FakeCatalog([
+            FakeBrain("VAN-0010", "VAN", "8.0", captured=1),
+            FakeBrain("VAN-0010", "VAN_ALT", "2.0", captured=2),
+        ])
+        self.assertEqual(
+            sample_ids_in_range(catalog, ["VAN", "VAN_ALT"], 1, 3), [])
+
+    def test_secondary_keyword_is_used_when_the_first_is_empty(self):
+        catalog = FakeCatalog([
+            FakeBrain("VAN-0010", "VAN", "", captured=2),
+            FakeBrain("VAN-0010", "VAN_ALT", "2.0", captured=1),
+        ])
+        self.assertEqual(
+            sample_ids_in_range(catalog, ["VAN", "VAN_ALT"], 1, 3),
+            ["VAN-0010"])
+
+    def test_latest_detection_limit_does_not_reuse_an_old_number(self):
+        catalog = FakeCatalog([
+            FakeBrain("VAN-0010", "VAN", "2.0", captured=1),
+            FakeBrain("VAN-0010", "VAN", "<0.5", captured=2),
+        ])
+        self.assertEqual(sample_ids_in_range(catalog, "VAN", 1, 3), [])
+
+    def test_empty_keywords_do_not_query_the_catalog(self):
+        self.assertEqual(sample_ids_in_range(self.catalog, [], 1, 3), [])
+        self.assertEqual(self.catalog.queries, [])
+
     def test_uncomparable_results_are_left_out(self):
         """"<0.5" et une case vide ne peuvent pas etre situes dans un
         intervalle: ils en sortent."""
