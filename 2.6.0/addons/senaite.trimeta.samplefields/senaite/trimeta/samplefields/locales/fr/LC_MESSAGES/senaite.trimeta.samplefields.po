@@ -443,3 +443,12 @@ msgstr "Historique des entretiens"
 
 msgid "Add intervention"
 msgstr "Ajouter une intervention"
+
+msgid "Worksheet analyst"
+msgstr "Analyste de la feuille"
+
+msgid "Assigned analyst"
+msgstr "Analyste affecté"
+
+msgid "Not assigned"
+msgstr "Non affecté"

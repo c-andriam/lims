@@ -18,6 +18,7 @@ from senaite.trimeta.samplefields.indexers import get_field_value
 from senaite.trimeta.samplefields.worksheet.export import fill_export_values
 from senaite.trimeta.samplefields.worksheet.export import format_due_date
 from senaite.trimeta.samplefields.worksheet.export import slot_title
+from senaite.trimeta.samplefields.worksheet.export import worksheet_result
 
 logger = logging.getLogger("senaite.trimeta.samplefields")
 
@@ -37,6 +38,19 @@ class SampleCodeSlotHeaderMixin(object):
     Le document demande de "remplacer ou ajouter" l'ID par le code: on
     ajoute, le lien vers l'echantillon reste porte par l'ID.
     """
+
+    def _folder_item_result(self, analysis_brain, item):
+        super(SampleCodeSlotHeaderMixin, self)._folder_item_result(analysis_brain, item)
+        # Le core n'ajoute formatted_result que si ViewResults est autorise
+        # et qu'un resultat existe. Ne jamais contourner ce controle.
+        if "formatted_result" not in item:
+            return
+        try:
+            analysis = api.get_object(analysis_brain)
+            item["formatted_result"] = worksheet_result(
+                analysis, item["formatted_result"], self.dmk)
+        except Exception:
+            logger.exception("Presentation du resultat de Work Sheet impossible")
 
     def get_slot_header_data(self, obj):
         data = super(SampleCodeSlotHeaderMixin, self).get_slot_header_data(obj)

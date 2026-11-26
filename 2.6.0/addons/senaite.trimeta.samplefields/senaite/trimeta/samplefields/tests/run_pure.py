@@ -262,6 +262,7 @@ PURE_CASES = [
     ("test_field_references.py", None),
     ("test_defaults.py", None),
     ("test_repetitions.py", None),
+    ("test_worksheet_precision.py", None),
 ]
 
 

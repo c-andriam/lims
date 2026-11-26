@@ -30,3 +30,12 @@ msgstr ""
 
 msgid "Add intervention"
 msgstr ""
+
+msgid "Worksheet analyst"
+msgstr ""
+
+msgid "Assigned analyst"
+msgstr ""
+
+msgid "Not assigned"
+msgstr ""

@@ -1,5 +1,32 @@
 # -*- coding: utf-8 -*-
 """Logique pure de la Work Sheet, testable sans Zope."""
+import re
+from senaite.trimeta.samplefields.compat import to_text
+
+NUMERIC_RESULT = re.compile(
+    r"^([<>]=?)?\s*([+-]?(?:\d+(?:[.,]\d*)?|[.,]\d+)(?:[eE][+-]?\d+)?)$")
+
+
+def stored_numeric_result(value, operand="", decimalmark="."):
+    """Conserve tous les chiffres stockes, sans conversion flottante."""
+    match = NUMERIC_RESULT.match(to_text(value).strip())
+    if match is None:
+        return None
+    number = match.group(2).replace(",", ".")
+    if decimalmark == ",":
+        number = number.replace(".", ",")
+    prefix = match.group(1) or (operand if operand in ("<", ">", "<=", ">=") else "")
+    return prefix + number
+
+
+def worksheet_result(analysis, fallback, decimalmark="."):
+    """Ne reformate que les valeurs numeriques, conserve les choix natifs."""
+    if (analysis.getResultType() != "numeric"
+            or getattr(analysis, "getResultOptions", lambda: [])()):
+        return fallback
+    value = stored_numeric_result(analysis.getResult(),
+                                  analysis.getDetectionLimitOperand(), decimalmark)
+    return fallback if value is None else value
 
 
 def format_due_date(due_date, localize):
