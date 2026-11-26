@@ -2,12 +2,9 @@
     define="model view/model"
     i18n:domain="senaite.trimeta.coa">
 
-  <!-- Domaine de traduction propre, sans catalogue: le COA reste en
-       anglais, comme le cahier des charges le specifie ("Sample
-       reference", "Report reference", "ORGANOLEPTIC ANALYSIS"...).
-       Sous senaite.impress, le catalogue francais de l'add-on (ecran de
-       publication) traduisait une partie des libelles seulement: le COA
-       melangeait les deux langues. -->
+  <!-- Les libelles anglais servent d'identifiants de traduction.
+       Le catalogue francais senaite.trimeta.coa les traduit pour le COA,
+       distinctement des libelles de l'interface de publication. -->
 
   <!-- Gabarit COA Trimeta (lot 4).
 
@@ -154,11 +151,19 @@
           </tr>
           <tr>
             <td class="label" i18n:translate="">Date Validated</td>
-            <td tal:content="python:view.to_localized_time(validation['date']) or (view.not_recorded_label if validation['verified'] else '')"></td>
+            <td>
+              <span tal:condition="validation/date" tal:content="python:view.to_localized_time(validation['date'])"></span>
+              <span tal:condition="python:not validation['date'] and validation['verified']"
+                    tal:content="view/not_recorded_label" i18n:translate=""></span>
+            </td>
           </tr>
           <tr>
             <td class="label" i18n:translate="">Validated by</td>
-            <td tal:content="python:validation['fullname'] or (view.not_recorded_label if validation['verified'] else '')"></td>
+            <td>
+              <span tal:condition="validation/fullname" tal:content="validation/fullname"></span>
+              <span tal:condition="python:not validation['fullname'] and validation['verified']"
+                    tal:content="view/not_recorded_label" i18n:translate=""></span>
+            </td>
           </tr>
           <tr tal:condition="model/FinalValidator|nothing">
             <td class="label" i18n:translate="">Designated signatory</td>

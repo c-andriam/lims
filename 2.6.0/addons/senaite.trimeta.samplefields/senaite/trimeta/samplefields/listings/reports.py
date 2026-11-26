@@ -7,6 +7,12 @@ est un ARReport, qui pointe vers l'echantillon dont il rend compte.
 """
 
 from bika.lims import api
+try:
+    from html.parser import HTMLParser
+    from urllib.parse import urljoin
+except ImportError:
+    from HTMLParser import HTMLParser
+    from urlparse import urljoin
 
 from senaite.trimeta.samplefields.compat import string_types
 from senaite.app.listing.interfaces import IListingViewAdapter
@@ -32,6 +38,25 @@ PDF = "PDF"
 NATIVE_BATCH = "Batch"
 
 
+class InfoLinkParser(HTMLParser):
+    """Recupere le premier lien d'information produit par le core."""
+
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.href = None
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "a" and self.href is None:
+            self.href = dict(attrs).get("href")
+
+
+def info_export_url(markup, base_url):
+    parser = InfoLinkParser()
+    parser.feed(markup)
+    parser.close()
+    return urljoin((base_url or "").rstrip("/") + "/", parser.href) if parser.href else ""
+
+
 @implementer(IListingViewAdapter)
 class ReportsListingAdapter(BaseListingAdapter):
     """Ajoute Code echantillon et Lot a la liste des rapports."""
@@ -54,11 +79,8 @@ class ReportsListingAdapter(BaseListingAdapter):
             # masquee par defaut, toujours activable dans le menu des colonnes
             columns[NATIVE_BATCH]["toggle"] = False
         if INFO in columns:
-            # La valeur de cette colonne EST du HTML (icone d'information):
-            # l'export CSV la recopiait telle quelle, en premiere colonne.
-            # L'export ne retient que les colonnes AFFICHEES: masquee par
-            # defaut, elle sort du fichier et reste activable dans le menu
-            # des colonnes.
+            # Colonne secondaire masquee par defaut. Si elle est reactivee,
+            # fill_export_values conserve l'icone et exporte son URL.
             columns[INFO]["toggle"] = False
         show_in_all_states(self.listing, SAMPLE_CODE, LOT)
 
@@ -86,6 +108,13 @@ class ReportsListingAdapter(BaseListingAdapter):
         fichier), la cellule reste vide.
         """
         replace = item.get("replace") or {}
+        info = item.get(INFO)
+        if isinstance(info, string_types) and "<" in info:
+            # A l'ecran: conserver l'icone native. Dans le CSV: son URL.
+            item.setdefault("replace", {}).setdefault(INFO, info)
+            context = getattr(self.listing, "context", self.context)
+            base_url = context.absolute_url() if hasattr(context, "absolute_url") else item.get("url", "")
+            item[INFO] = info_export_url(item["replace"][INFO], base_url)
         if not item.get(PRIMARY_SAMPLE) and sample is not None:
             item[PRIMARY_SAMPLE] = sample.getId()
         if not item.get(PDF):

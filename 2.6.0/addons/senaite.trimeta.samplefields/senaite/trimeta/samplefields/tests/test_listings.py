@@ -463,6 +463,39 @@ class TestReportsExport(unittest.TestCase):
         listing, _adapter = self.make_adapter()
         self.assertIs(listing.columns["Info"]["toggle"], False)
 
+    def test_visible_info_exports_its_absolute_url_and_keeps_the_native_icon(self):
+        listing, adapter = self.make_adapter()
+        class Context(object):
+            def absolute_url(self):
+                return 'http://lims/client-1'
+        listing.context = Context()
+        markup = '<a href="analysisreport_info?report_uid=u1&amp;mode=info"><i>Info</i></a>'
+        item = {'Info': markup, 'url':'http://lims/client-1/sample/report-1'}
+        adapter.folder_item(FakeBrain(getAnalysisRequestUID='u1'),item,0)
+        self.assertEqual(item['Info'],'http://lims/client-1/analysisreport_info?report_uid=u1&mode=info')
+        self.assertEqual(item['replace']['Info'],markup)
+
+    def test_existing_info_display_override_is_preserved(self):
+        _listing, adapter = self.make_adapter()
+        markup = '<a href="http://lims/info">Info</a>'
+        item = {'Info':'<span>old icon</span>','replace':{'Info':markup}}
+        adapter.folder_item(FakeBrain(getAnalysisRequestUID='u1'),item,0)
+        self.assertEqual(item['Info'],'http://lims/info')
+        self.assertEqual(item['replace']['Info'],markup)
+
+    def test_info_without_a_link_exports_no_html(self):
+        _listing, adapter = self.make_adapter()
+        item = {'Info':'<span>Info</span>'}
+        adapter.folder_item(FakeBrain(getAnalysisRequestUID='u1'),item,0)
+        self.assertEqual(item['Info'],'')
+        self.assertEqual(item['replace']['Info'],'<span>Info</span>')
+
+    def test_plain_info_value_is_not_changed(self):
+        _listing, adapter = self.make_adapter()
+        item = {'Info':'http://lims/info'}
+        adapter.folder_item(FakeBrain(getAnalysisRequestUID='u1'),item,0)
+        self.assertEqual(item['Info'],'http://lims/info')
+
     def test_primary_sample_and_pdf_are_exported(self):
         _listing, adapter = self.make_adapter()
         item = {"url": "http://lims/rapport-1",

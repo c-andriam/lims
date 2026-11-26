@@ -84,3 +84,9 @@ msgstr "Arôme"
 
 msgid "Responsibles"
 msgstr "Responsables"
+
+msgid "Designated signatory"
+msgstr "Signataire désigné"
+
+msgid "Not recorded"
+msgstr "Non renseigné"

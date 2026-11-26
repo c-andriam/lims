@@ -291,8 +291,10 @@ cellule, jamais la version HTML (`replace`) utilisée à l'écran.
 ### Ce qui a été fait
 
 - *Info* est **masquée par défaut** : elle sort du fichier et reste
-  activable dans le menu des colonnes (« ··· »). Il n'existe pas
-  d'indicateur « ne pas exporter » par colonne.
+  activable dans le menu des colonnes (« ··· »). Depuis la correction du
+  26 novembre 2026, si elle est réactivée, le CSV contient son URL
+  d'information plutôt que le HTML de l'icône : voir
+  [l'export de la liste des rapports](correction-export-liste-rapports.md).
 - **Échantillon primaire** exporte l'identifiant de l'échantillon,
   **Télécharger le PDF** l'adresse de téléchargement. Un rapport sans
   fichier laisse la cellule vide : aucune adresse n'est inventée.
