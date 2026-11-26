@@ -58,8 +58,9 @@ rendus par les méthodes natives (`view.render_*`). Seul le tableau
 | Sample Type, Specification | natifs |
 | Date Received | `model.DateReceived` (natif) |
 | Beginning / End of analysis | `AnalysisStart`, `AnalysisEnd` (add-on) |
-| Date Validated | `model.getDateVerified()` (natif) |
-| Validated by | `FinalValidator` → nom du contact labo (add-on) |
+| Date Validated | Dernier événement `verify`, pour un état validé ou publié |
+| Validated by | Auteur du même événement : nom du compte ou identifiant historique |
+| Designated signatory | `FinalValidator` → contact désigné, facultatif et distinct de l'auteur de la validation |
 | Date Published, Published by | natifs, **sans le lien mailto** |
 | Sample weight | `ReceptionWeight` (add-on) |
 | *Sample information* : Reception temperature, Designation | add-on |
@@ -69,6 +70,9 @@ rendus par les méthodes natives (`view.render_*`). Seul le tableau
 Les champs sont lus par leur **nom de champ** (`model/ReceptionWeight`),
 pas par l'accesseur `get…` : c'est ce que `SuperModel` expose, et il
 résout lui-même un champ référence en objet (`model/FinalValidator/Fullname`).
+
+La cohérence date/auteur est corrigée le 26 novembre 2026 : voir
+[la validation affichée sur le COA](correction-coa-validation.md).
 
 ---
 

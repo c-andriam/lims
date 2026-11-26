@@ -263,6 +263,7 @@ PURE_CASES = [
     ("test_defaults.py", None),
     ("test_repetitions.py", None),
     ("test_worksheet_precision.py", None),
+    ("test_coa_validation.py", None),
 ]
 
 

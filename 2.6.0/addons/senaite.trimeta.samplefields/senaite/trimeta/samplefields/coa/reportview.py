@@ -27,19 +27,51 @@ recoivent deux: le contexte s'ajoute devant. `self.context` reste ce
 qu'en fait la classe de base (le portail), dont dependent les gabarits.
 """
 
+import logging
+from bika.lims import api
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from senaite.impress.analysisrequest.reportview import MultiReportView
 from senaite.impress.analysisrequest.reportview import SingleReportView
 from senaite.impress.interfaces import IMultiReportView
 from senaite.impress.interfaces import IReportView
 from zope.interface import implementer
+from zope.i18nmessageid import MessageFactory
+from senaite.trimeta.samplefields.coa.validation import validation_details
+from senaite.trimeta.samplefields.compat import to_text
 
 HEADER_TEMPLATE = ViewPageTemplateFile("templates/header.pt")
 INFO_TEMPLATE = ViewPageTemplateFile("templates/info.pt")
+logger = logging.getLogger("senaite.trimeta.samplefields")
+_coa = MessageFactory("senaite.trimeta.coa")
+
+
+class CoaValidationMixin(object):
+    """Separe validation enregistree et signataire choisi dans la qualite."""
+
+    not_recorded_label = _coa(u"Not recorded")
+
+    def validation_actor_name(self, actor):
+        try:
+            user = api.get_user(actor)
+            fullname = user.getProperty("fullname", "") if user is not None else ""
+            return to_text(fullname or actor)
+        except Exception:
+            logger.exception("Nom du validateur indisponible pour %s", actor)
+            return actor
+
+    def get_coa_validation(self, model):
+        try:
+            sample = model.instance
+            state = api.get_review_status(sample)
+            return validation_details(state, api.get_review_history(sample),
+                                      self.validation_actor_name)
+        except Exception:
+            logger.exception("Historique de validation du COA inaccessible")
+            return validation_details("", [], self.validation_actor_name)
 
 
 @implementer(IReportView)
-class TrimetaSingleReportView(SingleReportView):
+class TrimetaSingleReportView(CoaValidationMixin, SingleReportView):
     """Rapport d'un echantillon, en-tete au logo du laboratoire."""
 
     HEADER_TEMPLATE = HEADER_TEMPLATE
@@ -50,7 +82,7 @@ class TrimetaSingleReportView(SingleReportView):
 
 
 @implementer(IMultiReportView)
-class TrimetaMultiReportView(MultiReportView):
+class TrimetaMultiReportView(CoaValidationMixin, MultiReportView):
     """Rapport de plusieurs echantillons, meme en-tete."""
 
     HEADER_TEMPLATE = HEADER_TEMPLATE

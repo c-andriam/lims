@@ -21,7 +21,8 @@
 
        1. Le tableau "Summary" natif est remplace par un tableau
           equivalent, complete des champs Trimeta (poids a la
-          reception, debut/fin d'analyse, validateur final) et sans le
+          reception, debut/fin d'analyse, validation enregistree et
+          signataire designe) et sans le
           lien mailto sur "Published by".
        2. Deux tableaux sont ajoutes a la suite: "Sample information"
           (temperature, designation, lot, client) et "Organoleptic
@@ -93,6 +94,7 @@
 
   <!-- REPORT SUMMARY (version Trimeta, cf. note en tete de fichier) -->
   <tal:t define="client model/Client;
+                 validation python:view.get_coa_validation(model);
                  reporter python:view.current_user;">
     <div class="row section-summary no-gutters">
       <div class="w-100">
@@ -152,10 +154,14 @@
           </tr>
           <tr>
             <td class="label" i18n:translate="">Date Validated</td>
-            <td tal:content="python:view.to_localized_time(model.getDateVerified())"></td>
+            <td tal:content="python:view.to_localized_time(validation['date']) or (view.not_recorded_label if validation['verified'] else '')"></td>
           </tr>
           <tr>
             <td class="label" i18n:translate="">Validated by</td>
+            <td tal:content="python:validation['fullname'] or (view.not_recorded_label if validation['verified'] else '')"></td>
+          </tr>
+          <tr tal:condition="model/FinalValidator|nothing">
+            <td class="label" i18n:translate="">Designated signatory</td>
             <td tal:content="model/FinalValidator/Fullname|nothing"></td>
           </tr>
           <tr>
