@@ -35,6 +35,7 @@ from senaite.impress.interfaces import IReportView
 from zope.interface import implementer
 
 HEADER_TEMPLATE = ViewPageTemplateFile("templates/header.pt")
+INFO_TEMPLATE = ViewPageTemplateFile("templates/info.pt")
 
 
 @implementer(IReportView)
@@ -42,6 +43,7 @@ class TrimetaSingleReportView(SingleReportView):
     """Rapport d'un echantillon, en-tete au logo du laboratoire."""
 
     HEADER_TEMPLATE = HEADER_TEMPLATE
+    INFO_TEMPLATE = INFO_TEMPLATE
 
     def __init__(self, context, model, request):
         super(TrimetaSingleReportView, self).__init__(model, request)
@@ -52,6 +54,7 @@ class TrimetaMultiReportView(MultiReportView):
     """Rapport de plusieurs echantillons, meme en-tete."""
 
     HEADER_TEMPLATE = HEADER_TEMPLATE
+    INFO_TEMPLATE = INFO_TEMPLATE
 
     def __init__(self, context, collection, request):
         super(TrimetaMultiReportView, self).__init__(collection, request)

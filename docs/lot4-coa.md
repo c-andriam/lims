@@ -305,9 +305,10 @@ reste vide, faute d'envoi par courriel sur ces rapports.
 
 ## Reste à trancher
 
-1. **« Supprimer l'adresse mail »** a été compris comme le lien mailto
-   de *Published by*. L'e-mail du contact client, dans le bloc d'en-tête
-   natif, est toujours affiché : à confirmer avec le laboratoire.
+1. **« Supprimer l'adresse mail »** — le lien de *Published by* avait été
+   retiré, mais l'adresse du contact client restait dans le bloc natif.
+   Ce dernier affichage est corrigé le 26 novembre 2026 : voir
+   [le retrait de l'adresse mail du COA](correction-coa-adresse-mail.md).
 2. **« Report reference »** — *tranché à partir du document*. Le même
    cahier des charges demande que le COA porte le nom du **Code
    échantillon** (nom du PDF) : c'est la référence sous laquelle le
