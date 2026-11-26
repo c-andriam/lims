@@ -28,6 +28,7 @@ qu'en fait la classe de base (le portail), dont dependent les gabarits.
 """
 
 import logging
+from xml.sax.saxutils import escape
 from bika.lims import api
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from senaite.impress.analysisrequest.reportview import MultiReportView
@@ -38,9 +39,11 @@ from zope.interface import implementer
 from zope.i18nmessageid import MessageFactory
 from senaite.trimeta.samplefields.coa.validation import validation_details
 from senaite.trimeta.samplefields.compat import to_text
+from senaite.trimeta.samplefields.worksheet.export import worksheet_result
 
 HEADER_TEMPLATE = ViewPageTemplateFile("templates/header.pt")
 INFO_TEMPLATE = ViewPageTemplateFile("templates/info.pt")
+COA_RESULTS_TEMPLATE = ViewPageTemplateFile("templates/results.pt")
 logger = logging.getLogger("senaite.trimeta.samplefields")
 _coa = MessageFactory("senaite.trimeta.coa")
 
@@ -49,6 +52,20 @@ class CoaValidationMixin(object):
     """Separe validation enregistree et signataire choisi dans la qualite."""
 
     not_recorded_label = _coa(u"Not recorded")
+
+    COA_RESULTS_TEMPLATE = COA_RESULTS_TEMPLATE
+
+    def get_coa_result(self, model, analysis):
+        try:
+            value = worksheet_result(analysis.instance, None, model.decimal_mark)
+            if value is not None:
+                return escape(to_text(value))
+        except Exception:
+            logger.exception("Precision du resultat COA indisponible")
+        return model.get_formatted_result(analysis)
+
+    def render_coa_results(self, context, **options):
+        return self.COA_RESULTS_TEMPLATE(context, **options)
 
     def validation_actor_name(self, actor):
         try:

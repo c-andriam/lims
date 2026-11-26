@@ -76,6 +76,8 @@ NATIVE_MODEL_NAMES = frozenset([
     "DateReceived",
     "Client",
     "ClientSampleID",
+    # Methode du modele senaite.impress.analysisrequest.model.SuperModel.
+    "is_provisional",
 ])
 
 
