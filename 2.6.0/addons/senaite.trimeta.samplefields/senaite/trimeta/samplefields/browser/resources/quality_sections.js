@@ -41,6 +41,17 @@
     if (block) {
       return { node: block, layout: "block" };
     }
+    // Le ReferenceWidget natif porte directement le nom du champ.
+    // Son libelle est un frere precedent : le titre de section doit
+    // preceder aussi ce libelle, pas seulement la zone de recherche.
+    var reference = document.getElementById(fieldName);
+    if (reference && reference.classList.contains("ArchetypesReferenceWidget")) {
+      var label = reference.previousElementSibling;
+      if (label && label.tagName === "LABEL" && label.htmlFor === fieldName) {
+        return { node: label, layout: "block" };
+      }
+      return { node: reference, layout: "block" };
+    }
     return null;
   }
 

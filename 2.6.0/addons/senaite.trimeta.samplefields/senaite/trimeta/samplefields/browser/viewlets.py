@@ -42,7 +42,7 @@ QA_SCRIPT_TAG = (
     '</script>'
     '<script type="text/javascript" '
     'id="trimeta-qa-sections-script" '
-    'src="{portal_url}/{resources}/quality_sections.js"></script>'
+    'src="{portal_url}/{resources}/quality_sections.js?v=2"></script>'
 )
 
 # Pages de modification, selon le rendu (Archetypes ou vue SENAITE).
