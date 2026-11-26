@@ -314,6 +314,9 @@ msgstr "Type d'échantillon"
 msgid "Date Received"
 msgstr "Date de réception"
 
+msgid "Actual date and time the sample was received. Can be corrected manually if entered after the fact."
+msgstr "Date et heure réelles de réception de l'échantillon. Peuvent être corrigées manuellement en cas de saisie différée."
+
 msgid "Date Validated"
 msgstr "Date de validation"
 

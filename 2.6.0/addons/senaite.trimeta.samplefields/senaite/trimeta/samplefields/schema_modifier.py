@@ -20,6 +20,8 @@ Trois retouches:
 
 from archetypes.schemaextender.interfaces import ISchemaModifier
 from bika.lims.interfaces import IAnalysisRequest
+from bika.lims.browser.widgets import DateTimeWidget
+from senaite.core.browser.widgets.referencewidget import ReferenceWidget
 from zope.component import adapts
 from zope.i18nmessageid import MessageFactory
 from zope.interface import implementer
@@ -67,7 +69,28 @@ class DateReceivedSchemaModifier(object):
         self.unlock_date_received(schema)
         self.relabel_client_sample_id(schema)
         self.hide_redundant_fields(schema)
+        self.restore_edit_labels(schema)
         return schema
+
+    def restore_edit_labels(self, schema):
+        """Laisse les widgets natifs nommer les champs hors tableau d'ajout."""
+        creation = getattr(self.context, "checkCreationFlag", lambda: False)()
+        for name in schema.keys():
+            field = schema.get(name)
+            widget = getattr(field, "widget", None)
+            if widget is None:
+                continue
+            owned = getattr(field, "schemata", "") in (
+                "Reception", "Analyse", "AssuranceQualite")
+            if name == "DateReceived" or (owned and isinstance(
+                    widget, (DateTimeWidget, ReferenceWidget))):
+                # ar_add porte deja le libelle dans sa colonne de gauche.
+                # base_edit attend le libelle fourni par le widget.
+                # Les declarations sont partagees entre requetes : isoler
+                # le widget pour ne pas melanger creation et modification.
+                local = field.copy()
+                local.widget.render_own_label = bool(creation)
+                schema[name] = local
 
     def protect_sample_client(self, schema):
         # Client is an add-only reference; existing samples get their client

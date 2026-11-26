@@ -23,6 +23,7 @@ que de laisser passer un test faux: c'est pour cela qu'elles sont
 volontairement minimales.
 """
 import importlib.util
+from copy import deepcopy
 import os
 import sys
 import types
@@ -45,6 +46,9 @@ def make_module(name, **attrs):
 # --------------------------------------------------------------------
 
 class StubWidget(object):
+    def copy(self):
+        return deepcopy(self)
+
     def __init__(self, **kwargs):
         self.label = kwargs.get("label")
         self.description = kwargs.get("description")
@@ -69,6 +73,9 @@ class StubField(object):
 
     def getName(self):
         return self._name
+
+    def copy(self):
+        return deepcopy(self)
 
 
 def install_stubs():

@@ -11,6 +11,8 @@ rester lisibles par quelqu'un qui ne connait pas Archetypes.
 import unittest
 
 from senaite.trimeta.samplefields.extender import ReceptionFieldsExtender
+from senaite.trimeta.samplefields.extender import ExtDateTimeField
+from bika.lims.browser.widgets import DateTimeWidget
 from senaite.trimeta.samplefields.schema_modifier import DateReceivedSchemaModifier
 from senaite.trimeta.samplefields.tests.base import TrimetaTestCase
 from senaite.trimeta.samplefields.tests.utils import SampleFactory
@@ -130,8 +132,7 @@ class TestExtenderDeclaration(unittest.TestCase):
 class TestNativeRequiredFields(unittest.TestCase):
 
     def test_received_date_is_required_and_visible(self):
-        field = type("Field", (object,), {})()
-        field.widget = type("Widget", (object,), {})()
+        field = ExtDateTimeField("DateReceived", widget=DateTimeWidget())
         field.required = False
         field.mode = "r"
         field.write_permission = "Receive sample"
@@ -145,6 +146,22 @@ class TestNativeRequiredFields(unittest.TestCase):
         self.assertEqual(field.mode, "rw")
         self.assertEqual(field.widget.visible["add"], "edit")
         self.assertEqual(field.write_permission, sampled.write_permission)
+
+    def test_date_label_is_visible_on_edit_and_not_duplicated_on_add(self):
+        field = ExtDateTimeField("DateReceived", widget=DateTimeWidget())
+        field.widget.render_own_label = True
+        context = type("Context", (object,), {})()
+        context.checkCreationFlag = lambda: False
+        modifier = DateReceivedSchemaModifier(context)
+        edit_schema = {"DateReceived": field}
+        modifier.restore_edit_labels(edit_schema)
+        self.assertFalse(edit_schema["DateReceived"].widget.render_own_label)
+        self.assertTrue(field.widget.render_own_label)
+        context.checkCreationFlag = lambda: True
+        add_schema = {"DateReceived": field}
+        modifier.restore_edit_labels(add_schema)
+        self.assertTrue(add_schema["DateReceived"].widget.render_own_label)
+        self.assertFalse(edit_schema["DateReceived"].widget.render_own_label)
 
 
 class TestSchemaOnSample(TrimetaTestCase):
