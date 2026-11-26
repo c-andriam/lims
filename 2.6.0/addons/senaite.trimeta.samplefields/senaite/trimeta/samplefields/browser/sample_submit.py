@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 """La creation d'un lot d'echantillons doit etre atomique."""
 import logging
+import re
 import transaction
 from senaite.trimeta.samplefields.browser.sample_add import SampleAddView
+from senaite.trimeta.samplefields.compat import to_text
 
 logger = logging.getLogger("senaite.trimeta.samplefields")
 
@@ -31,4 +33,23 @@ class TrimetaSampleSubmitView(SampleAddView):
     """Refuse les creations vides et annule tout le lot en cas d'echec."""
 
     def ajax_submit(self):
-        return atomic_submit(super(TrimetaSampleSubmitView, self).ajax_submit)
+        def submit():
+            self.normalize_item_codes()
+            return super(TrimetaSampleSubmitView, self).ajax_submit()
+        return atomic_submit(submit)
+
+    def normalize_item_codes(self):
+        """Le controle obligatoire doit lire la valeur, pas le choix Autre."""
+        form = getattr(self.request, "form", self.request)
+        keys = [key for key in form if re.match(r"^CodeArticle-\d+$", key)]
+        if not keys:
+            return
+        sample = self.get_ar()
+        field = sample.getField("CodeArticle")
+        for key in keys:
+            try:
+                value, _options = field.widget.process_form(
+                    sample, field, {"CodeArticle": form[key] or ""})
+            except IndexError:
+                value = ""
+            form[key] = to_text(value).strip()

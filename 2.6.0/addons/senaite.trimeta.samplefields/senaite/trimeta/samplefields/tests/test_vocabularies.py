@@ -47,6 +47,27 @@ class TestCodeArticleVocabulary(unittest.TestCase):
         keys = [k for k, _label in vocab.CODE_ARTICLE_VOCAB]
         self.assertEqual(keys[-1], "AUTRES")
 
+    def test_dynamic_choices_keep_every_initial_code(self):
+        self.assertEqual(vocab.item_code_choices(), list(vocab.CODE_ARTICLE_VOCAB))
+        initial = [key for key, _label in vocab.CODE_ARTICLE_VOCAB]
+        choices = [key for key, _label in vocab.item_code_choices(['V-NEW'])]
+        self.assertEqual(choices[:-2], initial[:-1])
+        self.assertEqual(choices[-2:], ['V-NEW', 'AUTRES'])
+
+    def test_dynamic_choices_deduplicate_trim_and_ignore_empty_values(self):
+        choices = vocab.item_code_choices(['V-GNN', 'AUTRES', ' V-NEW ', 'V-NEW', '', None])
+        keys = [key for key, _label in choices]
+        self.assertEqual(len(keys), len(set(keys)))
+        self.assertEqual(keys.count('V-NEW'), 1)
+        self.assertNotIn('', keys)
+
+    def test_dynamic_choices_keep_unicode_and_sort_deterministically(self):
+        extras = [u'V-\u00c9CHANTILLON', 'V-Z', 'V-A']
+        first = vocab.item_code_choices(extras)
+        self.assertEqual(first, vocab.item_code_choices(list(reversed(extras))))
+        self.assertIn((u'V-\u00c9CHANTILLON', u'V-\u00c9CHANTILLON'), first)
+        self.assertEqual(first[-1], ('AUTRES', 'AUTRES'))
+
 
 class TestReceptionListsFromSpecification(unittest.TestCase):
     """Condition et emballage: listes imposees par le cahier des charges."""

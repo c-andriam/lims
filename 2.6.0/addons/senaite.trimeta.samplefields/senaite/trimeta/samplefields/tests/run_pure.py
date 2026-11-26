@@ -104,7 +104,10 @@ def install_stubs():
     zope.i18nmessageid = make_module("zope.i18nmessageid",
                                      MessageFactory=MessageFactory)
 
-    make_module("AccessControl", ClassSecurityInfo=lambda: None)
+    class SecurityInfo(object):
+        def declarePublic(self, *names):
+            pass
+    make_module("AccessControl", ClassSecurityInfo=SecurityInfo)
 
     products = make_module("Products")
     archetypes = make_module("Products.Archetypes")

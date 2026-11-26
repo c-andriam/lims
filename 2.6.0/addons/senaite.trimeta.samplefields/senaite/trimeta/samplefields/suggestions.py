@@ -18,6 +18,7 @@ import logging
 
 from BTrees.OOBTree import OOBTree
 from zope.annotation.interfaces import IAnnotations
+from senaite.trimeta.samplefields.compat import to_text
 
 logger = logging.getLogger("senaite.trimeta.samplefields")
 
@@ -56,19 +57,22 @@ SUGGESTION_FIELDS = (
     "LampSerialNumber",
 )
 
+# CodeArticle utilise le selecteur natif, sans memorisation sur simple blur.
+REMEMBERED_FIELDS = SUGGESTION_FIELDS + ("CodeArticle",)
+
 
 def _get_portal():
     from bika.lims import api
     return api.get_portal()
 
 
-def get_storage():
-    """Return the root OOBTree, creating it if needed."""
+def get_storage(create=True):
+    """Magasin partage, sans ecriture lorsque create vaut False."""
     portal = _get_portal()
     annotations = IAnnotations(portal)
-    if annotations.get(STORAGE_KEY) is None:
+    if annotations.get(STORAGE_KEY) is None and create:
         annotations[STORAGE_KEY] = OOBTree()
-    return annotations[STORAGE_KEY]
+    return annotations.get(STORAGE_KEY)
 
 
 def _get_field_bucket(storage, fieldname):
@@ -79,8 +83,10 @@ def _get_field_bucket(storage, fieldname):
 
 def add_suggestion(fieldname, value):
     """Remember a value as a future suggestion for this field."""
-    if fieldname not in SUGGESTION_FIELDS:
+    if fieldname not in REMEMBERED_FIELDS:
         return
+    if fieldname == "CodeArticle":
+        value = to_text(value)
     value = (value or u"").strip()
     if not value:
         return
@@ -92,8 +98,10 @@ def add_suggestion(fieldname, value):
 
 def remove_suggestion(fieldname, value):
     """Remove a suggestion (e.g. via the small 'x' button in the UI)."""
-    if fieldname not in SUGGESTION_FIELDS:
+    if fieldname not in REMEMBERED_FIELDS:
         return
+    if fieldname == "CodeArticle":
+        value = to_text(value).strip()
     storage = get_storage()
     bucket = _get_field_bucket(storage, fieldname)
     if value in bucket:
@@ -102,10 +110,12 @@ def remove_suggestion(fieldname, value):
 
 def list_suggestions(fieldname):
     """Return the sorted list of suggestions for a field."""
-    if fieldname not in SUGGESTION_FIELDS:
+    if fieldname not in REMEMBERED_FIELDS:
         return []
-    storage = get_storage()
-    bucket = _get_field_bucket(storage, fieldname)
+    storage = get_storage(create=False)
+    bucket = storage.get(fieldname) if storage is not None else None
+    if bucket is None:
+        return []
     return sorted(bucket.keys(), key=lambda s: s.lower())
 
 
@@ -120,7 +130,7 @@ def remember_field_values(obj):
     """
     remembered = []
     try:
-        for fieldname in SUGGESTION_FIELDS:
+        for fieldname in REMEMBERED_FIELDS:
             field = obj.getField(fieldname)
             if field is None:
                 # Champ absent du schema: l'objet a ete cree avant

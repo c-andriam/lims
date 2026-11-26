@@ -22,6 +22,7 @@ from archetypes.schemaextender.interfaces import ISchemaModifier
 from bika.lims.interfaces import IAnalysisRequest
 from bika.lims.browser.widgets import DateTimeWidget
 from senaite.core.browser.widgets.referencewidget import ReferenceWidget
+from senaite.core.browser.widgets.selectotherwidget import SelectOtherWidget
 from zope.component import adapts
 from zope.i18nmessageid import MessageFactory
 from zope.interface import implementer
@@ -83,7 +84,7 @@ class DateReceivedSchemaModifier(object):
             owned = getattr(field, "schemata", "") in (
                 "Reception", "Analyse", "AssuranceQualite")
             if name == "DateReceived" or (owned and isinstance(
-                    widget, (DateTimeWidget, ReferenceWidget))):
+                    widget, (DateTimeWidget, ReferenceWidget, SelectOtherWidget))):
                 # ar_add porte deja le libelle dans sa colonne de gauche.
                 # base_edit attend le libelle fourni par le widget.
                 # Les declarations sont partagees entre requetes : isoler

@@ -6,12 +6,13 @@ Designation et Origin sont en texte libre, avec suggestions partagees
 (voir suggestions.py). Received By est une reference vers les contacts
 du laboratoire.
 
-Listes fixes: temperature de reception (15-31 degC), code article, et
-les deux listes imposees par le cahier des charges -- condition de
-l'echantillon et etat de l'emballage.
+Listes fixes: temperature de reception (15-31 degC), condition de
+l'echantillon et etat de l'emballage. Les codes article initiaux sont
+completes par les nouveaux codes memorises apres sauvegarde.
 """
 
 from zope.i18nmessageid import MessageFactory
+from senaite.trimeta.samplefields.compat import to_text
 
 _ = MessageFactory("senaite.trimeta.samplefields")
 
@@ -20,7 +21,7 @@ TEMPERATURE_VOCAB = tuple(
     (str(i), u"{} \u00b0C".format(i)) for i in range(15, 32)
 )
 
-# Code article: liste fixe de codes produit (remplace l'ancien champ
+# Code article: codes produit initiaux (remplace l'ancien champ
 # "Reference de l'echantillon", juge redondant).
 CODE_ARTICLE_VOCAB = (
     ("V-GNN", "V-GNN"),
@@ -31,6 +32,16 @@ CODE_ARTICLE_VOCAB = (
     ("V-LLB", "V-LLB"),
     ("AUTRES", "AUTRES"),
 )
+
+
+def item_code_choices(remembered=()):
+    """Codes livres puis codes memorises, sans doublon, AUTRES en dernier."""
+    known = set(key for key, _label in CODE_ARTICLE_VOCAB)
+    extras = set(to_text(value).strip() for value in remembered or ())
+    extras = sorted((value for value in extras if value and value not in known),
+                    key=lambda value: (value.lower(), value))
+    return (list(CODE_ARTICLE_VOCAB[:-1]) + [(value, value) for value in extras]
+            + list(CODE_ARTICLE_VOCAB[-1:]))
 
 # Condition de l'echantillon (cahier des charges: "conforme - non
 # conforme", champ obligatoire). Les valeurs enregistrees sont les

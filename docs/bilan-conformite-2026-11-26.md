@@ -1,8 +1,8 @@
 # Bilan de suivi des 14 demandes du Word
 
 Reference : texte de `AMELIORATIONS SENAITE LIMS.docx`, paragraphes 1 a 165.
-Base de suivi : code de `main` a `0702d86`, complete par la correction des
-tris de dates du tableau de bord du 26 novembre 2026.
+Base de suivi : code de `main` a `072bc09`, complete par le Code article
+extensible choisi par l'utilisateur le 26 novembre 2026.
 
 Ce bilan actualise le diagnostic initial apres les lots de correction.
 Les statuts ci-dessous reposent sur les declarations, traitements et
@@ -17,8 +17,8 @@ Les chemins courts renvoient au paquet
 
 | Ref | Couverture actuelle | Sources applicatives |
 |---|---|---|
-| D1 | 15 champs Reception obligatoires, contacts laboratoire et choix/suggestions. Temperature 15-31 degC conservee par decision utilisateur. Liste Code article a confirmer. | [extender.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/extender.py#L98), [vocabularies.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/vocabularies.py#L19) |
-| D2 | Numero de fiche et DateReceived obligatoires ; autres champs d'analyse facultatifs ; preparateurs multiples ; ClientReference masque. DateReceived placee dans Analyse. | [extender.getOrder](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/extender.py#L98), [schema_modifier.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/schema_modifier.py#L59) |
+| D1 | 15 champs Reception obligatoires, contacts laboratoire et choix/suggestions. Temperature 15-31 degC conservee par decision utilisateur. Liste Code article conservee et extensible apres sauvegarde, selon le choix utilisateur. | [extender.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/extender.py#L126), [vocabularies.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/vocabularies.py#L20) |
+| D2 | Numero de fiche et DateReceived obligatoires ; autres champs d'analyse facultatifs ; preparateurs multiples ; ClientReference masque. DateReceived placee dans Analyse. | [extender.getOrder](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/extender.py#L469), [schema_modifier.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/schema_modifier.py#L60) |
 | D3 | 41 champs facultatifs dans sept categories ; conformite OK/NOK, nombres 1/2/3, contacts laboratoire, modes de transmission et lots memorises. Position du titre Validation corrigee. | [qualitydata/extender.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/qualitydata/extender.py#L69), [qualitydata/fields.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/qualitydata/fields.py#L54), [quality_sections.js](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/browser/resources/quality_sections.js#L32) |
 | D4 | Code echantillon et Lot ajoutes aux listes d'echantillons et a leurs etats. | [listings/samples.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/listings/samples.py#L31), [listings/configure.zcml](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/listings/configure.zcml#L24) |
 | D5 | Rubriques demandees dans COA-Trimeta ; validation lue dans l'historique ; signataire designe distinct ; coordonnees client sans mail ; precision numerique conservee. Les autres gabarits natifs ne sont pas tous reecrits. | [COA-Trimeta.pt](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/coa/templates/reports/COA-Trimeta.pt#L92), [coa/reportview.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/coa/reportview.py#L51), [coa/validation.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/coa/validation.py#L8) |
@@ -34,9 +34,9 @@ Les chemins courts renvoient au paquet
 
 ## Ce qui reste a decider ou a receptionner
 
-1. **Code article** : le Word n'impose aucune liste de codes. Le choix entre
-   liste actuelle et ajout de nouveaux codes reste a confirmer ; la liste
-   existante n'est pas modifiee pendant cette attente.
+1. **Code article — decision recue** : l'utilisateur conserve les sept codes
+   actuels et permet des ajouts memorises. Les deux possibilites sont
+   implementees ensemble ; voir [Code article extensible](correction-code-article-extensible.md).
 2. **Adresse mail sur le COA** : le mail du contact client est retire du
    gabarit Trimeta. Le pied de page natif du laboratoire reste conserve.
    Supprimer aussi le mail du laboratoire ou modifier tous les autres

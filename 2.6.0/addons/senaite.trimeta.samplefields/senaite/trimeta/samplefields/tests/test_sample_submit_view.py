@@ -106,6 +106,25 @@ class TestSampleSubmitView(unittest.TestCase):
         self.assertEqual(self.view.ajax_submit(), result)
         self.assertNotIn("probe", self.root)
 
+    def test_item_code_other_value_is_normalized_before_required_check(self):
+        from senaite.trimeta.samplefields.extender import ItemCodeField
+        from senaite.core.browser.widgets.selectotherwidget import SelectOtherWidget
+        from senaite.core.z3cform.widgets.selectother.widget import OTHER_OPTION_VALUE
+        field = ItemCodeField('CodeArticle', required=True, widget=SelectOtherWidget())
+        sample = type('Sample', (object,), {'getField': lambda self, name: field})()
+        self.view.get_ar = lambda: sample
+        self.view.request.update({'CodeArticle-0':[OTHER_OPTION_VALUE, '  V-NEW  '],
+                                  'CodeArticle-1':[OTHER_OPTION_VALUE, '  '],
+                                  'CodeArticle-2':[OTHER_OPTION_VALUE],
+                                  'CodeArticle-3':['V-GNN'],
+                                  'Designation-0':'Preserve'})
+        self.view.normalize_item_codes()
+        self.assertEqual(self.view.request['CodeArticle-0'], 'V-NEW')
+        self.assertEqual(self.view.request['CodeArticle-1'], '')
+        self.assertEqual(self.view.request['CodeArticle-2'], '')
+        self.assertEqual(self.view.request['CodeArticle-3'], 'V-GNN')
+        self.assertEqual(self.view.request['Designation-0'], 'Preserve')
+
 
 def test_suite():
     return unittest.defaultTestLoader.loadTestsFromTestCase(TestSampleSubmitView)

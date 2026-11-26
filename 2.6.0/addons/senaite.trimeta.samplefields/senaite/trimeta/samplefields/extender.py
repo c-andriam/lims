@@ -13,11 +13,13 @@ dynamique et partagee (voir suggestions.py + browser/suggestions_api.py
 Sample Condition et Packaging Condition suivent les listes imposees par
 le cahier des charges; l'emballage accepte "Autre..." en saisie libre.
 
-Reception Temperature et Item Code (ex-Sample Reference) restent des
-listes deroulantes strictes. Received By est une reference dynamique
+Reception Temperature reste une liste deroulante stricte. Item Code
+garde ses codes initiaux et accepte des ajouts memorises apres sauvegarde.
+Received By est une reference dynamique
 vers les LabContacts existants.
 """
 
+import logging
 from AccessControl import ClassSecurityInfo
 from Products.Archetypes.public import (
     StringField,
@@ -42,8 +44,10 @@ from senaite.core.catalog import CONTACT_CATALOG
 
 from senaite.trimeta.samplefields import vocabularies as vocab
 from senaite.trimeta.samplefields import PRODUCT_NAME
+from senaite.trimeta.samplefields.compat import to_text
 
 _ = MessageFactory("senaite.trimeta.samplefields")
+logger = logging.getLogger("senaite.trimeta.samplefields")
 
 # Visibilite explicite requise pour que nos champs apparaissent dans la
 # grille "Request new analyses" (mode 'add'). Sans cela, les widgets AT
@@ -61,6 +65,30 @@ ADD_VISIBLE = {
 class ExtStringField(ExtensionField, StringField):
     """Champ texte extensible."""
     security = ClassSecurityInfo()
+
+
+class ItemCodeField(ExtStringField):
+    """Liste extensible dont la valeur stockee reste une chaine."""
+    security = ClassSecurityInfo()
+    security.declarePublic("Vocabulary")
+
+    def Vocabulary(self, content_instance=None):
+        remembered = []
+        if content_instance is not None:
+            try:
+                from senaite.trimeta.samplefields.suggestions import list_suggestions
+                remembered = list_suggestions("CodeArticle")
+            except Exception:
+                logger.exception("Codes article memorises indisponibles")
+        return vocab.as_displaylist(vocab.item_code_choices(remembered))
+
+    def validate(self, value, instance, *args, **kwargs):
+        return super(ItemCodeField, self).validate(
+            to_text(value).strip(), instance, *args, **kwargs)
+
+    def set(self, instance, value, **kwargs):
+        return super(ItemCodeField, self).set(
+            instance, to_text(value).strip(), **kwargs)
 
 
 class ExtFixedPointField(ExtensionField, FixedPointField):
@@ -108,14 +136,16 @@ class ReceptionFieldsExtender(object):
 
         # 2. Code article (remplace l'ancien "Sample Reference", juge
         # redondant avec un autre champ)
-        ExtStringField(
+        ItemCodeField(
             "CodeArticle",
             required=True,
+            enforceVocabulary=False,
             vocabulary=vocab.as_displaylist(vocab.CODE_ARTICLE_VOCAB),
             schemata="Reception",
-            widget=SelectionWidget(
+            widget=SelectOtherWidget(
                 visible=ADD_VISIBLE,
-                format="select",
+                render_own_label=True,
+                macro_view="widgets/string",
                 label=_(u"Item Code"),
             ),
         ),
