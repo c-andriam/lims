@@ -63,3 +63,10 @@ de `VAN-0006` sont conservés.
 
 Les 6 contrôles ciblés des classes natives passent. `make test` est également
 tenté : le lanceur Plone complet reste absent de l'image locale.
+
+Complément du 26 novembre : le modèle en lignes reprend désormais les six
+informations du modèle en colonnes, avec leurs libellés : client, type
+d'échantillon, identifiant, code échantillon, date d'échantillonnage avec heure
+et date de réception. Le résumé compact natif omettait la date d'échantillonnage.
+La présence des six champs et des décimales est vérifiée dans les deux pages
+d'impression, sans changement des styles natifs.

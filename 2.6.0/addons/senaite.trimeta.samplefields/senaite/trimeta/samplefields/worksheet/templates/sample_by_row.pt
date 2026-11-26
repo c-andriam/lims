@@ -81,14 +81,20 @@
                  data-addQuietZone='true'
                  tal:attributes="data-id ar/id"></div>
             <div class="arinfo">
+              <div><span i18n:translate="">Sample</span>:
+                <a tal:attributes="href ar/sample/url" tal:content="ar/sample/id"></a></div>
               <div><span tal:content="view/sample_code_label" i18n:translate=""></span>:
                 <span tal:content="ar/sample/sample_code"></span></div>
-              <a tal:attributes="href ar/client/url"
-                 tal:content="ar/client/name"></a><br/>
-              <a tal:attributes="href ar/sample/sample_type/url"
-                 tal:content="ar/sample/sample_type/title"
-                 tal:condition="ar/sample/sample_type"></a><br/>
-              <span tal:content="ar/date_received"></span>
+              <div><span i18n:translate="">Client</span>:
+                <a tal:attributes="href ar/client/url" tal:content="ar/client/name"></a></div>
+              <div><span i18n:translate="">Sample Type</span>:
+                <a tal:attributes="href ar/sample/sample_type/url"
+                   tal:content="ar/sample/sample_type/title"
+                   tal:condition="ar/sample/sample_type"></a></div>
+              <div><span i18n:translate="">Sampling Date</span>:
+                <span tal:content="ar/sample/date_sampled"></span></div>
+              <div><span i18n:translate="">Date received</span>:
+                <span tal:content="ar/date_received"></span></div>
             </div>
           </td>
           <tal:results repeat="antitle anst">
