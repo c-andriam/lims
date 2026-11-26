@@ -219,6 +219,10 @@ class DashboardView(ListingView):
             descending = self.get_sort_order() == "descending"
             if sort_on == cols.SAMPLE_TYPE_SORT:
                 return sorting.sort_sample_types(brains, descending)
+            if sort_on == cols.VALIDATION_SORT:
+                return sorting.sort_validation_dates(brains, descending)
+            if sort_on == cols.DATE_RECEIVED_SORT:
+                return sorting.sort_received_dates(brains, descending)
             keywords = self.get_column_keywords().get(cols.VANILLIN_COLUMN, [])
             sample_ids = [getattr(brain, "getId", "") for brain in brains]
             results = fetch_results(api.get_tool(ANALYSIS_CATALOG), sample_ids, keywords)
@@ -267,7 +271,9 @@ class DashboardView(ListingView):
             self._page_ids.append(sample_id)
 
             for key, attr in cols.get_metadata_map().items():
-                item[key] = self.format_value(getattr(obj, attr, ""))
+                value = (sorting.current_validation_date(obj)
+                         if key == "DateVerified" else getattr(obj, attr, ""))
+                item[key] = self.format_value(value)
         except Exception:
             logger.exception("Ligne %s incomplete", index)
         return item

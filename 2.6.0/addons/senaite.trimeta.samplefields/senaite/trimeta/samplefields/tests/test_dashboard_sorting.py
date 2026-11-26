@@ -4,6 +4,9 @@ import unittest
 
 from senaite.trimeta.samplefields.dashboard.sorting import sort_sample_types
 from senaite.trimeta.samplefields.dashboard.sorting import sort_vanillin
+from senaite.trimeta.samplefields.dashboard.sorting import current_validation_date
+from senaite.trimeta.samplefields.dashboard.sorting import sort_validation_dates
+from senaite.trimeta.samplefields.dashboard.sorting import sort_received_dates
 from senaite.trimeta.samplefields.dashboard.results import group_by_sample
 from senaite.trimeta.samplefields.tests.test_dashboard import FakeBrain
 
@@ -70,6 +73,33 @@ class TestDashboardSorting(unittest.TestCase):
     def test_empty_selection(self):
         self.assertEqual(sort_vanillin([], {}, ['VAN']), [])
         self.assertEqual(sort_sample_types([]), [])
+
+    def test_validation_sort_keeps_unvalidated_samples_in_both_directions(self):
+        for brain, state, date in zip(self.brains,
+                                      ['sample_received', 'published', 'verified'],
+                                      [99, 2, 1]):
+            brain.review_state = state
+            brain.getDateVerified = date
+        self.assertEqual(ids(sort_validation_dates(self.brains)), ['S2', 'S1', 'S3'])
+        self.assertEqual(ids(sort_validation_dates(self.brains, True)), ['S1', 'S2', 'S3'])
+        self.assertIsNone(current_validation_date(self.brains[0]))
+
+    def test_absent_validation_metadata_stays_empty(self):
+        brain = SampleBrain('S1')
+        for state in ('verified', 'published', 'sample_due', 'invalid', ''):
+            brain.review_state = state
+            self.assertIsNone(current_validation_date(brain))
+        brain.getDateVerified = 1
+        brain.review_state = 'sample_received'
+        self.assertIsNone(current_validation_date(brain))
+
+    def test_received_dates_keep_missing_values_and_stable_ties(self):
+        self.brains[0].getDateReceived = None
+        self.brains[1].getDateReceived = 1
+        self.brains[2].getDateReceived = 1
+        for descending in (False, True):
+            self.assertEqual(ids(sort_received_dates(self.brains, descending)),
+                             ['S1', 'S2', 'S3'])
 
     def test_non_latin_type_names_are_not_treated_as_missing(self):
         brains = [SampleBrain('S1', ''), SampleBrain('S2', u'\u9999\u8349'),

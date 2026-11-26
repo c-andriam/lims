@@ -5,6 +5,7 @@ import unicodedata
 from senaite.trimeta.samplefields.compat import to_text
 from senaite.trimeta.samplefields.dashboard.results import pick_result
 from senaite.trimeta.samplefields.dashboard.results import to_number
+from senaite.trimeta.samplefields.coa.validation import VALIDATED_STATES
 
 
 def stable_id(brain):
@@ -33,6 +34,22 @@ def sort_sample_types(brains, descending=False):
         value = u"".join(c for c in text if not unicodedata.combining(c))
         return value or None
     return sort_values(brains, value_for, descending)
+
+
+def current_validation_date(brain):
+    """Une ancienne validation n'est pas la validation d'un etat provisoire."""
+    if getattr(brain, "review_state", "") not in VALIDATED_STATES:
+        return None
+    return getattr(brain, "getDateVerified", None) or None
+
+
+def sort_validation_dates(brains, descending=False):
+    return sort_values(brains, current_validation_date, descending)
+
+
+def sort_received_dates(brains, descending=False):
+    return sort_values(brains, lambda brain: getattr(
+        brain, "getDateReceived", None) or None, descending)
 
 
 def sort_vanillin(brains, results, keywords, descending=False):

@@ -23,7 +23,7 @@ class SampleCatalog(object):
         self.queries = []
 
     def indexes(self):
-        return ['created']
+        return ['created', 'getDateReceived', 'getDateVerified']
 
     def __call__(self, query):
         self.queries.append(query)
@@ -82,6 +82,28 @@ class TestDashboardViewSorting(unittest.TestCase):
             query = self.view.get_catalog_query()
             self.assertEqual(query['sort_on'], 'created')
             self.assertEqual(self.view.manual_sort_on, criterion)
+
+    def test_validation_sort_preserves_all_pages_and_total(self):
+        for brain, state, date in zip(self.samples.brains,
+                                      ['sample_received', 'published', 'verified'],
+                                      [99, 2, 1]):
+            brain.review_state = state
+            brain.getDateVerified = date
+        self.select_sort(columns.VALIDATION_SORT)
+        self.assertEqual(ids(self.view._fetch_brains(0)), ['S3', 'S2'])
+        self.assertEqual(ids(self.view._fetch_brains(2)), ['S1'])
+        self.assertEqual(self.view.total, 3)
+        self.assertEqual(self.samples.queries[0]['sort_on'], 'created')
+        self.assertEqual(self.analyses.queries, [])
+
+    def test_received_date_sort_preserves_missing_dates(self):
+        self.samples.brains[0].getDateReceived = None
+        self.samples.brains[1].getDateReceived = 2
+        self.samples.brains[2].getDateReceived = 1
+        self.select_sort(columns.DATE_RECEIVED_SORT, 'descending')
+        self.assertEqual(ids(self.view._fetch_brains(0)), ['S2', 'S3'])
+        self.assertEqual(ids(self.view._fetch_brains(2)), ['S1'])
+        self.assertEqual(self.view.total, 3)
 
 
 def test_suite():

@@ -11,11 +11,9 @@ visible d'un coup d'oeil:
 - `analysis`  resultat d'analyse: rempli en UNE requete groupee pour
               toute la page (voir results.py).
 
-Seules les colonnes adossees a un INDEX sont declarees triables.
-senaite.app.listing trie via le catalogue: proposer le tri sur une
-colonne qui n'a pas d'index donnerait un en-tete cliquable qui ne trie
-rien -- pire qu'un en-tete inerte, parce que l'utilisateur croit que
-le tri a eu lieu.
+Les tris utilisent un index ou sort_brains(), avant pagination.
+Les dates passent par ce second chemin : le tri DateIndex natif
+ecarte les echantillons dont la date est absente.
 """
 
 import collections
@@ -86,7 +84,10 @@ VANILLIN_COLUMN = "Vanillin"
 # sans ajouter d'index ni recopier les resultats sur l'echantillon.
 SAMPLE_TYPE_SORT = "getSampleTypeTitle"
 VANILLIN_SORT = "trimeta_vanillin"
-MANUAL_SORTS = (SAMPLE_TYPE_SORT, VANILLIN_SORT)
+DATE_RECEIVED_SORT = "getDateReceived"
+VALIDATION_SORT = "getDateVerified"
+MANUAL_SORTS = (SAMPLE_TYPE_SORT, VANILLIN_SORT,
+                DATE_RECEIVED_SORT, VALIDATION_SORT)
 
 
 def get_keywords():

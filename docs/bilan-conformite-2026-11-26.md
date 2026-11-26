@@ -1,8 +1,8 @@
 # Bilan de suivi des 14 demandes du Word
 
 Reference : texte de `AMELIORATIONS SENAITE LIMS.docx`, paragraphes 1 a 165.
-Base de suivi : code de `main` a `9a55b0c`, complete par la correction de
-position des categories Assurance Qualite du 26 novembre 2026.
+Base de suivi : code de `main` a `0702d86`, complete par la correction des
+tris de dates du tableau de bord du 26 novembre 2026.
 
 Ce bilan actualise le diagnostic initial apres les lots de correction.
 Les statuts ci-dessous reposent sur les declarations, traitements et
@@ -19,7 +19,7 @@ Les chemins courts renvoient au paquet
 |---|---|---|
 | D1 | 15 champs Reception obligatoires, contacts laboratoire et choix/suggestions. Temperature 15-31 degC conservee par decision utilisateur. Liste Code article a confirmer. | [extender.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/extender.py#L98), [vocabularies.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/vocabularies.py#L19) |
 | D2 | Numero de fiche et DateReceived obligatoires ; autres champs d'analyse facultatifs ; preparateurs multiples ; ClientReference masque. DateReceived placee dans Analyse. | [extender.getOrder](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/extender.py#L98), [schema_modifier.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/schema_modifier.py#L59) |
-| D3 | 41 champs facultatifs dans sept categories ; conformite OK/NOK, nombres 1/2/3, contacts laboratoire, modes de transmission et lots memorises. Position du titre Validation corrigee dans ce lot. | [qualitydata/extender.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/qualitydata/extender.py#L69), [qualitydata/fields.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/qualitydata/fields.py#L54), [quality_sections.js](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/browser/resources/quality_sections.js#L32) |
+| D3 | 41 champs facultatifs dans sept categories ; conformite OK/NOK, nombres 1/2/3, contacts laboratoire, modes de transmission et lots memorises. Position du titre Validation corrigee. | [qualitydata/extender.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/qualitydata/extender.py#L69), [qualitydata/fields.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/qualitydata/fields.py#L54), [quality_sections.js](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/browser/resources/quality_sections.js#L32) |
 | D4 | Code echantillon et Lot ajoutes aux listes d'echantillons et a leurs etats. | [listings/samples.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/listings/samples.py#L31), [listings/configure.zcml](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/listings/configure.zcml#L24) |
 | D5 | Rubriques demandees dans COA-Trimeta ; validation lue dans l'historique ; signataire designe distinct ; coordonnees client sans mail ; precision numerique conservee. Les autres gabarits natifs ne sont pas tous reecrits. | [COA-Trimeta.pt](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/coa/templates/reports/COA-Trimeta.pt#L92), [coa/reportview.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/coa/reportview.py#L51), [coa/validation.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/coa/validation.py#L8) |
 | D6 | Deux historiques separes, Pannes et Entretiens, utilisant les interventions natives Repair et Preventive. Il s'agit de listes structurees, plutot que de deux zones de texte. | [equipment_history.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/equipment_history.py#L13), [browser/equipment_history.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/browser/equipment_history.py#L15) |
@@ -28,7 +28,7 @@ Les chemins courts renvoient au paquet
 | D9 | Repetitions variables, deux au minimum, moyenne automatique, controles de saisie et de concurrence. Calculs personnalises existants conserves. | [repetitions.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/repetitions.py#L33), [browser/repetitions.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/browser/repetitions.py#L83), [defaults.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/defaults.py#L75) |
 | D10 | Noms PDF fondes sur SampleCode, assainis, avec repli pour les anciens echantillons sans code. Suffixes uniques dans les archives. | [coa/filename.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/coa/filename.py#L37), [coa/configure.zcml](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/coa/configure.zcml#L67) |
 | D11 | Gabarit unitaire propose a la place des deux valeurs Multi d'usine ; telechargement groupe raccorde aux PDF stockes, sans mutation des objets. Les gabarits groupes choisis explicitement restent disponibles. | [defaults.set_default_coa_template](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/defaults.py#L75), [coa/workflow.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/coa/workflow.py#L59) |
-| D12 | 20 colonnes, six familles de filtres, recherche, ordre des operateurs et tri global Type/Vanilline avant pagination. Meme resultat effectif pour afficher, filtrer et trier. | [dashboard/view.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/dashboard/view.py#L77), [dashboard/columns.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/dashboard/columns.py#L226), [dashboard/results.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/dashboard/results.py#L130) |
+| D12 | 20 colonnes, six familles de filtres, recherche, ordre des operateurs et tri global Type/Vanilline et tris des dates avant pagination. Meme resultat effectif pour afficher, filtrer et trier. | [dashboard/view.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/dashboard/view.py#L77), [dashboard/columns.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/dashboard/columns.py#L227), [dashboard/results.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/dashboard/results.py#L130) |
 | D13 | CSV classique et transpose, positions et resultats, precision conservee et noms explicites. Le Word ne decrit le bug initial que par une URL : la cloture de ce symptome exact reste a confirmer par le laboratoire. | [worksheet/views.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/worksheet/views.py#L35), [worksheet/export.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/worksheet/export.py#L46), [worksheet_csv.js](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/browser/resources/worksheet_csv.js#L2) |
 | D14 | SampleCode et Lot dans la liste/export des rapports ; liens exportables en texte, sans HTML dans la colonne Info. | [listings/reports.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/listings/reports.py#L61) |
 
@@ -60,6 +60,11 @@ Les chemins courts renvoient au paquet
 Les choix qualite 1/2/3 proviennent explicitement du Word. Ils ne limitent
 pas le nombre de repetitions de mesures, qui est variable depuis la demande
 ulterieure de l'utilisateur. La temperature 15-31 degC est un choix confirme.
+
+Les tris Reception et Validation conservent les echantillons sans date,
+places en dernier dans les deux sens. La date de validation actuelle est
+vide dans un etat provisoire, meme en presence d'un ancien evenement de
+validation dans l'historique. Voir la [correction des tris de dates](correction-tri-dates-tableau-de-bord.md).
 
 L'etat dans la liste des rapports correspond a celui de l'echantillon.
 Date de generation et Genere par decrivent le fichier ; un rapport provisoire
