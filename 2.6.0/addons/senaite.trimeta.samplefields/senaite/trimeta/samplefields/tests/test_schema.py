@@ -110,6 +110,22 @@ class TestExtenderDeclaration(unittest.TestCase):
         declared = {f.getName() for f in ReceptionFieldsExtender.fields}
         self.assertEqual(ordered, declared)
 
+    def test_received_date_moves_once_without_losing_native_fields(self):
+        extender = ReceptionFieldsExtender(None)
+        original = {
+            "default": ["Client", "DateSampled", "DateReceived", "Remarks"],
+            "AssuranceQualite": ["HPLCDate", "FinalValidator"],
+        }
+        ordered = extender.getOrder(original)
+        self.assertEqual(ordered["Analyse"][:3],
+                         ["AnalysisSheetNumber", "DateReceived", "AnalysisStart"])
+        self.assertEqual(ordered["default"], ["Client", "DateSampled", "Remarks"])
+        self.assertEqual(ordered["AssuranceQualite"], ["HPLCDate", "FinalValidator"])
+        all_names = [n for names in ordered.values() for n in names]
+        self.assertEqual(all_names.count("DateReceived"), 1)
+        before = dict((key, list(value)) for key, value in ordered.items())
+        self.assertEqual(extender.getOrder(ordered), before)
+
 
 class TestNativeRequiredFields(unittest.TestCase):
 

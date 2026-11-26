@@ -447,6 +447,14 @@ class ReceptionFieldsExtender(object):
             f.getName() for f in self.fields
             if f.schemata == "Analyse"
         ]
+        # DateReceived est natif : on le deplace, sans creer de doublon.
+        # schemaextender applique cet ordre avant les modificateurs.
+        has_received_date = any(
+            "DateReceived" in names for names in schematas.values())
+        if has_received_date:
+            for name, names in list(schematas.items()):
+                schematas[name] = [n for n in names if n != "DateReceived"]
+            analyse_fields.insert(1, "DateReceived")
         schematas["Reception"] = reception_fields
         schematas["Analyse"] = analyse_fields
         return schematas
