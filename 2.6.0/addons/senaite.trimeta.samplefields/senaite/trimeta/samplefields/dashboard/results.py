@@ -96,35 +96,22 @@ def in_range(value, minimum=None, maximum=None):
     return True
 
 
-def _is_better(candidate, current):
-    """Des deux analyses, laquelle doit alimenter la case du tableau ?
+CONFLICT = u"Reprises \u00e0 v\u00e9rifier"
 
-    Un echantillon peut porter plusieurs analyses pour un meme mot-cle
-    -- une reprise (retest) apres un premier resultat. La regle:
 
-    1. un resultat renseigne l'emporte toujours sur une case vide;
-    2. entre deux resultats renseignes, le plus recemment saisi gagne;
-    3. a defaut de date exploitable, le dernier rencontre gagne.
-
-    `candidate` et `current` sont des couples (resultat, date de saisie).
-    """
-    new_result, new_date = candidate
-    old_result, old_date = current
-
-    if bool(new_result) != bool(old_result):
-        return bool(new_result)
-
-    if new_date is None or old_date is None:
-        # Sans date des deux cotes, on ne peut pas trancher sur la
-        # fraicheur: on garde le dernier vu, ce qui suit l'ordre de tri
-        # rendu par le catalogue.
-        return True
+def capture_rank(date):
+    """Classe les dates Zope et horodatages numeriques dans le meme ordre."""
+    if hasattr(date, "timeTime"):
+        date = date.timeTime()
+    if isinstance(date, string_types):
+        return (False, 0)
     try:
-        return new_date >= old_date
-    except TypeError:
-        # Types de date incomparables (Python 3 refuse ce que Python 2
-        # acceptait). On ne devine pas: dernier vu.
-        return True
+        stamp = float(date)
+    except (TypeError, ValueError, OverflowError):
+        return (False, 0)
+    if math.isnan(stamp) or math.isinf(stamp):
+        return (False, 0)
+    return (True, stamp)
 
 
 def group_by_sample(brains, keywords=None):
@@ -148,17 +135,16 @@ def group_by_sample(brains, keywords=None):
         operand = getattr(brain, "getTrimetaDetectionLimitOperand", "")
         if result and operand in ("<", ">") and not result.startswith(("<", ">")):
             result = operand + result
-        candidate = (
-            result,
-            getattr(brain, "getResultCaptureDate", None),
-        )
+        rank = (bool(result), capture_rank(getattr(brain, "getResultCaptureDate", None)))
         key = (sample_id, keyword)
         current = best.get(key)
-        if current is None or _is_better(candidate, current):
-            best[key] = candidate
+        if current is None or rank > current[0]:
+            best[key] = (rank, result)
+        elif rank == current[0] and result != current[1]:
+            best[key] = (rank, CONFLICT)
 
     grouped = {}
-    for (sample_id, keyword), (result, _date) in best.items():
+    for (sample_id, keyword), (_rank, result) in best.items():
         grouped.setdefault(sample_id, {})[keyword] = result
     return grouped
 

@@ -36,6 +36,10 @@ Les chemins ci-dessous sont relatifs au paquet `senaite/trimeta/samplefields`. L
 
 ## Décision de livraison
 
+**Suivi du correctif A3.** Le tableau de bord privilégie les résultats renseignés, puis la date de saisie exploitable la plus récente. Si les valeurs enregistrées à cette priorité sont identiques, il conserve la valeur. Si elles diffèrent et que leurs dates sont égales ou toutes absentes, la cellule affiche « Reprises à vérifier ». Ce libellé se retrouve dans le CSV du tableau. Les filtres numériques écartent ces conflits et le tri numérique les place après les valeurs comparables dans les deux sens.
+
+Les 321 contrôles de logique ont réussi, dont la vérification des permutations de reprises. Un contrôle sur copie isolée a confirmé la prise en compte des dates natives du catalogue, la priorité du résultat daté, le signalement du conflit et son classement.
+
 **Suivi du correctif A2.** Lorsqu’une plage de vanilline est demandée, une panne du catalogue interrompt la recherche. La page renvoie un message invitant à recharger le tableau et les requêtes AJAX reçoivent une erreur HTTP 503 sans lignes exportables. Une recherche réussie sans correspondance conserve son résultat vide normal.
 
 Sur copie isolée, la panne simulée a produit le statut 503 pour les deux parcours. Après rétablissement du catalogue, une plage de 1 à 3 a retrouvé VAN-0006, une plage sans correspondance a renvoyé zéro ligne et le retrait du filtre a supprimé la restriction. Les 321 contrôles de logique ont réussi.

@@ -190,13 +190,23 @@ class TestGroupBySample(unittest.TestCase):
         self.assertEqual(group_by_sample(brains),
                          {"VAN-0001": {"VAN": "2.4"}})
 
-    def test_missing_dates_keep_the_last_seen(self):
-        brains = [
-            FakeBrain("VAN-0001", "VAN", "2.1"),
-            FakeBrain("VAN-0001", "VAN", "2.4"),
+    def test_retests_do_not_depend_on_catalog_order(self):
+        from itertools import permutations
+        from senaite.trimeta.samplefields.dashboard.results import CONFLICT
+        cases = [
+            ([(None, "8"), (100, "2"), (200, "")], "2"),
+            ([(None, "8"), (None, "2")], CONFLICT),
+            ([(100, "8"), (100, "2"), (100, "2")], CONFLICT),
+            ([(100, "8"), (100, "2"), (200, "3")], "3"),
+            ([(None, "0"), (None, "0")], "0"),
         ]
-        self.assertEqual(group_by_sample(brains),
-                         {"VAN-0001": {"VAN": "2.4"}})
+        for entries, expected in cases:
+            for order in permutations(entries):
+                rows = [FakeBrain("S1", "VAN", result, captured=date)
+                        for date, result in order]
+                self.assertEqual(group_by_sample(rows)["S1"]["VAN"], expected)
+                matches = sample_ids_in_range(FakeCatalog(rows), "VAN", 0, 10)
+                self.assertEqual(matches, [] if expected == CONFLICT else ["S1"])
 
 
 class TestFetchResults(unittest.TestCase):
