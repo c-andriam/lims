@@ -90,7 +90,7 @@ SUGGESTIONS_SCRIPT_TAG = (
 
 # A incrementer a chaque modification de field_suggestions.js: le
 # navigateur garde sinon l'ancienne version en cache.
-SUGGESTIONS_SCRIPT_VERSION = 3
+SUGGESTIONS_SCRIPT_VERSION = 4
 
 
 class FieldSuggestionsViewlet(TrimetaViewletBase):

@@ -36,6 +36,10 @@ Les chemins ci-dessous sont relatifs au paquet `senaite/trimeta/samplefields`. L
 
 ## Décision de livraison
 
+**Suivi du correctif A1.** L’API vérifie désormais le droit Plone « Manage portal » sur le portail et le jeton natif avant toute écriture directe. Le formulaire transmet ce jeton pour retirer une suggestion. Les opérateurs alimentent la liste en enregistrant un échantillon. La sortie de champ et la touche Entrée ne déclenchent plus d’écriture anticipée, ce qui traite également le mécanisme signalé en A4.
+
+Sur copie isolée, le gestionnaire a pu ajouter puis retirer une valeur avec son jeton. Les écritures sans jeton ou avec un jeton invalide ont été refusées. Un lecteur muni de son propre jeton a pu consulter les suggestions et sa tentative de suppression a été refusée. La vérification a contrôlé la valeur stockée après chaque refus.
+
 Au cours de cet audit, 321 contrôles de logique Python ont réussi. La commande d’intégration Plone a été lancée et s’est arrêtée faute de lanceur dans l’image locale. Les contrôles locaux ne couvrent donc pas toute l’installation.
 
 Traiter en premier A1 à A3. Pour A4 à A6, corriger les écarts ou documenter leur acceptation par le responsable métier avant livraison. La décision finale nécessite une recette sur une instance représentative avec les profils réels, un export multi-échantillons dont chaque PDF est comparé à sa source, et la vérification de la version déployée et du profil GenericSetup 1012. L’audit porte sur les améliorations demandées et ne vaut pas certification de toute la plateforme.

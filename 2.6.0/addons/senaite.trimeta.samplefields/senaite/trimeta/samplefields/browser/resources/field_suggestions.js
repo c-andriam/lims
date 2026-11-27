@@ -14,6 +14,7 @@
 
   var SCRIPT_ID = "trimeta-suggestions-script";
   var cache = {};
+  var managementToken = null;
 
   function getFields() {
     return window.TRIMETA_SUGGEST_FIELDS || [];
@@ -45,7 +46,9 @@
       var items = [];
       if (xhr.status === 200) {
         try {
-          items = JSON.parse(xhr.responseText).suggestions || [];
+          var response = JSON.parse(xhr.responseText);
+          items = response.suggestions || [];
+          managementToken = response.token || null;
         } catch (e) {
           items = [];
         }
@@ -66,11 +69,16 @@
     xhr.open("POST", getApiUrl(), true);
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     xhr.onload = function () {
+      if (xhr.status !== 200) {
+        window.alert("La modification de la suggestion a echoue.");
+        return;
+      }
       delete cache[fieldname];
       if (callback) { callback(); }
     };
     xhr.send("action=" + action + "&field=" + encodeURIComponent(fieldname) +
-             "&value=" + encodeURIComponent(value));
+             "&value=" + encodeURIComponent(value) +
+             "&_authenticator=" + encodeURIComponent(managementToken));
   }
 
   function closeAllDropdowns() {
@@ -164,7 +172,7 @@
           remove.style.visibility = "hidden";
         };
         row.appendChild(label);
-        row.appendChild(remove);
+        if (managementToken) { row.appendChild(remove); }
         dropdown.appendChild(row);
       });
 
@@ -223,12 +231,9 @@
     }
   });
 
-  // Une valeur validee (champ quitte ou Entree) devient une suggestion
-  // pour tous les postes, sans attendre l'enregistrement du formulaire.
   document.addEventListener("focusout", function (e) {
     var fieldname = fieldFor(e.target);
     if (fieldname) {
-      postSuggestion("add", fieldname, e.target.value);
       // Delai: laisse un clic sur une suggestion aboutir avant fermeture.
       setTimeout(function () {
         closeDropdownsNotFor(document.activeElement);
@@ -241,9 +246,7 @@
     if (!fieldname) {
       return;
     }
-    if (e.key === "Enter") {
-      postSuggestion("add", fieldname, e.target.value);
-    } else if (e.key === "Escape") {
+    if (e.key === "Escape") {
       closeAllDropdowns();
     }
   });
