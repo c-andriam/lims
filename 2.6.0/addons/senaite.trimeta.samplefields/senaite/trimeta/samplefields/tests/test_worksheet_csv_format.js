@@ -67,12 +67,16 @@ async function testDownload() {
   await new Promise(resolve => setImmediate(resolve));
   assert.strictEqual(downloads[1].download, "WS-001-transposee.csv");
   button("Analysis-other");
-  assert(!click(link("blob:other", "download.csv")).prevented);
+  assert(click(link("blob:other", "Clients-LIMS-2026-11-27.csv")).prevented);
+  await new Promise(resolve => setImmediate(resolve));
+  assert.strictEqual(downloads[2].download, "Clients-LIMS-2026-11-27.csv");
   button("Analysis-analyses_classic_view");
   assert(!click(link("blob:pdf", "report.pdf")).prevented);
   timers.filter(timer => timer.delay === 0).forEach(timer => timer.callback());
   assert(!click(link("blob:later", "download.csv")).prevented);
-  assert.strictEqual(fetched.length, 2);
+  button("");
+  assert(!click(link("blob:not-a-listing", "download.csv")).prevented);
+  assert.strictEqual(fetched.length, 3);
   assert.deepStrictEqual(alerts, []);
   const completed = downloads.length;
   root.fetch = () => Promise.resolve({ok:true, text:() => Promise.resolve('"unfinished')});
@@ -83,5 +87,5 @@ async function testDownload() {
   assert.strictEqual(alerts.length, 1);
 }
 
-testDownload().then(() => console.log("Worksheet CSV: quotes, unicode, multiline, precision and scoped downloads OK"))
+testDownload().then(() => console.log("Listing CSV: quotes, unicode, multiline, precision and scoped downloads OK"))
   .catch(error => { console.error(error); process.exitCode = 1; });

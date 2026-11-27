@@ -1,5 +1,8 @@
 # D13 : guillemets et caracteres speciaux dans les CSV de Work Sheet
 
+Suite : le [correctif commun aux listes](correction-csv-toutes-listes.md)
+etend ce traitement aux autres exports CSV natifs avec la ressource `?v=2`.
+
 ## Defaut confirme dans le code natif
 
 Le JavaScript installe de `senaite.app.listing` construit les cellules et

@@ -1,5 +1,5 @@
 // Le CSV natif utilise JSON.stringify au lieu de l'echappement CSV.
-// Convertir uniquement les exports des deux grilles de Work Sheet.
+// Convertir les exports CSV des listes natives, dont les Work Sheets.
 (function (root) {
   "use strict";
 
@@ -48,7 +48,7 @@
     var link = target.closest("a[download]");
     if (link && pending && /^blob:/.test(link.getAttribute("href") || "")) {
       var name = link.getAttribute("download") || "";
-      if (name !== "download.csv" && !/-(classique|transposee)\.csv$/.test(name)) { return; }
+      if (!/\.csv$/i.test(name)) { return; }
       pending = false;
       event.preventDefault();
       event.stopImmediatePropagation();
@@ -72,7 +72,7 @@
         root.URL.revokeObjectURL(original);
         root.setTimeout(function () { root.URL.revokeObjectURL(url); }, 1000);
       }).catch(function (error) {
-        root.console.error("Worksheet CSV export failed", error);
+        root.console.error("Listing CSV export failed", error);
         root.alert("Impossible de préparer le fichier CSV. Rechargez la page puis réessayez.");
       });
       return;
@@ -80,8 +80,7 @@
     var button = target.closest(".pagination-controls button");
     var listing = button && button.closest("[data-listing_identifier]");
     if (!listing) { return; }
-    pending = /-analyses_(classic|transposed)_view$/.test(
-      listing.getAttribute("data-listing_identifier") || "");
+    pending = Boolean(listing.getAttribute("data-listing_identifier"));
     root.setTimeout(function () { pending = false; }, 0);
   }, true);
 }(typeof window === "undefined" ? {} : window));
