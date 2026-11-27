@@ -1,8 +1,8 @@
 # Bilan de suivi des 14 demandes du Word
 
 Reference : texte de `AMELIORATIONS SENAITE LIMS.docx`, paragraphes 1 a 165.
-Base de suivi : code de `main` a `16fd78e`, complete par le traitement des
-caracteres speciaux dans les CSV des listes natives le 27 novembre 2026.
+Base de suivi : code de `main` a `ecb0e7d`, complete par la verification
+des historiques d'equipement le 27 novembre 2026.
 
 Ce bilan actualise le diagnostic initial apres les lots de correction.
 Les statuts ci-dessous reposent sur les declarations, traitements et
@@ -20,6 +20,8 @@ couvre les CSV des listes, les impressions, les apercus PDF et les noms
 generiques des fichiers servis par le serveur, en conservant leur extension.
 Le [correctif CSV commun](correction-csv-toutes-listes.md) conserve aussi
 les guillemets et textes multilignes dans les exports des autres listes.
+La [verification des historiques d'equipement](verification-historiques-equipements.md)
+confirme leur separation et leur pagination avec les classes natives.
 
 | Ref | Couverture actuelle | Sources applicatives |
 |---|---|---|
