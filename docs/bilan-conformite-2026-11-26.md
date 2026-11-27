@@ -1,8 +1,8 @@
 # Bilan de suivi des 14 demandes du Word
 
 Reference : texte de `AMELIORATIONS SENAITE LIMS.docx`, paragraphes 1 a 165.
-Base de suivi : code de `main` a `3cc9070`, complete par la clarification
-sur le mail personnel du responsable du laboratoire le 27 novembre 2026.
+Base de suivi : code de `main` a `819eed6`, complete par la correction des
+caracteres speciaux des exports CSV de Work Sheet le 27 novembre 2026.
 
 Ce bilan actualise le diagnostic initial apres les lots de correction.
 Les statuts ci-dessous reposent sur les declarations, traitements et
@@ -45,8 +45,9 @@ Les chemins courts renvoient au paquet
    Si des rapports historiques ont un contenu errone, leur reprise demande
    d'identifier les fichiers et de decider leur traitement documentaire.
 4. **Export historique WS-005** : les cas classique/transpose et leurs
-   decimales sont traites. La conformite au symptome initial doit etre
+   decimales et caracteres speciaux sont traites. La conformite au symptome initial doit etre
    receptionnee avec les donnees concernees ; le Word ne le detaille pas.
+   Voir la [correction des CSV](correction-csv-caracteres-speciaux.md).
 5. **Donnees du laboratoire** : contacts, operateurs, descriptions
    organoleptiques et champs qualite doivent contenir les valeurs metier
    validees. Une case vide ne prouve pas l'absence de code. Aucune valeur

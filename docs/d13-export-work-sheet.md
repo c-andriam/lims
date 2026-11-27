@@ -1,5 +1,9 @@
 # D13 — Export des données d'une Work Sheet
 
+> Compte rendu initial. Les décimales et les noms de fichiers décrits ici
+> ont depuis été corrigés. La [correction du 27 novembre 2026](correction-csv-caracteres-speciaux.md)
+> complète le traitement des guillemets et caractères spéciaux.
+
 Deux demandes du document *AMÉLIORATIONS SENAITE LIMS* portent sur la
 Work Sheet :
 
@@ -78,9 +82,8 @@ Avant correctif, les cellules de la colonne `"1"` étaient vides.
    *Données › À partir d'un fichier texte/CSV* et choisir la virgule.
    Changer le séparateur demanderait de modifier le JavaScript de
    `senaite.app.listing` ; ce n'est pas fait.
-3. **Décimales** : l'export reprend le résultat *formaté*, arrondi selon
-   la précision du service d'analyse (*Configuration › Analyses*, champ
-   *Précision*). Sur l'instance de démonstration elle vaut 0 ; sur le
-   serveur réel, les captures montrent 3 décimales pour Vanillin.
+3. **Décimales — corrigé** : les nouveaux exports conservent les chiffres
+   enregistrés, sans cet arrondi supplémentaire. Les valeurs arrondies
+   de l'exemple historique ci-dessus ne sont plus le résultat attendu.
 4. **Lignes non chargées** : exporter après avoir affiché toutes les
    lignes.

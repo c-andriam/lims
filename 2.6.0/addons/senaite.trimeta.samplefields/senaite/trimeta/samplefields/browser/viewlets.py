@@ -171,7 +171,8 @@ class WorksheetAnalystColumnsViewlet(TrimetaViewletBase):
             return ('<script data-storage-key={key} '
                     'src="{portal}/{resources}/analyst_columns.js?v=1"></script>'
                     '<script data-worksheet-id={worksheet} '
-                    'src="{portal}/{resources}/worksheet_csv.js?v=1"></script>').format(
+                    'src="{portal}/{resources}/worksheet_csv.js?v=1"></script>'
+                    '<script src="{portal}/{resources}/worksheet_csv_format.js?v=1"></script>').format(
                         key=key, worksheet=quoteattr(api.get_id(self.context)),
                         portal=self.get_portal_url(), resources=RESOURCE_BASE)
         except Exception:
