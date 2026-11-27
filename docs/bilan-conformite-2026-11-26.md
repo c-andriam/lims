@@ -1,8 +1,8 @@
 # Bilan de suivi des 14 demandes du Word
 
 Reference : texte de `AMELIORATIONS SENAITE LIMS.docx`, paragraphes 1 a 165.
-Base de suivi : code de `main` a `072bc09`, complete par le Code article
-extensible choisi par l'utilisateur le 26 novembre 2026.
+Base de suivi : code de `main` a `3cc9070`, complete par la clarification
+sur le mail personnel du responsable du laboratoire le 27 novembre 2026.
 
 Ce bilan actualise le diagnostic initial apres les lots de correction.
 Les statuts ci-dessous reposent sur les declarations, traitements et
@@ -21,7 +21,7 @@ Les chemins courts renvoient au paquet
 | D2 | Numero de fiche et DateReceived obligatoires ; autres champs d'analyse facultatifs ; preparateurs multiples ; ClientReference masque. DateReceived placee dans Analyse. | [extender.getOrder](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/extender.py#L469), [schema_modifier.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/schema_modifier.py#L60) |
 | D3 | 41 champs facultatifs dans sept categories ; conformite OK/NOK, nombres 1/2/3, contacts laboratoire, modes de transmission et lots memorises. Position du titre Validation corrigee. | [qualitydata/extender.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/qualitydata/extender.py#L69), [qualitydata/fields.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/qualitydata/fields.py#L54), [quality_sections.js](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/browser/resources/quality_sections.js#L32) |
 | D4 | Code echantillon et Lot ajoutes aux listes d'echantillons et a leurs etats. | [listings/samples.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/listings/samples.py#L31), [listings/configure.zcml](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/listings/configure.zcml#L24) |
-| D5 | Rubriques demandees dans COA-Trimeta ; validation lue dans l'historique ; signataire designe distinct ; coordonnees client sans mail ; precision numerique conservee. Les autres gabarits natifs ne sont pas tous reecrits. | [COA-Trimeta.pt](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/coa/templates/reports/COA-Trimeta.pt#L92), [coa/reportview.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/coa/reportview.py#L51), [coa/validation.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/coa/validation.py#L8) |
+| D5 | Rubriques demandees dans COA-Trimeta ; validation lue dans l'historique ; signataire designe distinct ; coordonnees client conservees, mail personnel du responsable masque ; precision numerique conservee. Les autres gabarits natifs ne sont pas tous reecrits. | [COA-Trimeta.pt](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/coa/templates/reports/COA-Trimeta.pt#L92), [coa/reportview.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/coa/reportview.py#L51), [coa/validation.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/coa/validation.py#L8) |
 | D6 | Deux historiques separes, Pannes et Entretiens, utilisant les interventions natives Repair et Preventive. Il s'agit de listes structurees, plutot que de deux zones de texte. | [equipment_history.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/equipment_history.py#L13), [browser/equipment_history.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/browser/equipment_history.py#L15) |
 | D7 | Contact laboratoire affecte a chaque analyse, y compris sans compte utilisateur ; permissions et verrouillage des analyses soumises conserves. Compte executant natif distinct. | [analyst_extender.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/analyst_extender.py#L20), [browser/analyst.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/browser/analyst.py#L19) |
 | D8 | Code echantillon dans les grilles et positions des feuilles de travail, avec identifiant natif en complement. | [worksheet/views.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/worksheet/views.py#L35), [listings/worksheets.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/listings/worksheets.py#L33) |
@@ -37,10 +37,10 @@ Les chemins courts renvoient au paquet
 1. **Code article — decision recue** : l'utilisateur conserve les sept codes
    actuels et permet des ajouts memorises. Les deux possibilites sont
    implementees ensemble ; voir [Code article extensible](correction-code-article-extensible.md).
-2. **Adresse mail sur le COA** : le mail du contact client est retire du
-   gabarit Trimeta. Le pied de page natif du laboratoire reste conserve.
-   Supprimer aussi le mail du laboratoire ou modifier tous les autres
-   gabarits necessite de preciser ce perimetre.
+2. **Adresse mail sur le COA — perimetre confirme** : le mail personnel du
+   responsable cote laboratoire est masque dans les donnees de rendu.
+   Le mail client est retabli et le mail general du laboratoire conserve.
+   Voir la [correction precisee le 27 novembre](correction-mail-responsable-laboratoire.md).
 3. **Anciens rapports** : aucun PDF archive n'est regenere automatiquement.
    Si des rapports historiques ont un contenu errone, leur reprise demande
    d'identifier les fichiers et de decider leur traitement documentaire.

@@ -42,7 +42,6 @@ from senaite.trimeta.samplefields.compat import to_text
 from senaite.trimeta.samplefields.worksheet.export import worksheet_result
 
 HEADER_TEMPLATE = ViewPageTemplateFile("templates/header.pt")
-INFO_TEMPLATE = ViewPageTemplateFile("templates/info.pt")
 COA_RESULTS_TEMPLATE = ViewPageTemplateFile("templates/results.pt")
 logger = logging.getLogger("senaite.trimeta.samplefields")
 _coa = MessageFactory("senaite.trimeta.coa")
@@ -54,6 +53,16 @@ class CoaValidationMixin(object):
     not_recorded_label = _coa(u"Not recorded")
 
     COA_RESULTS_TEMPLATE = COA_RESULTS_TEMPLATE
+
+    @property
+    def current_user(self):
+        """Masque le mail personnel uniquement dans les donnees du rapport."""
+        properties = dict(super(CoaValidationMixin, self).current_user or {})
+        properties["email"] = u""
+        properties["fullname"] = (properties.get("fullname")
+                                  or properties.get("username")
+                                  or properties.get("userid") or u"")
+        return properties
 
     def get_coa_result(self, model, analysis):
         try:
@@ -92,7 +101,6 @@ class TrimetaSingleReportView(CoaValidationMixin, SingleReportView):
     """Rapport d'un echantillon, en-tete au logo du laboratoire."""
 
     HEADER_TEMPLATE = HEADER_TEMPLATE
-    INFO_TEMPLATE = INFO_TEMPLATE
 
     def __init__(self, context, model, request):
         super(TrimetaSingleReportView, self).__init__(model, request)
@@ -103,7 +111,6 @@ class TrimetaMultiReportView(CoaValidationMixin, MultiReportView):
     """Rapport de plusieurs echantillons, meme en-tete."""
 
     HEADER_TEMPLATE = HEADER_TEMPLATE
-    INFO_TEMPLATE = INFO_TEMPLATE
 
     def __init__(self, context, collection, request):
         super(TrimetaMultiReportView, self).__init__(collection, request)

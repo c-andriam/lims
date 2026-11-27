@@ -84,7 +84,7 @@
   <tal:t replace="structure python:view.render_header(context, **options)" />
 
   <!-- REPORT INFO -->
-  <tal:t replace="structure python:view.render_info(context, **dict(options, include_contact_email=False))" />
+  <tal:t replace="structure python:view.render_info(context, **options)" />
 
   <!-- REPORT ALERTS -->
   <tal:t replace="structure python:view.render_alerts(context, **options)" />

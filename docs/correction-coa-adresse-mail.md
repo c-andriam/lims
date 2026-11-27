@@ -1,5 +1,9 @@
 # Retrait de l'adresse mail du COA
 
+> Historique du premier lot. La clarification utilisateur vise le mail du
+> responsable cote laboratoire. Le retrait du mail client decrit ci-dessous
+> est annule par la [correction du 27 novembre 2026](correction-mail-responsable-laboratoire.md).
+
 Le paragraphe 100 du texte de `AMELIORATIONS SENAITE LIMS.docx` demande de
 supprimer l'adresse mail. Le gabarit Trimeta supprimait déjà les liens mail
 des responsables, mais `render_info()` déléguait au bloc natif de
