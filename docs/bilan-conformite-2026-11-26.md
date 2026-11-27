@@ -1,8 +1,8 @@
 # Bilan de suivi des 14 demandes du Word
 
 Reference : texte de `AMELIORATIONS SENAITE LIMS.docx`, paragraphes 1 a 165.
-Base de suivi : code de `main` a `ecb0e7d`, complete par la verification
-des historiques d'equipement le 27 novembre 2026.
+Base de suivi : code de `main` a `41d48b5`, complete par la validation
+utilisateur du correctif d'export vide le 27 novembre 2026.
 
 Ce bilan actualise le diagnostic initial apres les lots de correction.
 Les statuts ci-dessous reposent sur les declarations, traitements et
@@ -37,7 +37,7 @@ confirme leur separation et leur pagination avec les classes natives.
 | D10 | Noms PDF fondes sur SampleCode, assainis, avec repli pour les anciens echantillons sans code. Suffixes uniques dans les archives. | [coa/filename.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/coa/filename.py#L37), [coa/configure.zcml](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/coa/configure.zcml#L67) |
 | D11 | Gabarit unitaire propose a la place des deux valeurs Multi d'usine ; telechargement groupe raccorde aux PDF stockes, sans mutation des objets. Les gabarits groupes choisis explicitement restent disponibles. | [defaults.set_default_coa_template](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/defaults.py#L75), [coa/workflow.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/coa/workflow.py#L59) |
 | D12 | 20 colonnes, six familles de filtres, recherche, ordre des operateurs et tri global Type/Vanilline et tris des dates avant pagination. Meme resultat effectif pour afficher, filtrer et trier. | [dashboard/view.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/dashboard/view.py#L77), [dashboard/columns.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/dashboard/columns.py#L227), [dashboard/results.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/dashboard/results.py#L130) |
-| D13 | CSV classique et transpose, positions et resultats, precision conservee et noms explicites. Le Word ne decrit le bug initial que par une URL : la cloture de ce symptome exact reste a confirmer par le laboratoire. | [worksheet/views.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/worksheet/views.py#L35), [worksheet/export.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/worksheet/export.py#L46), [worksheet_csv.js](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/browser/resources/worksheet_csv.js#L2) |
+| D13 | CSV classique et transpose, positions et resultats, precision conservee et noms explicites. Symptome precise par l'utilisateur : export auparavant vide ; export confirme fonctionnel le 27 novembre 2026 sur le parcours local propose. | [worksheet/views.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/worksheet/views.py#L35), [worksheet/export.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/worksheet/export.py#L46), [worksheet_csv.js](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/browser/resources/worksheet_csv.js#L2) |
 | D14 | SampleCode et Lot dans la liste/export des rapports ; liens exportables en texte, sans HTML dans la colonne Info. | [listings/reports.py](../2.6.0/addons/senaite.trimeta.samplefields/senaite/trimeta/samplefields/listings/reports.py#L61) |
 
 ## Ce qui reste a decider ou a receptionner
@@ -52,9 +52,11 @@ confirme leur separation et leur pagination avec les classes natives.
 3. **Anciens rapports** : aucun PDF archive n'est regenere automatiquement.
    Si des rapports historiques ont un contenu errone, leur reprise demande
    d'identifier les fichiers et de decider leur traitement documentaire.
-4. **Export historique WS-005** : les cas classique/transpose et leurs
-   decimales et caracteres speciaux sont traites. La conformite au symptome initial doit etre
-   receptionnee avec les donnees concernees ; le Word ne le detaille pas.
+4. **Export vide - validation recue** : le 27 novembre 2026, l'utilisateur
+   precise que le fichier etait vide auparavant et confirme que l'export
+   est maintenant correct, apres communication du lien local WS-001.
+   Ce retour leve la reserve sur le symptome non decrit dans le Word.
+   Il ne constitue pas une verification du serveur historique WS-005.
    Voir la [correction des CSV](correction-csv-caracteres-speciaux.md).
 5. **Donnees du laboratoire** : contacts, operateurs, descriptions
    organoleptiques et champs qualite doivent contenir les valeurs metier

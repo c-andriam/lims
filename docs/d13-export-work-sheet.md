@@ -4,6 +4,15 @@
 > ont depuis été corrigés. La [correction du 27 novembre 2026](correction-csv-caracteres-speciaux.md)
 > complète le traitement des guillemets et caractères spéciaux.
 
+## Validation utilisateur du 27 novembre 2026
+
+L'utilisateur precise le symptome initial : le fichier exporte etait vide.
+Apres communication du lien local WS-001 et verification de l'export,
+il confirme : « avant l'export etait vide mais maintenant c'est OK ».
+Le correctif est donc valide pour le parcours local communique. Ce retour
+ne certifie pas un deploiement ni une verification sur le serveur historique
+mentionne dans le Word.
+
 Deux demandes du document *AMÉLIORATIONS SENAITE LIMS* portent sur la
 Work Sheet :
 
