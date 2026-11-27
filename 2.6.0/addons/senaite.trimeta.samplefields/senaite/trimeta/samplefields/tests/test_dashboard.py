@@ -345,12 +345,10 @@ class TestSampleIdsInRange(unittest.TestCase):
         self.assertNotIn("VAN-0004", found)
         self.assertNotIn("VAN-0005", found)
 
-    def test_a_failing_catalog_disables_the_filter(self):
-        """Plutot afficher tout le tableau qu'une page d'erreur."""
-        with capture_logs("senaite.trimeta.samplefields") as records:
-            self.assertIsNone(
-                sample_ids_in_range(ExplodingCatalog(), "VAN", 1, 2))
-        self.assertEqual(len(records), 1)
+    def test_failing_catalog_is_distinct_from_absent_filter(self):
+        with self.assertRaises(RuntimeError):
+            sample_ids_in_range(ExplodingCatalog(), "VAN", 1, 2)
+
 
 
 class TestColumnKeywordResolution(unittest.TestCase):

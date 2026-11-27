@@ -235,12 +235,7 @@ def sample_ids_in_range(catalog, keyword, minimum=None, maximum=None):
     if not keywords:
         return []
 
-    try:
-        brains = catalog({"getKeyword": keyword})
-    except Exception:
-        logger.exception("Filtre de plage impossible sur %s", keyword)
-        return None
-
+    brains = catalog({"getKeyword": keyword})
     grouped = group_by_sample(brains, keywords)
     return sorted(
         sample_id for sample_id, per_sample in grouped.items()

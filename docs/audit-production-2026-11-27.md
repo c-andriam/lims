@@ -36,6 +36,10 @@ Les chemins ci-dessous sont relatifs au paquet `senaite/trimeta/samplefields`. L
 
 ## Décision de livraison
 
+**Suivi du correctif A2.** Lorsqu’une plage de vanilline est demandée, une panne du catalogue interrompt la recherche. La page renvoie un message invitant à recharger le tableau et les requêtes AJAX reçoivent une erreur HTTP 503 sans lignes exportables. Une recherche réussie sans correspondance conserve son résultat vide normal.
+
+Sur copie isolée, la panne simulée a produit le statut 503 pour les deux parcours. Après rétablissement du catalogue, une plage de 1 à 3 a retrouvé VAN-0006, une plage sans correspondance a renvoyé zéro ligne et le retrait du filtre a supprimé la restriction. Les 321 contrôles de logique ont réussi.
+
 **Suivi du correctif A1.** L’API vérifie désormais le droit Plone « Manage portal » sur le portail et le jeton natif avant toute écriture directe. Le formulaire transmet ce jeton pour retirer une suggestion. Les opérateurs alimentent la liste en enregistrant un échantillon. La sortie de champ et la touche Entrée ne déclenchent plus d’écriture anticipée, ce qui traite également le mécanisme signalé en A4.
 
 Sur copie isolée, le gestionnaire a pu ajouter puis retirer une valeur avec son jeton. Les écritures sans jeton ou avec un jeton invalide ont été refusées. Un lecteur muni de son propre jeton a pu consulter les suggestions et sa tentative de suppression a été refusée. La vérification a contrôlé la valeur stockée après chaque refus.

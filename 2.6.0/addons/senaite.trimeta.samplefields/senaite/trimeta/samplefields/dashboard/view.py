@@ -41,6 +41,7 @@ visiteurs anonymes sur la racine du site; la page, et sa barre de
 filtres, ne leur sont donc pas servies (renvoi vers la connexion).
 """
 
+import json
 import logging
 
 from AccessControl import Unauthorized
@@ -72,6 +73,10 @@ logger = logging.getLogger("senaite.trimeta.samplefields")
 # tout le catalogue au lieu de rien. Un identifiant qui n'existe pas
 # leve l'ambiguite.
 NO_MATCH = "__trimeta_aucun_resultat__"
+
+
+class VanillinFilterUnavailable(Exception):
+    pass
 
 
 class DashboardView(ListingView):
@@ -118,7 +123,7 @@ class DashboardView(ListingView):
         self._column_keywords = None
 
         self._base_content_filter = dict(self.contentFilter)
-        self.refresh_filters()
+        self.filters = {}
 
         # Identifiants de la page en cours, remplis par folderitem() et
         # consommes par folderitems() pour la requete groupee.
@@ -130,7 +135,18 @@ class DashboardView(ListingView):
         # connexion, puis le retour ici une fois connecte.
         if ploneapi.user.is_anonymous():
             raise Unauthorized("trimeta-dashboard")
-        return super(DashboardView, self).__call__()
+        try:
+            return super(DashboardView, self).__call__()
+        except VanillinFilterUnavailable:
+            message = u"Filtre Vanilline indisponible. Rechargez le tableau avant tout export."
+            response = self.request.response
+            response.setHeader("Cache-Control", "no-store")
+            response.setStatus(503)
+            if self.traverse_subpath:
+                response.setHeader("Content-Type", "application/json")
+                return json.dumps(self.json_message(message, status=503))
+            response.setHeader("Content-Type", "text/plain; charset=utf-8")
+            return message.encode("utf-8")
 
     # -- filtres --------------------------------------------------------
 
@@ -171,11 +187,15 @@ class DashboardView(ListingView):
         try:
             self.contentFilter.update(
                 flt.build_query(self.filters, to_date=self.to_date))
-            self.apply_result_range()
         except Exception:
             # Un filtre qui echoue doit rendre le tableau non filtre,
             # pas une page d'erreur.
             logger.exception("Application des filtres impossible")
+        try:
+            self.apply_result_range()
+        except Exception:
+            logger.exception("Filtre Vanilline indisponible")
+            raise VanillinFilterUnavailable()
 
     def apply_result_range(self):
         """Filtre de plage sur la vanilline.
