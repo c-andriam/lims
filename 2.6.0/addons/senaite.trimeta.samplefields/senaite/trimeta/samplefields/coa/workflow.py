@@ -139,6 +139,7 @@ class TrimetaDownloadReportsAdapter(WorkflowActionDownloadReportsAdapter):
     def download(self, data, filename, type="application/zip"):
         """Comme l'amont, mais avec un nom de fichier entre guillemets."""
         response = self.request.response
+        response._trimeta_coa_filename_set = True
         response.setHeader(
             "Content-Disposition",
             'attachment; filename="{}"'.format(filename))

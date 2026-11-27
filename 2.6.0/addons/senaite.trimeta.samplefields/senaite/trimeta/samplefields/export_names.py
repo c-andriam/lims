@@ -5,7 +5,7 @@ import os
 import re
 from email.message import Message
 
-from senaite.trimeta.samplefields.coa.filename import sanitize
+from senaite.trimeta.samplefields.coa.filename import build_filename, sanitize
 
 logger = logging.getLogger("senaite.trimeta.samplefields")
 GENERIC = re.compile(r"^(download|export|report|reports|default|multidefault|"
@@ -43,6 +43,7 @@ def context_names(context, request):
     base = "{}-{}".format(labels.get(kind, "Export"), identifier)
     if kind == "Plone Site":
         base = "LIMS"
+    fallback_id = api.get_id(context)
     pdf = base
     url = request.get("ACTUAL_URL", "")
     if "sticker" in url:
@@ -64,15 +65,15 @@ def context_names(context, request):
             sample = api.get_object_by_uid(uid)
             if sample is not None and IAnalysisRequest.providedBy(sample) and \
                     getSecurityManager().checkPermission("View", sample):
-                codes.append(get_field_value(sample, "SampleCode") or api.get_id(sample))
+                codes.append((get_field_value(sample, "SampleCode"), api.get_id(sample)))
         if len(codes) == 1:
-            pdf = codes[0]
+            pdf, fallback_id = codes[0]
         elif codes:
             pdf = "COA-{}-echantillons".format(len(codes))
         elif kind == "AnalysisRequest":
             pdf = identifier
     return {"context": sanitize(base), "title": sanitize(title),
-            "pdf": sanitize(pdf)}
+            "pdf": build_filename(pdf, fallback_id, extension=u"")}
 
 
 def remember_export_request(event):
@@ -89,7 +90,7 @@ def name_export_response(event):
     if response is None:
         response = event.request.response
     request = getattr(response, "_trimeta_export_request", None)
-    if request is None:
+    if request is None or getattr(response, "_trimeta_coa_filename_set", False):
         return
     try:
         disposition = response.getHeader("Content-Disposition")

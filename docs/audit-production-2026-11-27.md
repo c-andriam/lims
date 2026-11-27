@@ -36,6 +36,10 @@ Les chemins ci-dessous sont relatifs au paquet `senaite/trimeta/samplefields`. L
 
 ## Décision de livraison
 
+**Suivi du correctif A5.** L’aperçu unitaire emploie le générateur de noms des COA archivés. Le navigateur utilise le nom fourni par le serveur pour le téléchargement. Le téléchargement groupé conserve également les noms déjà attribués aux fichiers par le module COA.
+
+Sur copie isolée, la comparaison entre l’aperçu et un rapport archivé du même échantillon a donné un nom identique pour six codes, dont `LOT.24`, `LOT-24`, un code de 178 caractères et un code ramené à l’identifiant échantillon après assainissement. Le contrôle JavaScript du bouton de téléchargement a vérifié le nom complet avec point et longueur supérieure à 150 caractères.
+
 **Suivi du correctif A3.** Le tableau de bord privilégie les résultats renseignés, puis la date de saisie exploitable la plus récente. Si les valeurs enregistrées à cette priorité sont identiques, il conserve la valeur. Si elles diffèrent et que leurs dates sont égales ou toutes absentes, la cellule affiche « Reprises à vérifier ». Ce libellé se retrouve dans le CSV du tableau. Les filtres numériques écartent ces conflits et le tri numérique les place après les valeurs comparables dans les deux sens.
 
 Les 321 contrôles de logique ont réussi, dont la vérification des permutations de reprises. Un contrôle sur copie isolée a confirmé la prise en compte des dates natives du catalogue, la priorité du résultat daté, le signalement du conflit et son classement.

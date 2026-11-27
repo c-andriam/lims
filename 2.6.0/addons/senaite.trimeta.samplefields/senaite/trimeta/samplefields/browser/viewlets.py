@@ -167,7 +167,7 @@ class ExportNamesViewlet(TrimetaViewletBase):
             from senaite.trimeta.samplefields.export_names import context_names
             names = context_names(self.context, self.request)
             return ('<script data-export-context={context} data-export-pdf={pdf} '
-                    'src="{portal}/{resources}/export_names.js?v=1"></script>'
+                    'src="{portal}/{resources}/export_names.js?v=2"></script>'
                     '<script src="{portal}/{resources}/worksheet_csv_format.js?v=2"></script>').format(
                         context=quoteattr(names["context"]), pdf=quoteattr(names["pdf"]),
                         portal=self.get_portal_url(), resources=RESOURCE_BASE)

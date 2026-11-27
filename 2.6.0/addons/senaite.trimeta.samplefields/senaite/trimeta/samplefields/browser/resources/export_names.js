@@ -51,7 +51,7 @@
       // Reutiliser le PDF courant du moteur natif, sans sauvegarde/publication.
       root.impress.createPDF().then(function (blob) {
         if (blob.type.split(";")[0] !== "application/pdf") { throw new Error("PDF unavailable"); }
-        download(blob, safe(pdf) + ".pdf");
+        download(blob, pdf + ".pdf");
       }).catch(function (error) {
         root.console.error("PDF export failed", error);
         root.alert("Impossible de preparer le PDF. Rechargez la page puis reessayez.");

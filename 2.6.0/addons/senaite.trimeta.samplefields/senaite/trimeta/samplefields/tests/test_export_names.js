@@ -9,10 +9,11 @@ assert.strictEqual(names.filename("WS", "Feuille-de-travail-WS-001", "Analysis-a
 assert.strictEqual(names.safe("CON"), "CON_");
 assert.strictEqual(names.safe("../\r\n"), "Export-LIMS");
 const handlers = {}, timers = [], downloads = [], alerts = [];
+const reportCode = "LOT.24-" + "A".repeat(170);
 let pdfCalls = 0;
 const root = {
   document: {
-    currentScript: {getAttribute: name => name === "data-export-pdf" ? "ECH-DEMO-002" : "Echantillon-ECH-DEMO-002"},
+    currentScript: {getAttribute: name => name === "data-export-pdf" ? reportCode : "Echantillon-ECH-DEMO-002"},
     addEventListener: (name, fn) => { handlers[name] = fn; },
     querySelector: () => ({textContent: "Rapports d’analyses"}),
     createElement: () => ({style: {}, click() { downloads.push(this.download); }, remove() {}}),
@@ -26,7 +27,7 @@ const root = {
 };
 vm.runInNewContext(fs.readFileSync(source, "utf8"), {window: root});
 handlers.DOMContentLoaded();
-assert.strictEqual(root.document.title, "ECH-DEMO-002");
+assert.strictEqual(root.document.title, names.safe(reportCode));
 function click(selectors) {
   let prevented = false;
   handlers.click({target: {closest: selector => selectors[selector] || null},
@@ -54,7 +55,7 @@ async function run() {
   assert(button.disabled);
   assert(!click({"button[name='impress_download_pdf']": button}));
   await new Promise(setImmediate);
-  assert.deepStrictEqual(downloads, ["ECH-DEMO-002.pdf"]);
+  assert.deepStrictEqual(downloads, [reportCode + ".pdf"]);
   assert.strictEqual(pdfCalls, 1);
   assert(!button.disabled);
   root.impress.createPDF = () => Promise.resolve(new Blob(["error"], {type: "text/html"}));
