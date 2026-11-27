@@ -1,0 +1,20 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      metal:use-macro="here/main_template/macros/master"
+      i18n:domain="senaite.core">
+  <metal:title fill-slot="content-title">
+    <h1><span i18n:translate="">Analyses</span> — <span tal:content="view/heading" /></h1>
+  </metal:title>
+  <metal:content fill-slot="content-core">
+    <table class="table table-striped" tal:condition="view/rows">
+      <thead><tr><th scope="col" i18n:translate="">Sample</th>
+        <th scope="col" i18n:translate="">Analysis</th></tr></thead>
+      <tbody><tr tal:repeat="row view/rows">
+        <td><a tal:attributes="href row/url" tal:content="row/sample" /></td>
+        <td tal:content="row/title" />
+      </tr></tbody>
+    </table>
+    <p tal:condition="not:view/rows" i18n:translate="">No items found</p>
+    <a tal:condition="view/previous" tal:attributes="href view/previous" i18n:translate="">Previous</a>
+    <a tal:condition="view/following" tal:attributes="href view/following" i18n:translate="">Next</a>
+  </metal:content>
+</html>

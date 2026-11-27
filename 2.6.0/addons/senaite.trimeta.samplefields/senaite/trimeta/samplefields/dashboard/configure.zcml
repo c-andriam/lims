@@ -4,6 +4,21 @@
     xmlns:browser="http://namespaces.zope.org/browser"
     i18n_domain="senaite.trimeta.samplefields">
 
+  <browser:page
+      for="Products.CMFPlone.Portal.PloneSite"
+      name="senaite-dashboard"
+      class=".system.SystemDashboard"
+      permission="zope.Public"
+      layer="senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
+      />
+  <browser:page
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      name="dashboard-analyses"
+      class=".system.AnalysisPanel"
+      permission="zope2.View"
+      layer="senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
+      />
+
   <!-- Tableau de bord: /senaite/trimeta-dashboard
 
        La declaration reprend a l'identique celle des vues auxiliaires
