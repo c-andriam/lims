@@ -268,6 +268,7 @@ PURE_CASES = [
     ("test_dashboard_sorting.py", None),
     ("test_dashboard_filters.py", None),
     ("test_coa_filename.py", None),
+    ("test_export_names.py", None),
     ("test_catalog_wiring.py", None),
     ("test_field_references.py", None),
     ("test_defaults.py", None),

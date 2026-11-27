@@ -185,4 +185,11 @@
 
   <include package=".browser" />
 
+  <subscriber for="ZPublisher.interfaces.IPubAfterTraversal"
+              handler=".export_names.remember_export_request" />
+  <subscriber for="ZPublisher.interfaces.IPubBeforeStreaming"
+              handler=".export_names.name_export_response" />
+  <subscriber for="ZPublisher.interfaces.IPubBeforeCommit"
+              handler=".export_names.name_export_response" />
+
 </configure>

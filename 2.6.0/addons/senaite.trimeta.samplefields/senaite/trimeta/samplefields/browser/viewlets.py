@@ -158,6 +158,23 @@ class NumericFieldsViewlet(TrimetaViewletBase):
         ).format(portal=self.get_portal_url(), resources=RESOURCE_BASE)
 
 
+class ExportNamesViewlet(TrimetaViewletBase):
+    """Noms des exports navigateur sur toutes les pages du laboratoire."""
+
+    def render(self):
+        try:
+            from xml.sax.saxutils import quoteattr
+            from senaite.trimeta.samplefields.export_names import context_names
+            names = context_names(self.context, self.request)
+            return ('<script data-export-context={context} data-export-pdf={pdf} '
+                    'src="{portal}/{resources}/export_names.js?v=1"></script>').format(
+                        context=quoteattr(names["context"]), pdf=quoteattr(names["pdf"]),
+                        portal=self.get_portal_url(), resources=RESOURCE_BASE)
+        except Exception:
+            logger.exception("Noms des exports navigateur indisponibles")
+            return ""
+
+
 class WorksheetAnalystColumnsViewlet(TrimetaViewletBase):
     """Ajoute la nouvelle colonne aux preferences natives deja memorisees."""
 

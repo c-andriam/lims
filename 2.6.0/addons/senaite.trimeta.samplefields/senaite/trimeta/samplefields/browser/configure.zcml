@@ -51,6 +51,22 @@
       />
 
   <browser:viewlet
+      name="senaite.trimeta.samplefields.export_names"
+      manager="plone.app.layout.viewlets.interfaces.IHtmlHead"
+      class=".viewlets.ExportNamesViewlet"
+      permission="zope2.View"
+      layer="senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
+      />
+
+  <browser:viewlet
+      name="senaite.trimeta.samplefields.impress_export_names"
+      manager="senaite.impress.browser.viewlets.interfaces.IPublishCustomHtmlHeadViewlets"
+      class=".viewlets.ExportNamesViewlet"
+      permission="zope2.View"
+      layer="senaite.trimeta.samplefields.interfaces.ISenaiteTrimetaLayer"
+      />
+
+  <browser:viewlet
       name="senaite.trimeta.samplefields.reception_separator"
       manager="plone.app.layout.viewlets.interfaces.IHtmlHead"
       class=".viewlets.ReceptionSeparatorViewlet"
