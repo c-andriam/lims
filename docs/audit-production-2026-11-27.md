@@ -36,6 +36,8 @@ Les chemins ci-dessous sont relatifs au paquet `senaite/trimeta/samplefields`. L
 
 ## Décision de livraison
 
+**Suivi du correctif A6.** Le générateur protège le segment réservé avant le premier point. Sur copie isolée, l’aperçu et le rapport archivé ont donné le même nom pour quatre codes. L’extraction du ZIP sous Windows a conservé les quatre PDF, dont deux codes ne différant que par la casse. Chaque fichier extrait avait la même empreinte SHA-256 que son contenu source. Les 323 contrôles de logique ont réussi.
+
 **Suivi du correctif A5.** L’aperçu unitaire emploie le générateur de noms des COA archivés. Le navigateur utilise le nom fourni par le serveur pour le téléchargement. Le téléchargement groupé conserve également les noms déjà attribués aux fichiers par le module COA.
 
 Sur copie isolée, la comparaison entre l’aperçu et un rapport archivé du même échantillon a donné un nom identique pour six codes, dont `LOT.24`, `LOT-24`, un code de 178 caractères et un code ramené à l’identifiant échantillon après assainissement. Le contrôle JavaScript du bouton de téléchargement a vérifié le nom complet avec point et longueur supérieure à 150 caractères.
@@ -54,4 +56,4 @@ Sur copie isolée, le gestionnaire a pu ajouter puis retirer une valeur avec son
 
 Au cours de cet audit, 321 contrôles de logique Python ont réussi. La commande d’intégration Plone a été lancée et s’est arrêtée faute de lanceur dans l’image locale. Les contrôles locaux ne couvrent donc pas toute l’installation.
 
-Traiter en premier A1 à A3. Pour A4 à A6, corriger les écarts ou documenter leur acceptation par le responsable métier avant livraison. La décision finale nécessite une recette sur une instance représentative avec les profils réels, un export multi-échantillons dont chaque PDF est comparé à sa source, et la vérification de la version déployée et du profil GenericSetup 1012. L’audit porte sur les améliorations demandées et ne vaut pas certification de toute la plateforme.
+Les correctifs A1 à A6 sont intégrés au code. La décision finale nécessite une recette sur une instance représentative avec les profils réels, un export multi-échantillons dont chaque PDF est comparé à sa source, et la vérification de la version déployée et du profil GenericSetup 1012.

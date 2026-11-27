@@ -99,6 +99,17 @@ class TestSanitize(unittest.TestCase):
         self.assertEqual(sanitize(u"con"), u"con_")
         self.assertEqual(sanitize(u"LPT1"), u"LPT1_")
 
+    def test_windows_reserved_stem_with_extensions(self):
+        for stem in (u"CON", u"Prn", u"aux", u"NUL", u"com9", u"LPT1",
+                     u"CONIN$", u"CONOUT$"):
+            self.assertEqual(build_filename(stem + u".01.rev", None),
+                             stem + u"_.01.rev.pdf")
+        self.assertEqual(build_filename(None, u"LPT1.01"), u"LPT1_.01.pdf")
+
+    def test_long_reserved_name_respects_limit(self):
+        self.assertEqual(sanitize(u"CON." + u"a" * MAX_LENGTH),
+                         u"CON_." + u"a" * (MAX_LENGTH - 5))
+
     def test_name_merely_containing_a_reserved_word_is_untouched(self):
         self.assertEqual(sanitize(u"CONTRAT-1"), u"CONTRAT-1")
 

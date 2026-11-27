@@ -13,7 +13,7 @@ from senaite.trimeta.samplefields.indexers import get_field_value
 FALLBACK = u"COA"
 MAX_LENGTH = 180
 SAMPLE_CODE_FIELD = "SampleCode"
-RESERVED = set(["CON", "PRN", "AUX", "NUL"] +
+RESERVED = set(["CON", "PRN", "AUX", "NUL", "CONIN$", "CONOUT$"] +
                ["%s%d" % (prefix, n) for prefix in ("COM", "LPT")
                 for n in range(1, 10)])
 
@@ -29,8 +29,11 @@ def sanitize(value, fallback=FALLBACK):
     name = re.sub(r"_+", "_", name)
     name = re.sub(r"[-_]*-[-_]*", "-", name)
     name = name.strip("._- ")[:MAX_LENGTH].rstrip("._- ")
-    if name.split(".")[0].upper() in RESERVED:
-        name += "_"
+    stem, dot, suffix = name.partition(".")
+    if stem.upper() in RESERVED:
+        name = stem + "_" + dot + suffix
+        if len(name) > MAX_LENGTH:
+            name = name[:MAX_LENGTH].rstrip("._- ")
     return name or fallback
 
 
