@@ -57,3 +57,11 @@ Sur copie isolée, le gestionnaire a pu ajouter puis retirer une valeur avec son
 Au cours de cet audit, 321 contrôles de logique Python ont réussi. La commande d’intégration Plone a été lancée et s’est arrêtée faute de lanceur dans l’image locale. Les contrôles locaux ne couvrent donc pas toute l’installation.
 
 Les correctifs A1 à A6 sont intégrés au code. La décision finale nécessite une recette sur une instance représentative avec les profils réels, un export multi-échantillons dont chaque PDF est comparé à sa source, et la vérification de la version déployée et du profil GenericSetup 1012.
+
+## Contre-vérification du 28 novembre 2026
+
+Sur la copie de recette SENAITE 2.6.0, le lanceur Plone a exécuté les 419 tests unitaires et les 60 tests d’intégration de l’extension, sans échec ni test ignoré. Sur l’hôte, les 323 tests de logique, les 6 tests du validateur de sauvegarde et les six scripts JavaScript ont réussi.
+
+Le téléchargement depuis la liste des rapports déclare désormais le type binaire exact du PDF ou du ZIP. Après correction, les neuf tests de livraison des COA ont réussi dans le Python de SENAITE. Ils vérifient notamment les en-têtes HTTP, les noms des entrées du ZIP et les octets de chaque PDF avec deux contenus distincts.
+
+Une copie jetable de la base de recette est passée du profil GenericSetup 1008 au profil 1012 pendant la transaction de vérification. La base de recette ne contenait aucun objet ARReport. La publication groupée depuis le navigateur, avec le modèle et les rôles du laboratoire, reste à valider sur un jeu représentatif avant le déploiement.

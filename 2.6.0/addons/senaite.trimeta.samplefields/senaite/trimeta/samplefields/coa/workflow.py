@@ -143,7 +143,7 @@ class TrimetaDownloadReportsAdapter(WorkflowActionDownloadReportsAdapter):
         response.setHeader(
             "Content-Disposition",
             'attachment; filename="{}"'.format(filename))
-        response.setHeader("Content-Type", "{}; charset=utf-8".format(type))
+        response.setHeader("Content-Type", type)
         response.setHeader("Content-Length", len(data))
         response.setHeader("Cache-Control", "no-store")
         response.setHeader("Pragma", "no-cache")

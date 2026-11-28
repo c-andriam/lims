@@ -139,11 +139,13 @@ class TestCoaDelivery(unittest.TestCase):
         self.assertEqual(self.request.response.body, self.one.pdf.data)
         self.assertEqual(self.request.response.headers['Content-Disposition'],
                          'attachment; filename="ECH_1.pdf"')
+        self.assertEqual(self.request.response.headers['Content-Type'], 'application/pdf')
         self.assert_pdfs_unchanged()
 
     def test_zip_keeps_distinct_pdf_bytes_and_unique_case_insensitive_names(self):
         workflow.TrimetaDownloadReportsAdapter(self.context, self.request)(
             'download_reports', ['one', 'two', 'one'])
+        self.assertEqual(self.request.response.headers['Content-Type'], 'application/zip')
         with zipfile.ZipFile(io.BytesIO(self.request.response.body)) as archive:
             self.assertEqual(archive.namelist(), ['ECH_1.pdf', 'ech_1-2.pdf', 'ECH_1-3.pdf'])
             self.assertEqual(archive.read('ECH_1.pdf'), self.one.pdf.data)
