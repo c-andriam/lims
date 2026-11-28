@@ -65,3 +65,17 @@ Sur la copie de recette SENAITE 2.6.0, le lanceur Plone a exécuté les 419 test
 Le téléchargement depuis la liste des rapports déclare désormais le type binaire exact du PDF ou du ZIP. Après correction, les neuf tests de livraison des COA ont réussi dans le Python de SENAITE. Ils vérifient notamment les en-têtes HTTP, les noms des entrées du ZIP et les octets de chaque PDF avec deux contenus distincts.
 
 Une copie jetable de la base de recette est passée du profil GenericSetup 1008 au profil 1012 pendant la transaction de vérification. La base de recette ne contenait aucun objet ARReport. La publication groupée depuis le navigateur, avec le modèle et les rôles du laboratoire, reste à valider sur un jeu représentatif avant le déploiement.
+
+### Publication groupée vérifiée le 28 novembre 2026
+
+Sur une copie jetable migrée au profil 1012, cinq échantillons fictifs ont suivi les transitions de réception, soumission et vérification. Un compte de recette ayant le rôle LabManager a utilisé Chromium pour générer les cinq rapports en une seule sélection avec le modèle présélectionné `senaite.trimeta.samplefields:COA-Trimeta.pt`. La sélection des cinq lignes de la liste des rapports a produit une archive ZIP. L’action de publication manuelle a ensuite fait passer les cinq échantillons à l’état « Publié ».
+
+| PDF dans le ZIP | Lot lu dans le PDF | Résultat de vanilline fictif | SHA-256 commun au ZIP et au téléchargement individuel |
+|---|---|---:|---|
+| REC-COA-01.pdf | LOT-REC-01 | 7301 | d7097a65336a753619d35f25e02484ed359189f857fefdd80e00c4b45582b407 |
+| REC-COA-02.pdf | LOT-REC-02 | 7302 | d378814cdad432a856d3594df2b73248958d573132069ef655e6339d5446fe8b |
+| REC-COA-03.pdf | LOT-REC-03 | 7303 | b27acd4f978804a4b143b5664ccda779a4fe43d5243393558c0b51144d898769 |
+| REC-COA-04.pdf | LOT-REC-04 | 7304 | 54b6d39418f1e1e6d4debb342de2f9fb269a1de05de1d5c5978a102fd6df20bd |
+| REC-COA-05.pdf | LOT-REC-05 | 7305 | 706ec860269e1f41589a5bf55b5c957e2ac735acf63498054cce56c17e7e004a |
+
+Pour chaque PDF, le contrôle du texte extrait a retrouvé son code, son lot et son résultat et a confirmé l’absence de ces trois valeurs pour chacun des quatre autres échantillons. La comparaison octet par octet avec le PDF archivé téléchargé individuellement a réussi dans les cinq cas. La fiche client fictive avait un nom vide en base. Cette recette porte sur la séparation des rapports et ne valide pas le rendu d’un nom client renseigné.
